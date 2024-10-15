@@ -8,7 +8,7 @@ const authMiddleware = require('./middlewares/authMiddleware');
 const loggerMiddleware = require('./middlewares/loggerMiddleware');
 const app = express();
 
-app.use(cors({ origin: 'https://bootemilio.github.io/emi-gymya/'}));
+app.use(cors({ origin: 'https://bootemilio.github.io'}));
 
 app.use(express.json());
 app.use(loggerMiddleware);
