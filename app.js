@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+import swaggerUI from "swagger-ui-express"; // const
+import specs from "./swagger/swagger";// const 
 const authRoutes = require('./routes/authRoutes'); // Rutas de autenticación
 const gymRoutes = require('./routes/gymRoutes');
 const trainerRoutes = require('./routes/trainerRoutes');
@@ -11,6 +13,7 @@ const app = express();
 app.use(cors({ origin: 'https://bootemilio.github.io'}));
 
 app.use(express.json());
+app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 app.use(loggerMiddleware);
 
 app.use('/api', authRoutes);
