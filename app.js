@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-import swaggerUI from "swagger-ui-express"; // const
-import specs from "./swagger/swagger";// const 
+const swaggerUI = require("swagger-ui-express"); // const
+const specs = require("./swagger/swagger");// const 
 const authRoutes = require('./routes/authRoutes'); // Rutas de autenticación
 const gymRoutes = require('./routes/gymRoutes');
 const trainerRoutes = require('./routes/trainerRoutes');

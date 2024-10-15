@@ -138,3 +138,9 @@
 2024-10-14T14:14:02.830Z - GET /api/entrenadores - Body: {}
 2024-10-14T14:15:18.497Z - GET /api/gimnasios - Body: {}
 2024-10-14T14:15:18.501Z - GET /api/gimnasios - Body: {}
+2024-10-15T16:32:19.053Z - GET /api/gimnasios%7B - Body: {}
+2024-10-15T16:32:19.126Z - GET /favicon.ico - Body: {}
+2024-10-15T16:32:25.403Z - GET /api/gimnasios%7B - Body: {}
+2024-10-15T16:32:25.428Z - GET /favicon.ico - Body: {}
+2024-10-15T16:32:33.129Z - GET /api-docs%7B - Body: {}
+2024-10-15T16:32:33.159Z - GET /favicon.ico - Body: {}
