@@ -1,22 +1,21 @@
 const jwt = require('jsonwebtoken');
-require('dotenv').config(); // Cargar variables de entorno
-const secretKey = process.env.JWT_SECRET; // Obtener la clave secreta desde el .env
+const secretKey = 'Calamardo-Totelini'; // Mismo valor que el del authService
 
 const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
   
   if (authHeader && authHeader.startsWith('Bearer ')) {
-    const token = authHeader.split(' ')[1]; // Extraer el token
+    const token = authHeader.split(' ')[1];
 
     try {
-      const decoded = jwt.verify(token, secretKey); // Verificar el token con la clave secreta del .env
+      const decoded = jwt.verify(token, secretKey);
       req.user = decoded; // Guardar el usuario decodificado en la solicitud
-      next(); // Continuar al siguiente middleware o ruta
+      next();
     } catch (err) {
-      return res.status(401).json({ message: 'Token inválido o expirado' }); // Manejar errores de verificación
+      return res.status(401).json({ message: 'Token inválido o expirado' });
     }
   } else {
-    return res.status(401).json({ message: 'Token no proporcionado' }); // Caso en que no haya token
+    return res.status(401).json({ message: 'Token no proporcionado' });
   }
 };
 
