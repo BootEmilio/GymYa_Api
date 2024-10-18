@@ -87,7 +87,7 @@ router.post('/gimnasios', loggerMiddleware, gymController.createGym);
  *       200:
  *         description: Gimnasio actualizado exitosamente
  */
-router.put('/gimnasios/:id', loggerMiddleware, gymController.updateGym);
+router.patch('/gimnasios/:id', loggerMiddleware, gymController.updateGym);
 
 /**
  * @swagger
