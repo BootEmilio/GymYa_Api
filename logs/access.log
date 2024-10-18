@@ -144,3 +144,4 @@
 2024-10-15T16:32:25.428Z - GET /favicon.ico - Body: {}
 2024-10-15T16:32:33.129Z - GET /api-docs%7B - Body: {}
 2024-10-15T16:32:33.159Z - GET /favicon.ico - Body: {}
+2024-10-18T19:28:18.101Z - POST /api/login - Body: {"username":"Anne","password":"fresitas88"}
