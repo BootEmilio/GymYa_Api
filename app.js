@@ -21,9 +21,6 @@ app.use('/api', authRoutes);
 
 app.use(authMiddleware);
 
-
-const token = jwt.sign({ userId: 'someUserId' }, secretKey, { expiresIn: tokenExpiration });
-// Rutas protegidas por autenticación
 app.use('/api', gymRoutes);
 app.use('/api', trainerRoutes);
 app.use('/api', clientRoutes);
