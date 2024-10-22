@@ -67,7 +67,7 @@ router.post('/clientes', loggerMiddleware, clientController.createClient);
 /**
  * @swagger
  * /api/clientes/{id}:
- *   put:
+ *   patch:
  *     summary: Actualiza un cliente por ID
  *     tags: [Clientes]
  *     parameters:
@@ -87,7 +87,7 @@ router.post('/clientes', loggerMiddleware, clientController.createClient);
  *       200:
  *         description: Cliente actualizado exitosamente
  */
-router.put('/clientes/:id', loggerMiddleware, clientController.updateClient);
+router.patch('/clientes/:id', loggerMiddleware, clientController.updateClient);
 
 /**
  * @swagger

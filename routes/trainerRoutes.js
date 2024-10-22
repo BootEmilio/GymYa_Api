@@ -67,7 +67,7 @@ router.post('/entrenadores', loggerMiddleware, trainerController.createTrainer);
 /**
  * @swagger
  * /api/entrenadores/{id}:
- *   put:
+ *   patch:
  *     summary: Actualiza un entrenador por ID
  *     tags: [Entrenadores]
  *     parameters:
@@ -87,7 +87,7 @@ router.post('/entrenadores', loggerMiddleware, trainerController.createTrainer);
  *       200:
  *         description: Entrenador actualizado exitosamente
  */
-router.put('/entrenadores/:id', loggerMiddleware, trainerController.updateTrainer);
+router.patch('/entrenadores/:id', loggerMiddleware, trainerController.updateTrainer);
 
 /**
  * @swagger

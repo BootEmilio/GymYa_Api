@@ -67,7 +67,7 @@ router.post('/gimnasios', loggerMiddleware, gymController.createGym);
 /**
  * @swagger
  * /api/gimnasios/{id}:
- *   put:
+ *   patch:
  *     summary: Actualiza un gimnasio por ID
  *     tags: [Gimnasios]
  *     parameters:
