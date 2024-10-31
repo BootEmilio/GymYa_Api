@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
-const secretKey = 'Calamardo-Totelini'; // Mismo valor que el del authService
+require('dotenv').config(); // Cargar las variables de entorno
+const secretKey = process.env.JWT_SECRET; // Utilizar la clave secreta del archivo .env
 
 const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;

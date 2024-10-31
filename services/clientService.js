@@ -1,20 +1,21 @@
+// services/clientService.js
 const Client = require('../models/clientModel');
 const clientRepository = require('../repositories/clientRepository');
 
 // Obtener todos los clientes
-const getAllClients = () => {
-  return clientRepository.getAllClients();
+const getAllClients = async () => {
+  return await clientRepository.getAllClients();
 };
 
 // Obtener cliente por ID
-const getClientById = (id) => {
-  return clientRepository.getClientById(id);
+const getClientById = async (id) => {
+  return await clientRepository.getClientById(id);
 };
 
 // Crear un nuevo cliente
-const createClient = (clientData) => {
+const createClient = async (clientData) => {
   const newClient = new Client(
-    clientData.id_cliente,
+    null,  // id_cliente se generará automáticamente en la BD
     clientData.nombre,
     clientData.apellido,
     clientData.contacto,
@@ -22,17 +23,17 @@ const createClient = (clientData) => {
     clientData.fecha_registro,
     clientData.imagen
   );
-  return clientRepository.createClient(newClient);
+  return await clientRepository.createClient(newClient);
 };
 
 // Actualizar un cliente por ID
-const updateClient = (id, clientData) => {
-  return clientRepository.updateClient(id, clientData);
+const updateClient = async (id, clientData) => {
+  return await clientRepository.updateClient(id, clientData);
 };
 
 // Eliminar un cliente por ID
-const deleteClient = (id) => {
-  return clientRepository.deleteClient(id);
+const deleteClient = async (id) => {
+  return await clientRepository.deleteClient(id);
 };
 
 module.exports = {

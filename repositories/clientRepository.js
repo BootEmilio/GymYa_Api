@@ -1,62 +1,37 @@
-const fs = require('fs');
-const path = require('path');
-const filePath = path.join(__dirname, '../data/gimnasios.json');
+// repositories/clientRepository.js
+const db = require('../db');
 
-// Leer archivo JSON
-const readFile = () => {
-  const data = fs.readFileSync(filePath, 'utf8');
-  return JSON.parse(data);
-};
-
-// Guardar archivo JSON
-const writeFile = (data) => {
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
-};
-
-// Obtener todos los clientes
 const getAllClients = async () => {
-  const data = readFile();
-  return data.clientes;
+  const result = await db.query('SELECT * FROM clientes');
+  return result.rows;
 };
 
-// Obtener cliente por ID
 const getClientById = async (id) => {
-  const data = readFile();
-  return data.clientes.find((c) => c.id_cliente === parseInt(id));
+  const result = await db.query('SELECT * FROM clientes WHERE id_cliente = $1', [id]);
+  return result.rows[0];
 };
 
-// Crear nuevo cliente
-const createClient = async (clientData) => {
-  const data = readFile();
-  const newClient = {
-    id_cliente: data.clientes.length + 1, // Asignación sencilla del ID
-    ...clientData
-  };
-  data.clientes.push(newClient);
-  writeFile(data);
-  return newClient;
+const createClient = async (client) => {
+  const query = `
+    INSERT INTO clientes (nombre, apellido, contacto, email, fecha_registro, imagen)
+    VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`;
+  const values = [client.nombre, client.apellido, client.contacto, client.email, client.fecha_registro, client.imagen];
+  const result = await db.query(query, values);
+  return result.rows[0];
 };
 
-// Actualizar cliente
 const updateClient = async (id, clientData) => {
-  const data = readFile();
-  const clientIndex = data.clientes.findIndex((c) => c.id_cliente === parseInt(id));
-  if (clientIndex === -1) return null;
-
-  data.clientes[clientIndex] = { ...data.clientes[clientIndex], ...clientData };
-  writeFile(data);
-  return data.clientes[clientIndex];
+  const query = `
+    UPDATE clientes
+    SET nombre = $1, apellido = $2, contacto = $3, email = $4, fecha_registro = $5, imagen = $6
+    WHERE id_cliente = $7 RETURNING *`;
+  const values = [clientData.nombre, clientData.apellido, clientData.contacto, clientData.email, clientData.fecha_registro, clientData.imagen, id];
+  const result = await db.query(query, values);
+  return result.rows[0];
 };
 
-// Eliminar cliente
 const deleteClient = async (id) => {
-  const data = readFile();
-  const clientIndex = data.clientes.findIndex((c) => c.id_cliente === parseInt(id));
-  if (clientIndex === -1) return null;
-
-  const deletedClient = data.clientes.splice(clientIndex, 1);
-  writeFile(data);
-  return deletedClient;
+  await db.query('DELETE FROM clientes WHERE id_cliente = $1', [id]);
 };
 
 module.exports = {
@@ -64,5 +39,5 @@ module.exports = {
   getClientById,
   createClient,
   updateClient,
-  deleteClient
+  deleteClient,
 };

@@ -1,34 +1,36 @@
-const fs = require('fs');
-const path = require('path');
+// authService.js
 const jwt = require('jsonwebtoken');
-const secretKey = 'Calamardo-Totelini'; // Cambia esto a una clave más segura
+const db = require('../db'); // Asegúrate de tener configurada la conexión a la base de datos
+require('dotenv').config();
 
-// Cargar los usuarios desde el archivo JSON
-const usersFilePath = path.join(__dirname, '../data/users.json');
+const secretKey = process.env.JWT_SECRET; // Toma la clave desde el archivo .env
+const tokenExpiration = process.env.JWT_EXPIRATION || '1h'; // Tiempo de expiración del token
 
-const getUsers = () => {
-  const data = fs.readFileSync(usersFilePath, 'utf-8');
-  return JSON.parse(data);
-};
-
-// Autenticar usuario
-const authenticateUser = (username, password) => {
-  const users = getUsers();
-
-  // Buscar el usuario por username
-  const user = users.find((user) => user.username === username);
-  
-  if (user && user.password === password) {
-    const token = jwt.sign(
-      { id: user.id, username: user.username, role: user.role },
-      secretKey,
-      { expiresIn: '1h' } // El token expirará en 1 hora
+// Autenticar administrador en la base de datos
+const authenticateAdmin = async (username, password) => {
+  try {
+    // Consulta a la base de datos para encontrar el administrador
+    const result = await db.query(
+      'SELECT * FROM administradores WHERE username = $1 AND password = $2',
+      [username, password]
     );
 
-    return { token, user }; // Devuelve el token y la información del usuario
-  }
+    // Si encuentra al usuario, crea un token y devuelve sus datos
+    const admin = result.rows[0];
+    if (admin) {
+      const token = jwt.sign(
+        { id: admin.id, username: admin.username, role: 'administrador' },
+        secretKey,
+        { expiresIn: tokenExpiration }
+      );
 
-  return null; // Credenciales inválidas
+      return { token, admin }; // Devuelve el token y los datos del administrador
+    }
+    return null; // Si no se encuentra el usuario, devuelve null
+  } catch (error) {
+    console.error('Error autenticando al administrador:', error);
+    throw new Error('Error al autenticar');
+  }
 };
 
-module.exports = { authenticateUser };
+module.exports = { authenticateAdmin };

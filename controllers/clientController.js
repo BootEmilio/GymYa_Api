@@ -1,71 +1,40 @@
-const clientService = require('../services/clientService');
+// controllers/clientController.js
+const Client = require('../models/Client');
 
-// Obtener todos los clientes
-const getAllClients = async (req, res) => {
+exports.crearCliente = async (req, res) => {
   try {
-    const clients = await clientService.getAllClients();
-    res.json(clients);
+    const nuevoCliente = await Client.create(req.body);
+    res.status(201).json(nuevoCliente);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error al crear el cliente' });
   }
 };
 
-// Obtener cliente por ID
-const getClientById = async (req, res) => {
+exports.obtenerCliente = async (req, res) => {
   try {
-    const { id } = req.params;
-    const client = await clientService.getClientById(id);
-    if (!client) {
-      return res.status(404).json({ error: 'Cliente no encontrado' });
-    }
-    res.json(client);
+    const cliente = await Client.findById(req.params.id);
+    if (!cliente) return res.status(404).json({ error: 'Cliente no encontrado' });
+    res.json(cliente);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error al obtener el cliente' });
   }
 };
 
-// Crear nuevo cliente
-const createClient = async (req, res) => {
+// Otros métodos para actualizar y eliminar clientes
+exports.actualizarCliente = async (req, res) => {
   try {
-    const newClient = await clientService.createClient(req.body);
-    res.status(201).json(newClient);
+    const clienteActualizado = await Client.update(req.params.id, req.body);
+    res.json(clienteActualizado);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error al actualizar el cliente' });
   }
 };
 
-// Actualizar cliente
-const updateClient = async (req, res) => {
+exports.eliminarCliente = async (req, res) => {
   try {
-    const { id } = req.params;
-    const updatedClient = await clientService.updateClient(id, req.body);
-    if (!updatedClient) {
-      return res.status(404).json({ error: 'Cliente no encontrado' });
-    }
-    res.json(updatedClient);
+    await Client.delete(req.params.id);
+    res.status(204).end();
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error al eliminar el cliente' });
   }
-};
-
-// Eliminar cliente
-const deleteClient = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const deletedClient = await clientService.deleteClient(id);
-    if (!deletedClient) {
-      return res.status(404).json({ error: 'Cliente no encontrado' });
-    }
-    res.json(deletedClient);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-module.exports = {
-  getAllClients,
-  getClientById,
-  createClient,
-  updateClient,
-  deleteClient,
 };
