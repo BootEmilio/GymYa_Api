@@ -1,7 +1,6 @@
-const User = require('../models/userModel');
 const userService = require('../services/userService');
 
-exports.crearUsuario = async (req, res) => {
+const createUser = async (req, res) => {
     try {
         const nuevoUsuario = await userService.createUser(req.body);
         res.status(201).json(nuevoUsuario);
@@ -10,7 +9,7 @@ exports.crearUsuario = async (req, res) => {
     }
 };
 
-exports.obtenerUsuario = async (req, res) => {
+const getAllUsers = async (req, res) => {
     try {
         const usuario = await userService.getUserById(req.params.id);
         if (!usuario) return res.status(404).json({ error: 'Usuario no encontrado' });
@@ -21,7 +20,7 @@ exports.obtenerUsuario = async (req, res) => {
 };
 
 // Otros métodos para actualizar y eliminar usuarios
-exports.actualizarUsuario = async (req, res) => {
+const updateUser = async (req, res) => {
     try {
         const usuarioActualizado = await userService.updateUser(req.params.id, req.body);
         res.json(usuarioActualizado);
@@ -30,7 +29,7 @@ exports.actualizarUsuario = async (req, res) => {
     }
 };
 
-exports.eliminarUsuario = async (req, res) => {
+const deleteUser = async (req, res) => {
     try {
         await userService.deleteUser(req.params.id);
         res.status(204).end();
@@ -38,3 +37,10 @@ exports.eliminarUsuario = async (req, res) => {
         res.status(500).json({ error: 'Error al eliminar el usuario' });
     }
 };
+
+module.exports = {
+  getAllUsers,
+  createUser,
+  updateUser,
+  deleteUser
+}
