@@ -9,6 +9,7 @@ const authMiddleware = (req, res, next) => {
 
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.split(' ')[1];
+    console.log ('Token recibido', token);
 
     try {
       const decoded = jwt.verify(token, secretKey);
