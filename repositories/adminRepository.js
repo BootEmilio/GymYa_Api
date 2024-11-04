@@ -20,15 +20,10 @@ const getPendingPayments = async () => {
 };
 
 const getActiveMemberships = async () => {
-  const result = await db.query(`
-    SELECT m.nombre, COUNT(hm.id) AS cantidad 
-    FROM historial_membresias hm
-    JOIN membresias m ON hm.id_membresia = m.id
-    WHERE hm.estado = 'Activa'
-    GROUP BY m.nombre
-  `);
-  return result.rows;
-};
+    const result = await db.query('SELECT * FROM clientes');
+    return result.rows;
+  };
+  
 
 const getIncomeGraphData = async () => {
   const result = await db.query(`
