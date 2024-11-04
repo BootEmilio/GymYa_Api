@@ -1,3 +1,4 @@
+// middlewares/authMiddleware.js
 const jwt = require('jsonwebtoken');
 require('dotenv').config(); // Cargar las variables de entorno
 const secretKey = process.env.JWT_SECRET; // Utilizar la clave secreta del archivo .env
@@ -21,4 +22,3 @@ const authMiddleware = (req, res, next) => {
 };
 
 module.exports = authMiddleware;
-

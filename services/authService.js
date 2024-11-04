@@ -1,4 +1,4 @@
-// authService.js
+// services/authService.js
 const jwt = require('jsonwebtoken');
 const db = require('../db'); // Asegúrate de tener configurada la conexión a la base de datos
 require('dotenv').config();
@@ -19,7 +19,7 @@ const authenticateAdmin = async (username, password) => {
     const admin = result.rows[0];
     if (admin) {
       const token = jwt.sign(
-        { id: admin.id, username: admin.username, role: 'administrador' },
+        { id: admin.id, username: admin.username, role: 'administrador' }, // Asegúrate de incluir el ID
         secretKey,
         { expiresIn: tokenExpiration }
       );

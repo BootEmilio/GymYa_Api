@@ -1,12 +1,14 @@
+// routes/userRoutes.js
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
-const loggerMiddleware = require('../middlewares/loggerMiddleware');
+const authMiddleware = require('../middlewares/authMiddleware'); // Importar el middleware
 
-router.get('/usuarios', loggerMiddleware, userController.getAllUsers);
-router.get('/usuarios/:id', loggerMiddleware, userController.getUserById);
-router.post('/usuarios', loggerMiddleware, userController.createUser);
-router.patch('/usuarios/:id', loggerMiddleware, userController.updateUser);
-router.delete('/usuarios/:id', loggerMiddleware, userController.deleteUser);
+// Aplicar el middleware a las rutas que necesiten autenticación
+router.get('/usuarios', authMiddleware, userController.getAllUsers);
+router.get('/usuarios/:id', authMiddleware, userController.getUserById);
+router.post('/usuarios', authMiddleware, userController.createUser);
+router.patch('/usuarios/:id', authMiddleware, userController.updateUser);
+router.delete('/usuarios/:id', authMiddleware, userController.deleteUser);
 
 module.exports = router;
