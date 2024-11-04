@@ -1,13 +1,12 @@
-// routes/userRoutes.js
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
-const authMiddleware = require('../middlewares/authMiddleware'); // Importar el middleware
+const authMiddleware = require('../middlewares/authMiddleware'); // Middleware de autenticación
 
-// Aplicar el middleware a las rutas que necesiten autenticación
+// Rutas para usuarios
+router.post('/usuarios', authMiddleware, userController.createUser);
 router.get('/usuarios', authMiddleware, userController.getAllUsers);
 router.get('/usuarios/:id', authMiddleware, userController.getUserById);
-router.post('/usuarios', authMiddleware, userController.createUser);
 router.patch('/usuarios/:id', authMiddleware, userController.updateUser);
 router.delete('/usuarios/:id', authMiddleware, userController.deleteUser);
 
