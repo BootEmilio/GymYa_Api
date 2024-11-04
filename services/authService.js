@@ -5,7 +5,7 @@ require('dotenv').config();
 const secretKey = process.env.JWT_SECRET; // Toma la clave desde el archivo .env
 console.log('JWT_SECRET en authService:', secretKey); // Imprimir el valor de JWT_SECRET
 
-const tokenExpiration = process.env.JWT_EXPIRATION || '1h'; // Tiempo de expiración del token
+const tokenExpiration = process.env.JWT_EXPIRATION || '2h'; // Tiempo de expiración del token
 
 const authenticateAdmin = async (username, password) => {
   try {
