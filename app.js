@@ -3,6 +3,7 @@ const cors = require('cors');
 const swaggerUI = require("swagger-ui-express");
 const specs = require("./swagger/swagger");
 const authRoutes = require('./routes/authRoutes'); // Rutas de autenticación
+const adminRoutes = require('./routes/adminRoutes');
 const userRoutes = require('./routes/userRoutes'); // Rutas de clientes
 const pagosRoutes = require ('./routes/pagosRoutes');
 const authMiddleware = require('./middlewares/authMiddleware');
@@ -20,6 +21,7 @@ app.use('/api', authRoutes);
 
 app.use(authMiddleware);
 
+app.use('/api', adminRoutes);
 app.use('/api', userRoutes);
 app.use('/api', pagosRoutes);
 
