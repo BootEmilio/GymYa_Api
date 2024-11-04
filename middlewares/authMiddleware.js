@@ -22,5 +22,3 @@ const authMiddleware = (req, res, next) => {
 
 module.exports = authMiddleware;
 
-console.log('Auth Header:', authHeader);
-console.log('Token:', token);
