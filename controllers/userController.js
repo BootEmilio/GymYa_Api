@@ -10,14 +10,15 @@ const createUser = async (req, res) => {
 };
 
 const getAllUsers = async (req, res) => {
-  try {
-      const users = await userService.getAllUsers(); // Llama al servicio para obtener todos los usuarios
-      res.status(200).json(users); // Devuelve los usuarios con un código de estado 200
-  } catch (error) {
-      console.error('Error al obtener los usuarios:', error);
-      res.status(500).json({ error: 'Error al obtener los usuarios' }); // Manejo de errores
-  }
-};
+    try {
+        const users = await userService.getAllUsers(); // Llama al servicio para obtener todos los usuarios
+        res.status(200).json(users); // Devuelve los usuarios con un código de estado 200
+    } catch (error) {
+        console.error('Error al obtener los usuarios:', error);
+        res.status(500).json({ error: 'Error al obtener los usuarios' }); // Manejo de errores
+    }
+  };
+  
 
 const getUserById = async (req, res) => {
     try {
@@ -49,9 +50,9 @@ const deleteUser = async (req, res) => {
 };
 
 module.exports = {
-  getAllUsers,
-  getUserById,
-  createUser,
-  updateUser,
-  deleteUser
+    getAllUsers,
+    getUserById,
+    createUser,
+    updateUser,
+    deleteUser
 }
