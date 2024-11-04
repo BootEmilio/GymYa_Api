@@ -4,6 +4,7 @@ const swaggerUI = require("swagger-ui-express");
 const specs = require("./swagger/swagger");
 const authRoutes = require('./routes/authRoutes'); // Rutas de autenticación
 const clientRoutes = require('./routes/clientRoutes'); // Rutas de clientes
+const pagosRoutes = require ('./routes/pagosRoutes');
 const authMiddleware = require('./middlewares/authMiddleware');
 const loggerMiddleware = require('./middlewares/loggerMiddleware');
 const app = express();
@@ -21,6 +22,7 @@ app.use('/api', authRoutes);
 app.use(authMiddleware);
 
 app.use('/api', clientRoutes);
+app.use('/api', pagosRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
