@@ -1,25 +1,23 @@
-// services/authService.js
 const jwt = require('jsonwebtoken');
 const db = require('../db'); // Asegúrate de tener configurada la conexión a la base de datos
 require('dotenv').config();
 
 const secretKey = process.env.JWT_SECRET; // Toma la clave desde el archivo .env
+console.log('JWT_SECRET en authService:', secretKey); // Imprimir el valor de JWT_SECRET
+
 const tokenExpiration = process.env.JWT_EXPIRATION || '1h'; // Tiempo de expiración del token
 
-// Autenticar administrador en la base de datos
 const authenticateAdmin = async (username, password) => {
   try {
-    // Consulta a la base de datos para encontrar el administrador
     const result = await db.query(
       'SELECT * FROM administradores WHERE username = $1 AND password = $2',
       [username, password]
     );
 
-    // Si encuentra al usuario, crea un token y devuelve sus datos
     const admin = result.rows[0];
     if (admin) {
       const token = jwt.sign(
-        { id: admin.id, username: admin.username, role: 'administrador' }, // Asegúrate de incluir el ID
+        { id: admin.id, username: admin.username, role: 'administrador' },
         secretKey,
         { expiresIn: tokenExpiration }
       );
