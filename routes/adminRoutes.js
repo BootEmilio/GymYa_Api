@@ -1,12 +1,17 @@
 const express = require('express');
-const router = express.Router();
 const adminController = require('../controllers/adminController');
-const loggerMiddleware = require('../middlewares/loggerMiddleware');
+const router = express.Router();
 
-// Rutas de estadísticas
-router.get('/estadisticas/financieras', loggerMiddleware, adminController.getFinancialStats);
-router.get('/estadisticas/clientes', loggerMiddleware, adminController.getClientStats);
-router.get('/estadisticas/asistencias', loggerMiddleware, adminController.getAttendanceStats);
-router.get('/estadisticas/alertas', loggerMiddleware, adminController.getAlerts);
+// Resumen Financiero
+router.get('/estadisticas/financieras', adminController.getFinancialStats);
+
+// Estadísticas de Clientes
+router.get('/estadisticas/clientes', adminController.getClientStats);
+
+// Estadísticas de Asistencias
+router.get('/estadisticas/asistencias', adminController.getAttendanceStats);
+
+// Alertas y Notificaciones
+router.get('/estadisticas/alertas', adminController.getAlerts);
 
 module.exports = router;
