@@ -157,3 +157,6 @@ const options = {
     },
     apis: ["./routes/*.js"], 
 };
+
+const specs = swaggerJsdoc(options);
+module.exports = specs;
