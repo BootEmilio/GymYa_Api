@@ -5,7 +5,7 @@ const options = {
         openapi: "3.0.0",
         info: {
             title: "GymYa API",
-            version: "1.0.0",
+            version: "2.1.0",
             description: "API para la administración de gimnasios",
         },
         servers: [
@@ -15,88 +15,141 @@ const options = {
         ],
         components: {
             schemas: {
-                Client: {
+                User: {
                     type: "object",
-                    required: ["name", "email", "phone"],
+                    required: ["nombre_completo", "fecha_registro", "telefono", "username", "password"],
                     properties: {
                         id: {
                             type: "string",
-                            description: "ID autogenerado del cliente",
+                            description: "ID autogenerado del usuario",
                         },
-                        name: {
+                        nombre_completo: {
                             type: "string",
-                            description: "Nombre del cliente",
+                            description: "Nombre completo del usuario",
                         },
-                        email: {
+                        fecha_registro: {
                             type: "string",
-                            description: "Email del cliente",
+                            format: "date",
+                            description: "Fecha de registro del usuario",
                         },
-                        phone: {
+                        telefono: {
                             type: "string",
-                            description: "Número de teléfono del cliente",
+                            description: "Número de teléfono del usuario",
+                        },
+                        activo: {
+                            type: "boolean",
+                            description: "Estado del usuario (activo o inactivo)",
+                        },
+                        username: {
+                            type: "string",
+                            description: "Nombre de usuario para el inicio de sesión",
+                        },
+                        password: {
+                            type: "string",
+                            description: "Contraseña del usuario (debe manejarse de manera segura)",
                         },
                     },
                     example: {
                         id: "1",
-                        name: "Jane Doe",
-                        email: "jane.doe@example.com",
-                        phone: "1234567890",
+                        nombre_completo: "Carlos Pérez",
+                        fecha_registro: "2024-01-15",
+                        telefono: "5551234567",
+                        activo: true,
+                        username: "cperez",
+                        password: "12345",
                     },
                 },
-                Gym: {
+                Pago: {
                     type: "object",
-                    required: ["name", "location", "capacity"],
+                    required: ["id_cliente", "id_membresia", "monto", "metodo_pago"],
                     properties: {
-                        id: {
+                        id_cliente: {
                             type: "string",
-                            description: "ID autogenerado del gimnasio",
+                            description: "ID del cliente asociado al pago",
                         },
-                        name: {
+                        id_membresia: {
                             type: "string",
-                            description: "Nombre del gimnasio",
+                            description: "ID de la membresía asociada al pago",
                         },
-                        location: {
-                            type: "string",
-                            description: "Ubicación del gimnasio",
-                        },
-                        capacity: {
+                        monto: {
                             type: "number",
-                            description: "Capacidad del gimnasio",
+                            format: "float",
+                            description: "Monto del pago",
+                        },
+                        metodo_pago: {
+                            type: "string",
+                            description: "Método de pago utilizado (por ejemplo, tarjeta, efectivo)",
+                        },
+                        estado: {
+                            type: "string",
+                            description: "Estado del pago (por defecto es 'Completado')",
                         },
                     },
                     example: {
-                        id: "1",
-                        name: "Gym Center",
-                        location: "Calle Falsa 123",
-                        capacity: 50,
+                        id_cliente: "1",
+                        id_membresia: "123",
+                        monto: 500.00,
+                        metodo_pago: "tarjeta",
+                        estado: "Completado",
                     },
                 },
-                Trainer: {
-                    type: "object",
-                    required: ["name", "specialty", "experience"],
-                    properties: {
-                        id: {
-                            type: "string",
-                            description: "ID autogenerado del entrenador",
-                        },
-                        name: {
-                            type: "string",
-                            description: "Nombre del entrenador",
-                        },
-                        specialty: {
-                            type: "string",
-                            description: "Especialidad del entrenador",
-                        },
-                        experience: {
-                            type: "number",
-                            description: "Años de experiencia del entrenador",
+
+            },
+        },
+        paths: {
+            "/login": {
+                post: {
+                    summary: "Iniciar sesión",
+                    description: "Permite a un usuario autenticarse en la aplicación",
+                    tags: ["Auth"],
+                    requestBody: {
+                        required: true,
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    type: "object",
+                                    properties: {
+                                        username: {
+                                            type: "string",
+                                            description: "Nombre de usuario del cliente",
+                                        },
+                                        password: {
+                                            type: "string",
+                                            description: "Contraseña del cliente",
+                                        },
+                                    },
+                                    required: ["username", "password"],
+                                    example: {
+                                        username: "cperez",
+                                        password: "12345",
+                                    },
+                                },
+                            },
                         },
                     },
-                    example: {
-                        id: "1",
-                        name: "John Doe",
-                        specialty: "CrossFit",
-                        experience: 5,
+                    responses: {
+                        200: {
+                            description: "Inicio de sesión exitoso",
+                            content: {
+                                "application/json": {
+                                    schema: {
+                                        type: "object",
+                                        properties: {
+                                            token: {
+                                                type: "string",
+                                                description: "Token JWT para autenticación",
+                                            },
+                                        },
+                                        example: {
+                                            token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        401: {
+                            description: "Credenciales inválidas",
+                        },
                     },
                 },
             },
@@ -104,6 +157,3 @@ const options = {
     },
     apis: ["./routes/*.js"], 
 };
-
-const specs = swaggerJsdoc(options);
-module.exports = specs;
