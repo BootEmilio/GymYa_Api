@@ -6,6 +6,7 @@ const authRoutes = require('./routes/authRoutes'); // Rutas de autenticación
 const adminRoutes = require('./routes/adminRoutes');
 const userRoutes = require('./routes/userRoutes'); // Rutas de clientes
 const pagosRoutes = require ('./routes/pagosRoutes');
+const accesosRoutes = require('./routes/accesosRoutes');
 const authMiddleware = require('./middlewares/authMiddleware');
 const loggerMiddleware = require('./middlewares/loggerMiddleware');
 const app = express();
@@ -24,6 +25,7 @@ app.use(authMiddleware);
 app.use('/api', adminRoutes);
 app.use('/api', userRoutes);
 app.use('/api', pagosRoutes);
+app.use('/api', accesosRoutes);
 
 
 const PORT = process.env.PORT || 3000;
