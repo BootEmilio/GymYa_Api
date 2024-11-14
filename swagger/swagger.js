@@ -10,7 +10,7 @@ const options = {
         },
         servers: [
             {
-                url: 'https://api-gymya-api.onrender.com',
+                url: 'https://api-gymya-api.onrender.com/api',
             },
         ],
         components: {
