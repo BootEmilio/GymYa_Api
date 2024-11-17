@@ -123,44 +123,41 @@ const options = {
             },
             "/accesos": {
                 get: {
-                    summary: "Obtener todos los accesos",
-                    description: "Devuelve una lista de todos los accesos registrados",
+                    summary: "Obtener todos los accesos con paginación",
+                    description: "Devuelve una lista de todos los accesos registrados con soporte para paginación",
                     tags: ["Accesos"],
                     security: [{ bearerAuth: [] }],
+                    parameters: [
+                        {
+                            name: "page",
+                            in: "query",
+                            schema: { type: "integer", default: 1 },
+                            description: "Número de la página a obtener",
+                        },
+                        {
+                            name: "limit",
+                            in: "query",
+                            schema: { type: "integer", default: 10 },
+                            description: "Número de elementos por página",
+                        },
+                    ],
                     responses: {
                         200: {
                             description: "Lista de accesos obtenida exitosamente",
                             content: {
                                 "application/json": {
                                     schema: {
-                                        type: "array",
-                                        items: { $ref: "#/components/schemas/Accesos" },
+                                        type: "object",
+                                        properties: {
+                                            currentPage: { type: "integer", example: 1 },
+                                            totalPages: { type: "integer", example: 5 },
+                                            totalItems: { type: "integer", example: 50 },
+                                            data: {
+                                                type: "array",
+                                                items: { $ref: "#/components/schemas/Accesos" },
+                                            },
+                                        },
                                     },
-                                },
-                            },
-                        },
-                        401: { description: "Token inválido o no proporcionado" },
-                    },
-                },
-                post: {
-                    summary: "Registrar un nuevo acceso",
-                    description: "Registra un nuevo acceso para un cliente",
-                    tags: ["Accesos"],
-                    security: [{ bearerAuth: [] }],
-                    requestBody: {
-                        required: true,
-                        content: {
-                            "application/json": {
-                                schema: { $ref: "#/components/schemas/Accesos" },
-                            },
-                        },
-                    },
-                    responses: {
-                        201: {
-                            description: "Acceso registrado exitosamente",
-                            content: {
-                                "application/json": {
-                                    schema: { $ref: "#/components/schemas/Accesos" },
                                 },
                             },
                         },
@@ -192,26 +189,6 @@ const options = {
                                 },
                             },
                         },
-                        401: { description: "Token inválido o no proporcionado" },
-                        404: { description: "Acceso no encontrado" },
-                    },
-                },
-                delete: {
-                    summary: "Eliminar un acceso",
-                    description: "Elimina un acceso específico por ID",
-                    tags: ["Accesos"],
-                    security: [{ bearerAuth: [] }],
-                    parameters: [
-                        {
-                            name: "id",
-                            in: "path",
-                            required: true,
-                            schema: { type: "integer" },
-                            description: "ID del acceso a eliminar",
-                        },
-                    ],
-                    responses: {
-                        204: { description: "Acceso eliminado exitosamente" },
                         401: { description: "Token inválido o no proporcionado" },
                         404: { description: "Acceso no encontrado" },
                     },

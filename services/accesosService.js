@@ -1,15 +1,20 @@
-const Accesos = require ('../models/accesosModel');
 const accesosRepository = require('../repositories/accesosRepository');
 
-const getAllAccesos = async () =>{
-    return await accesosRepository.getAllAccesos();
+const getPaginatedAccesos = async (limit, offset) => {
+    const data = await accesosRepository.getPaginatedAccesos(limit, offset);
+    const totalItems = await accesosRepository.getTotalAccesos();
+
+    // Calcula el total de páginas
+    const totalPages = Math.ceil(totalItems / limit);
+
+    return { data, totalItems, totalPages };
 };
 
-const getAccesosById = async () => {
-    return await accesosRepository.getAccesosById();
+const getAccesosById = async (id) => {
+    return await accesosRepository.getAccesosById(id);
 };
 
 module.exports = {
-    getAllAccesos,
-    getAccesosById
+    getPaginatedAccesos,
+    getAccesosById,
 };

@@ -7,40 +7,60 @@ const authMiddleware = require('../middlewares/authMiddleware');
  * @swagger
  * /accesos:
  *   get:
- *     summary: Obtener todos los accesos
- *     description: Devuelve una lista de todos los accesos. Se requiere autenticación mediante token JWT.
+ *     summary: Obtener todos los accesos con paginación
+ *     description: Devuelve una lista de accesos con soporte para paginación. Se requiere autenticación mediante token JWT.
  *     tags:
  *       - Accesos
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Número de la página a obtener
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Número de elementos por página
  *     responses:
  *       200:
  *         description: Lista de accesos obtenida exitosamente
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: integer
- *                     description: ID del acceso
- *                   nombre:
- *                     type: string
- *                     description: Nombre del acceso
- *                   descripcion:
- *                     type: string
- *                     description: Descripción del acceso
- *                   fecha_creacion:
- *                     type: string
- *                     format: date-time
- *                     description: Fecha de creación del acceso
- *                 example:
- *                   id: 1
- *                   nombre: "Acceso Principal"
- *                   descripcion: "Permite acceso principal a la aplicación"
- *                   fecha_creacion: "2024-10-30T12:34:56Z"
+ *               type: object
+ *               properties:
+ *                 currentPage:
+ *                   type: integer
+ *                   example: 1
+ *                 totalPages:
+ *                   type: integer
+ *                   example: 5
+ *                 totalItems:
+ *                   type: integer
+ *                   example: 50
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         description: ID del acceso
+ *                       nombre:
+ *                         type: string
+ *                         description: Nombre del acceso
+ *                       descripcion:
+ *                         type: string
+ *                         description: Descripción del acceso
+ *                       fecha_creacion:
+ *                         type: string
+ *                         format: date-time
+ *                         description: Fecha de creación del acceso
  *       401:
  *         description: Token inválido o no proporcionado
  *       500:
@@ -86,11 +106,6 @@ router.get('/accesos', authMiddleware, accesosController.getAllAccesos);
  *                   type: string
  *                   format: date-time
  *                   description: Fecha de creación del acceso
- *               example:
- *                 id: 1
- *                 nombre: "Acceso Principal"
- *                 descripcion: "Permite acceso principal a la aplicación"
- *                 fecha_creacion: "2024-10-30T12:34:56Z"
  *       401:
  *         description: Token inválido o no proporcionado
  *       404:
