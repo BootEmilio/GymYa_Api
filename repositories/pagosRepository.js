@@ -1,4 +1,3 @@
-// repositories/pagosRepository.js
 const db = require('../db'); // Asegúrate de tener configurada la conexión a la base de datos
 
 class PagosRepository {
@@ -27,19 +26,49 @@ class PagosRepository {
         return result.rows[0];
     }
 
-    async findAllPagos() {
-        const result = await db.query('SELECT * FROM pagos');
+    async findAllPagos(limit, offset) {
+        const result = await db.query(
+            'SELECT * FROM pagos ORDER BY fecha_pago DESC LIMIT $1 OFFSET $2',
+            [limit, offset]
+        );
         return result.rows;
     }
 
-    async findPagosByCliente(id_cliente) {
-        const result = await db.query('SELECT * FROM pagos WHERE id_cliente = $1', [id_cliente]);
+    async countAllPagos() {
+        const result = await db.query('SELECT COUNT(*) FROM pagos');
+        return parseInt(result.rows[0].count, 10);
+    }
+
+    async findPagosByCliente(id_cliente, limit, offset) {
+        const result = await db.query(
+            'SELECT * FROM pagos WHERE id_cliente = $1 ORDER BY fecha_pago DESC LIMIT $2 OFFSET $3',
+            [id_cliente, limit, offset]
+        );
         return result.rows;
     }
 
-    async findPagosPendientes() {
-        const result = await db.query('SELECT * FROM pagos WHERE estado = $1', ['Pendiente']);
+    async countPagosByCliente(id_cliente) {
+        const result = await db.query(
+            'SELECT COUNT(*) FROM pagos WHERE id_cliente = $1',
+            [id_cliente]
+        );
+        return parseInt(result.rows[0].count, 10);
+    }
+
+    async findPagosPendientes(limit, offset) {
+        const result = await db.query(
+            'SELECT * FROM pagos WHERE estado = $1 ORDER BY fecha_pago DESC LIMIT $2 OFFSET $3',
+            ['Pendiente', limit, offset]
+        );
         return result.rows;
+    }
+
+    async countPagosPendientes() {
+        const result = await db.query(
+            'SELECT COUNT(*) FROM pagos WHERE estado = $1',
+            ['Pendiente']
+        );
+        return parseInt(result.rows[0].count, 10);
     }
 }
 

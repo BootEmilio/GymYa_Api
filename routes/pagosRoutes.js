@@ -1,4 +1,3 @@
-// routes/pagosRoutes.js
 const express = require('express');
 const router = express.Router();
 const PagosController = require('../controllers/pagosController');
@@ -9,18 +8,43 @@ const loggerMiddleware = require('../middlewares/loggerMiddleware');
  * /pagos:
  *   get:
  *     summary: Listar todos los pagos
- *     description: Retorna una lista de todos los pagos registrados en el sistema.
+ *     description: Retorna una lista de todos los pagos registrados en el sistema con soporte para paginación.
  *     tags:
  *       - Pagos
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Número de la página a obtener.
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Número de elementos por página.
  *     responses:
  *       200:
  *         description: Lista de pagos obtenida exitosamente.
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Pago'
+ *               type: object
+ *               properties:
+ *                 currentPage:
+ *                   type: integer
+ *                   example: 1
+ *                 totalPages:
+ *                   type: integer
+ *                   example: 5
+ *                 totalItems:
+ *                   type: integer
+ *                   example: 50
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Pago'
  */
 router.get('/pagos', loggerMiddleware, PagosController.getPagos);
 
@@ -78,7 +102,7 @@ router.post('/pagos', loggerMiddleware, PagosController.addPago);
  * /pagos/clientes/{id_cliente}:
  *   get:
  *     summary: Obtener todos los pagos de un cliente específico
- *     description: Retorna todos los pagos realizados por un cliente específico.
+ *     description: Retorna todos los pagos realizados por un cliente específico con soporte para paginación.
  *     tags:
  *       - Pagos
  *     parameters:
@@ -87,16 +111,40 @@ router.post('/pagos', loggerMiddleware, PagosController.addPago);
  *         required: true
  *         schema:
  *           type: string
- *         description: ID del cliente
+ *         description: ID del cliente.
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Número de la página a obtener.
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Número de elementos por página.
  *     responses:
  *       200:
  *         description: Pagos del cliente obtenidos exitosamente.
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Pago'
+ *               type: object
+ *               properties:
+ *                 currentPage:
+ *                   type: integer
+ *                   example: 1
+ *                 totalPages:
+ *                   type: integer
+ *                   example: 5
+ *                 totalItems:
+ *                   type: integer
+ *                   example: 20
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Pago'
  *       404:
  *         description: Cliente no encontrado o no tiene pagos registrados.
  */
@@ -107,18 +155,43 @@ router.get('/pagos/clientes/:id_cliente', loggerMiddleware, PagosController.getP
  * /pagos/pendientes:
  *   get:
  *     summary: Listar pagos pendientes
- *     description: Retorna una lista de todos los pagos con estado "Pendiente".
+ *     description: Retorna una lista de todos los pagos con estado "Pendiente" con soporte para paginación.
  *     tags:
  *       - Pagos
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Número de la página a obtener.
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Número de elementos por página.
  *     responses:
  *       200:
  *         description: Lista de pagos pendientes obtenida exitosamente.
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Pago'
+ *               type: object
+ *               properties:
+ *                 currentPage:
+ *                   type: integer
+ *                   example: 1
+ *                 totalPages:
+ *                   type: integer
+ *                   example: 3
+ *                 totalItems:
+ *                   type: integer
+ *                   example: 30
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Pago'
  */
 router.get('/pagos/pendientes', loggerMiddleware, PagosController.getPagosPendientes);
 
@@ -136,7 +209,7 @@ router.get('/pagos/pendientes', loggerMiddleware, PagosController.getPagosPendie
  *         required: true
  *         schema:
  *           type: string
- *         description: ID del pago
+ *         description: ID del pago.
  *     requestBody:
  *       required: true
  *       content:
@@ -146,7 +219,7 @@ router.get('/pagos/pendientes', loggerMiddleware, PagosController.getPagosPendie
  *             properties:
  *               estado:
  *                 type: string
- *                 description: Nuevo estado del pago
+ *                 description: Nuevo estado del pago.
  *             example:
  *               estado: "Completado"
  *     responses:
