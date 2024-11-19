@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const PagosController = require('../controllers/pagosController');
-const loggerMiddleware = require('../middlewares/loggerMiddleware');
+const authMiddleware = require('../middlewares/authMiddleware');
 
 /**
  * @swagger
@@ -46,7 +46,7 @@ const loggerMiddleware = require('../middlewares/loggerMiddleware');
  *                   items:
  *                     $ref: '#/components/schemas/Pago'
  */
-router.get('/pagos', loggerMiddleware, PagosController.getPagos);
+router.get('/pagos', authMiddleware, PagosController.getPagos);
 
 /**
  * @swagger
@@ -73,7 +73,7 @@ router.get('/pagos', loggerMiddleware, PagosController.getPagos);
  *       404:
  *         description: Pago no encontrado.
  */
-router.get('/pagos/:id', loggerMiddleware, PagosController.getPago);
+router.get('/pagos/:id', authMiddleware, PagosController.getPago);
 
 /**
  * @swagger
@@ -95,7 +95,7 @@ router.get('/pagos/:id', loggerMiddleware, PagosController.getPago);
  *       400:
  *         description: Datos del pago inválidos.
  */
-router.post('/pagos', loggerMiddleware, PagosController.addPago);
+router.post('/pagos', authMiddleware, PagosController.addPago);
 
 /**
  * @swagger
@@ -148,7 +148,7 @@ router.post('/pagos', loggerMiddleware, PagosController.addPago);
  *       404:
  *         description: Cliente no encontrado o no tiene pagos registrados.
  */
-router.get('/pagos/clientes/:id_cliente', loggerMiddleware, PagosController.getPagosByCliente);
+router.get('/pagos/clientes/:id_cliente', authMiddleware, PagosController.getPagosByCliente);
 
 /**
  * @swagger
@@ -193,7 +193,7 @@ router.get('/pagos/clientes/:id_cliente', loggerMiddleware, PagosController.getP
  *                   items:
  *                     $ref: '#/components/schemas/Pago'
  */
-router.get('/pagos/pendientes', loggerMiddleware, PagosController.getPagosPendientes);
+router.get('/pagos/pendientes', authMiddleware, PagosController.getPagosPendientes);
 
 /**
  * @swagger
@@ -230,6 +230,6 @@ router.get('/pagos/pendientes', loggerMiddleware, PagosController.getPagosPendie
  *       400:
  *         description: Datos inválidos.
  */
-router.patch('/pagos/:id', loggerMiddleware, PagosController.editPago);
+router.patch('/pagos/:id', authMiddleware, PagosController.editPago);
 
 module.exports = router;
