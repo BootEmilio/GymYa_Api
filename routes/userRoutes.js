@@ -7,36 +7,52 @@ const authMiddleware = require('../middlewares/authMiddleware');
  * @swagger
  * /usuarios:
  *   get:
- *     summary: Obtener todos los usuarios
- *     description: Retorna una lista de todos los usuarios registrados en el sistema con soporte para paginación.
+ *     summary: Obtener todos los usuarios con paginación
+ *     description: Retorna una lista paginada de los usuarios registrados en el sistema. Puedes especificar el número de página y la cantidad de resultados por página.
  *     tags:
  *       - Usuarios
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - name: limit
+ *       - name: page
  *         in: query
- *         description: Número máximo de usuarios a devolver.
+ *         description: Número de la página que deseas consultar (1 es la primera página).
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *       - name: pageSize
+ *         in: query
+ *         description: Número de usuarios por página.
  *         required: false
  *         schema:
  *           type: integer
  *           example: 10
- *       - name: offset
- *         in: query
- *         description: Número de usuarios a saltar antes de comenzar a devolver resultados.
- *         required: false
- *         schema:
- *           type: integer
- *           example: 0
  *     responses:
  *       200:
  *         description: Lista de usuarios obtenida exitosamente.
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/User'
+ *               type: object
+ *               properties:
+ *                 currentPage:
+ *                   type: integer
+ *                   description: Página actual.
+ *                 totalPages:
+ *                   type: integer
+ *                   description: Número total de páginas disponibles.
+ *                 pageSize:
+ *                   type: integer
+ *                   description: Número de usuarios por página.
+ *                 totalUsers:
+ *                   type: integer
+ *                   description: Número total de usuarios.
+ *                 users:
+ *                   type: array
+ *                   description: Lista de usuarios en la página actual.
+ *                   items:
+ *                     $ref: '#/components/schemas/User'
  *       401:
  *         description: No autorizado. Token inválido o faltante.
  */
