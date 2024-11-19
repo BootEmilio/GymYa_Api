@@ -1,8 +1,8 @@
 const User = require('../models/userModel');
 const userRepository = require('../repositories/userRepository');
 
-const getAllUsers = async () => {
-    return await userRepository.getAllUsers();
+const getAllUsers = async (limit, offset) => {
+    return await userRepository.getAllUsers(limit, offset);
 };
 
 const getUserById = async (id) => {

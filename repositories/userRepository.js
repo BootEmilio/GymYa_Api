@@ -1,9 +1,11 @@
 const db = require('../db');
 
-const getAllUsers = async () => {
-    const result = await db.query('SELECT * FROM usuarios');
+const getAllUsers = async (limit, offset) => {
+    const query = 'SELECT * FROM usuarios LIMIT $1 OFFSET $2';
+    const result = await db.query(query, [limit, offset]);
     return result.rows;
 };
+
 
 const getUserById = async (id) => {
     const result = await db.query('SELECT * FROM usuarios WHERE id = $1', [id]);

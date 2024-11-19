@@ -8,11 +8,26 @@ const authMiddleware = require('../middlewares/authMiddleware');
  * /usuarios:
  *   get:
  *     summary: Obtener todos los usuarios
- *     description: Retorna una lista de todos los usuarios registrados en el sistema.
+ *     description: Retorna una lista de todos los usuarios registrados en el sistema con soporte para paginación.
  *     tags:
  *       - Usuarios
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - name: limit
+ *         in: query
+ *         description: Número máximo de usuarios a devolver.
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           example: 10
+ *       - name: offset
+ *         in: query
+ *         description: Número de usuarios a saltar antes de comenzar a devolver resultados.
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           example: 0
  *     responses:
  *       200:
  *         description: Lista de usuarios obtenida exitosamente.
@@ -22,8 +37,11 @@ const authMiddleware = require('../middlewares/authMiddleware');
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/User'
+ *       401:
+ *         description: No autorizado. Token inválido o faltante.
  */
 router.get('/usuarios', authMiddleware, userController.getAllUsers);
+
 
 /**
  * @swagger

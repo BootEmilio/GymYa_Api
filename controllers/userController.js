@@ -11,13 +11,26 @@ const createUser = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
     try {
-        const users = await userService.getAllUsers(); // Llama al servicio para obtener todos los usuarios
-        res.status(200).json(users); // Devuelve los usuarios con un código de estado 200
+        // Obtén los parámetros de paginación de la consulta (con valores predeterminados)
+        const page = parseInt(req.query.page) || 1; // Página predeterminada: 1
+        const limit = parseInt(req.query.limit) || 10; // Tamaño de página predeterminado: 10
+        const offset = (page - 1) * limit;
+
+        // Llama al servicio para obtener los datos paginados
+        const { data, totalItems, totalPages } = await userService.getAllUsers(limit, offset);
+
+        // Devuelve los datos en un formato estándar de paginación
+        res.status(200).json({
+            currentPage: page,
+            totalPages,
+            totalItems,
+            data,
+        });
     } catch (error) {
-        console.error('Error al obtener los usuarios:', error);
-        res.status(500).json({ error: 'Error al obtener los usuarios' }); // Manejo de errores
+        console.error('Error al obtener los logs de los usuarios', error);
+        res.status(500).json({ error: 'Error al obtener los logs de usuarios' });
     }
-  };
+};
   
 
 const getUserById = async (req, res) => {
