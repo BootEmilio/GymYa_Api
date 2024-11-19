@@ -2,7 +2,7 @@ const db = require('../db');
 
 const getPaginatedUsers = async (limit, offset) => {
     const query = `
-        SELECT * FROM accesos_usuarios
+        SELECT * FROM usuarios
         LIMIT $1 OFFSET $2;
     `;
     const { rows } = await db.query(query, [limit, offset]);
