@@ -17,7 +17,7 @@ const getAllUsers = async (req, res) => {
         const offset = (page - 1) * limit;
 
         // Llama al servicio para obtener los datos paginados
-        const { data, totalItems, totalPages } = await userService.getAllUsers(limit, offset);
+        const { data, totalItems, totalPages } = await userService.getPaginatedUsers(limit, offset);
 
         // Devuelve los datos en un formato estándar de paginación
         res.status(200).json({

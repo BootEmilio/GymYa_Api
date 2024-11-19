@@ -1,8 +1,14 @@
 const User = require('../models/userModel');
 const userRepository = require('../repositories/userRepository');
 
-const getAllUsers = async (limit, offset) => {
-    return await userRepository.getAllUsers(limit, offset);
+const getPaginatedUsers = async (limit, offset) => {
+    const data = await userRepository.getPaginatedUsers(limit, offset);
+    const totalItems = await userRepository.getTotalUsers();
+
+        // Calcula el total de páginas
+        const totalPages = Math.ceil(totalItems / limit);
+
+        return { data, totalItems, totalPages };
 };
 
 const getUserById = async (id) => {
@@ -31,7 +37,7 @@ const deleteUser = async (id) => {
 };
 
 module.exports = {
-    getAllUsers,
+    getPaginatedUsers,
     getUserById,
     createUser,
     updateUser,

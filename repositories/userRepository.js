@@ -1,11 +1,19 @@
 const db = require('../db');
 
-const getAllUsers = async (limit, offset) => {
-    const query = 'SELECT * FROM usuarios LIMIT $1 OFFSET $2';
-    const result = await db.query(query, [limit, offset]);
-    return result.rows;
+const getPaginatedUsers = async (limit, offset) => {
+    const query = `
+        SELECT * FROM accesos_usuarios
+        LIMIT $1 OFFSET $2;
+    `;
+    const { rows } = await db.query(query, [limit, offset]);
+    return rows;
 };
 
+const getTotalUsers = async () => {
+    const query = `SELECT COUNT(*) FROM usuarios;`;
+    const { rows } = await db.query(query);
+    return parseInt(rows[0].count, 10);
+};
 
 const getUserById = async (id) => {
     const result = await db.query('SELECT * FROM usuarios WHERE id = $1', [id]);
@@ -36,7 +44,8 @@ const deleteUser = async (id) => {
 };
 
 module.exports = {
-    getAllUsers,
+    getPaginatedUsers,
+    getTotalUsers,
     getUserById,
     createUser,
     updateUser,
