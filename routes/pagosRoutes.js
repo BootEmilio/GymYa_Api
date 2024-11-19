@@ -11,6 +11,8 @@ const authMiddleware = require('../middlewares/authMiddleware');
  *     description: Retorna una lista de todos los pagos registrados en el sistema con soporte para paginación.
  *     tags:
  *       - Pagos
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: page
@@ -56,6 +58,8 @@ router.get('/pagos', authMiddleware, PagosController.getPagos);
  *     description: Retorna los detalles de un pago específico identificado por su ID.
  *     tags:
  *       - Pagos
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -83,6 +87,8 @@ router.get('/pagos/:id', authMiddleware, PagosController.getPago);
  *     description: Permite registrar un nuevo pago en el sistema.
  *     tags:
  *       - Pagos
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -105,6 +111,8 @@ router.post('/pagos', authMiddleware, PagosController.addPago);
  *     description: Retorna todos los pagos realizados por un cliente específico con soporte para paginación.
  *     tags:
  *       - Pagos
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id_cliente
@@ -158,6 +166,8 @@ router.get('/pagos/clientes/:id_cliente', authMiddleware, PagosController.getPag
  *     description: Retorna una lista de todos los pagos con estado "Pendiente" con soporte para paginación.
  *     tags:
  *       - Pagos
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: page
@@ -203,6 +213,8 @@ router.get('/pagos/pendientes', authMiddleware, PagosController.getPagosPendient
  *     description: Permite actualizar el estado de un pago existente.
  *     tags:
  *       - Pagos
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
