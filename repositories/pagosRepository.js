@@ -2,9 +2,13 @@ const db = require('../db'); // Asegúrate de tener configurada la conexión a l
 
 class PagosRepository {
     async createPago(pago) {
+        // Obtener la fecha actual en formato ISO
+        const fechaPago = new Date().toISOString();
+
+        // Incluir fecha de pago en la consulta
         const result = await db.query(
-            'INSERT INTO pagos (id_cliente, id_membresia, monto, metodo_pago, estado) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-            [pago.id_cliente, pago.id_membresia, pago.monto, pago.metodo_pago, pago.estado]
+            'INSERT INTO pagos (id_cliente, id_membresia, monto, metodo_pago, estado, fecha_pago) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+            [pago.id_cliente, pago.id_membresia, pago.monto, pago.metodo_pago, pago.estado, fechaPago]
         );
         return result.rows[0];
     }

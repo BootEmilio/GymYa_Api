@@ -4,7 +4,10 @@ const { Pago } = require('../models/pagosModel');
 class PagosService {
     async createPago(data) {
         const pago = new Pago(data.id_cliente, data.id_membresia, data.monto, data.metodo_pago, data.estado);
-        return await PagosRepository.createPago(pago);
+        const result = await PagosRepository.createPago(pago);
+
+        console.log("Pago creado con fecha de pago:", result.fecha_pago); // Registro para depuración
+        return result;
     }
 
     async updatePago(id, data) {
