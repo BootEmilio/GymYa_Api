@@ -1,6 +1,7 @@
 const PagosService = require('../services/pagosService');
 
 class PagosController {
+    // Agregar un nuevo pago
     async addPago(req, res) {
         try {
             const newPago = await PagosService.createPago(req.body);
@@ -14,10 +15,17 @@ class PagosController {
         }
     }
 
+    // Editar un pago existente
     async editPago(req, res) {
         const { id } = req.params;
+
+        // Validar que el ID sea un número
+        if (isNaN(parseInt(id, 10))) {
+            return res.status(400).json({ message: 'El ID debe ser un número válido' });
+        }
+
         try {
-            const updatedPago = await PagosService.updatePago(id, req.body);
+            const updatedPago = await PagosService.updatePago(parseInt(id, 10), req.body);
             if (!updatedPago) {
                 return res.status(404).json({ message: 'Pago no encontrado.' });
             }
@@ -31,14 +39,15 @@ class PagosController {
         }
     }
 
+    // Obtener un pago por su ID
     async getPago(req, res) {
         const { id } = req.params;
-    
+
         // Validar que el ID sea un número
         if (isNaN(parseInt(id, 10))) {
             return res.status(400).json({ message: 'El ID debe ser un número válido' });
         }
-    
+
         try {
             const pago = await PagosService.findPagoById(parseInt(id, 10));
             if (!pago) {
@@ -50,11 +59,17 @@ class PagosController {
             res.status(500).json({ message: 'Error al obtener el pago' });
         }
     }
-    
 
+    // Obtener todos los pagos con paginación
     async getPagos(req, res) {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
+
+        // Validar que los valores sean positivos
+        if (page < 1 || limit < 1) {
+            return res.status(400).json({ message: 'Los valores de paginación deben ser números positivos.' });
+        }
+
         const offset = (page - 1) * limit;
 
         try {
@@ -71,10 +86,17 @@ class PagosController {
         }
     }
 
+    // Obtener pagos de un cliente específico
     async getPagosByCliente(req, res) {
         const { id_cliente } = req.params;
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
+
+        // Validar que los valores sean positivos
+        if (page < 1 || limit < 1) {
+            return res.status(400).json({ message: 'Los valores de paginación deben ser números positivos.' });
+        }
+
         const offset = (page - 1) * limit;
 
         try {
@@ -91,17 +113,18 @@ class PagosController {
         }
     }
 
+    // Obtener pagos pendientes con paginación
     async getPagosPendientes(req, res) {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
-    
-        // Validar que los valores sean números positivos
+
+        // Validar que los valores sean positivos
         if (page < 1 || limit < 1) {
             return res.status(400).json({ message: 'Los valores de paginación deben ser números positivos.' });
         }
-    
+
         const offset = (page - 1) * limit;
-    
+
         try {
             const { data, totalItems, totalPages } = await PagosService.findPagosPendientes(limit, offset);
             res.status(200).json({
@@ -115,8 +138,6 @@ class PagosController {
             res.status(500).json({ message: 'Error al obtener pagos pendientes' });
         }
     }
-    
-    
 }
 
 module.exports = new PagosController();
