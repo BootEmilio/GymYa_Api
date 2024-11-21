@@ -35,11 +35,26 @@ class PagosService {
     }
 
     async findPagosPendientes(limit, offset) {
-        const data = await PagosRepository.findPagosPendientes(limit, offset);
-        const totalItems = await PagosRepository.countPagosPendientes();
-        const totalPages = Math.ceil(totalItems / limit);
+        try {
+            // Obtener los pagos pendientes
+            const pagos = await PagosRepository.findPagosPendientes(limit, offset);
 
-        return { data, totalItems, totalPages };
+            // Contar el número total de pagos pendientes
+            const totalItems = await PagosRepository.countPagosPendientes();
+
+            // Calcular el número total de páginas
+            const totalPages = Math.ceil(totalItems / limit);
+
+            // Devolver los resultados
+            return {
+                data: pagos,
+                totalItems,
+                totalPages
+            };
+        } catch (error) {
+            console.error('Error al obtener pagos pendientes:', error);
+            throw new Error('Error al obtener pagos pendientes');
+        }
     }
 }
 

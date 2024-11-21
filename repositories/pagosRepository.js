@@ -60,19 +60,30 @@ class PagosRepository {
     }
 
     async findPagosPendientes(limit, offset) {
-        const result = await db.query(
-            'SELECT * FROM pagos WHERE estado = $1 ORDER BY fecha_pago DESC LIMIT $2 OFFSET $3',
-            ['Pendiente', limit, offset]
-        );
-        return result.rows;
+        try {
+            const result = await db.query(
+                'SELECT * FROM pagos WHERE estado = $1 ORDER BY fecha_pago DESC LIMIT $2 OFFSET $3',
+                ['Pendiente', limit, offset]
+            );
+            return result.rows;  // Devuelve los pagos pendientes
+        } catch (error) {
+            console.error('Error al obtener pagos pendientes:', error);
+            throw new Error('Error al obtener pagos pendientes');
+        }
     }
 
+    // Método para contar el número total de pagos pendientes
     async countPagosPendientes() {
-        const result = await db.query(
-            'SELECT COUNT(*) FROM pagos WHERE estado = $1',
-            ['Pendiente']
-        );
-        return parseInt(result.rows[0].count, 10);
+        try {
+            const result = await db.query(
+                'SELECT COUNT(*) FROM pagos WHERE estado = $1',
+                ['Pendiente']
+            );
+            return parseInt(result.rows[0].count, 10);  // Devuelve el número total de pagos pendientes
+        } catch (error) {
+            console.error('Error al contar pagos pendientes:', error);
+            throw new Error('Error al contar pagos pendientes');
+        }
     }
 }
 

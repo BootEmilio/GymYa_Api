@@ -88,9 +88,12 @@ class PagosController {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const offset = (page - 1) * limit;
-
+    
         try {
+            // Llamar al servicio para obtener los pagos pendientes y la información de paginación
             const { data, totalItems, totalPages } = await PagosService.findPagosPendientes(limit, offset);
+            
+            // Devolver la respuesta con los datos de paginación
             res.status(200).json({
                 currentPage: page,
                 totalPages,
@@ -102,6 +105,7 @@ class PagosController {
             res.status(500).json({ message: 'Error al obtener pagos pendientes' });
         }
     }
+    
 }
 
 module.exports = new PagosController();
