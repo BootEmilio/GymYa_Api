@@ -8,7 +8,7 @@ const login = async (req, res) => {
   }
 
   try {
-    const authResult = await authService.authenticateAdmin(username, password);
+    const authResult = await authService.authenticate(username, password);
 
     if (!authResult) {
       return res.status(401).json({ message: 'Credenciales inválidas' });
@@ -17,7 +17,8 @@ const login = async (req, res) => {
     res.status(200).json({
       message: 'Login exitoso',
       token: authResult.token,
-      user: authResult.admin // información del administrador autenticado
+      user: authResult.user,
+      role: authResult.role, // Tipo de usuario autenticado
     });
   } catch (error) {
     console.error('Error en el proceso de login:', error);
