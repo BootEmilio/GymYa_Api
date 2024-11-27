@@ -6,21 +6,24 @@ const secretKey = process.env.JWT_SECRET;
 const tokenExpiration = process.env.JWT_EXPIRATION || '2h';
 
 const authenticateUser = async (username, password) => {
+  console.log('Intentando autenticar usuario:', username);
+
   try {
-    // Busca al usuario en la base de datos
     const result = await db.query(
       'SELECT * FROM usuarios WHERE username = $1 AND password = $2',
       [username, password]
     );
 
-    // Si no se encuentra el usuario, devuelve null
+    console.log('Resultado de la consulta:', result.rows);
+
     if (result.rows.length === 0) {
+      console.log('Usuario no encontrado');
       return null;
     }
 
     const user = result.rows[0];
+    console.log('Usuario autenticado:', user);
 
-    // Genera un token JWT para el usuario
     const token = jwt.sign(
       { id: user.id, username: user.username, role: 'usuario' },
       secretKey,
@@ -33,5 +36,6 @@ const authenticateUser = async (username, password) => {
     throw new Error('Error al autenticar');
   }
 };
+
 
 module.exports = { authenticateUser };
