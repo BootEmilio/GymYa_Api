@@ -1,5 +1,4 @@
 const db = require('../db');
-const bcrypt = require('bcrypt'); // Si usas encriptación de contraseñas
 
 const registerAdmin = async (req, res) => {
   try {
