@@ -2,8 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const swaggerUI = require("swagger-ui-express");
 const specs = require("./swagger/swagger");
-const authRoutes = require('./routes/authRoutes'); // Rutas de autenticación
-const adminRoutes = require('./routes/adminRoutes');
+const adminAuthRoutes = require('./routes/adminAuthRoutes');
+const userAuthRoutes = require('./routes/userAuthRoutes');
 const userRoutes = require('./routes/userRoutes'); // Rutas de clientes
 const pagosRoutes = require ('./routes/pagosRoutes');
 const accesosRoutes = require('./routes/accesosRoutes');
@@ -18,7 +18,8 @@ app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 
 app.use(loggerMiddleware);
 
-app.use('/api', authRoutes);
+app.use('/api/admin', adminAuthRoutes); // Login para administradores
+app.use('/api/user', userAuthRoutes); // Login para usuarios
 
 app.use(authMiddleware);
 
