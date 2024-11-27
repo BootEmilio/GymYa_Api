@@ -3,7 +3,7 @@ const cors = require('cors');
 const swaggerUI = require("swagger-ui-express");
 const specs = require("./swagger/swagger");
 const adminAuthRoutes = require('./routes/adminAuthRoutes');
-const adminRegisterRoutes = require('./routes/adminRegisterRoutes');
+const addGymRoutes = require('./routes/addGymAdmin');
 const userAuthRoutes = require('./routes/userAuthRoutes');
 const adminUsersRoutes = require('./routes/adminUsersRoutes'); // Rutas de clientes
 const adminPaymentsRoutes = require ('./routes/adminPaymentsRoutes');
@@ -19,7 +19,7 @@ app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 
 app.use(loggerMiddleware);
 
-app.use('/api/admin', adminRegisterRoutes);
+app.use('/api/admin', addGymRoutes);
 app.use('/api/admin', adminAuthRoutes); // Login para administradores
 app.use('/api/user', userAuthRoutes); // Login para usuarios
 
