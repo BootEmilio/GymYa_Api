@@ -1,4 +1,4 @@
-const accesosRepository = require('../repositories/accesosRepository');
+const accesosRepository = require('../repositories/adminAccessRepository');
 
 const getPaginatedAccesos = async (limit, offset) => {
     const data = await accesosRepository.getPaginatedAccesos(limit, offset);

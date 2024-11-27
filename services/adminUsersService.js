@@ -1,5 +1,5 @@
 const User = require('../models/userModel');
-const userRepository = require('../repositories/userRepository');
+const userRepository = require('../repositories/adminUsersRepository');
 
 const getPaginatedUsers = async (limit, offset) => {
     const data = await userRepository.getPaginatedUsers(limit, offset);

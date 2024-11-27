@@ -1,4 +1,4 @@
-const PagosRepository = require('../repositories/pagosRepository');
+const PagosRepository = require('../repositories/adminPaymentsRepository');
 const { Pago } = require('../models/pagosModel');
 
 class PagosService {
