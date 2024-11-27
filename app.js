@@ -19,7 +19,7 @@ app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 
 app.use(loggerMiddleware);
 
-app.use('/api/adminRegister', adminRegisterRoutes);
+app.use('/api/admin', adminRegisterRoutes);
 app.use('/api/admin', adminAuthRoutes); // Login para administradores
 app.use('/api/user', userAuthRoutes); // Login para usuarios
 
