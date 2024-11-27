@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const accesosController = require('../controllers/adminAccessController');
+const adminAccessController = require('../controllers/adminAccessController');
 const authMiddleware = require('../middlewares/authMiddleware');
 
 /**
@@ -66,7 +66,7 @@ const authMiddleware = require('../middlewares/authMiddleware');
  *       500:
  *         description: Error interno del servidor
  */
-router.get('/accesos', authMiddleware, accesosController.getAllAccesos);
+router.get('/accesos', authMiddleware, adminAccessController.getAllAccesos);
 
 /**
  * @swagger
@@ -113,6 +113,6 @@ router.get('/accesos', authMiddleware, accesosController.getAllAccesos);
  *       500:
  *         description: Error interno del servidor
  */
-router.get('/accesos/:id', authMiddleware, accesosController.getAccesosById);
+router.get('/accesos/:id', authMiddleware, adminAccessController.getAccesosById);
 
 module.exports = router;

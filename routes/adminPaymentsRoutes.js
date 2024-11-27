@@ -77,31 +77,7 @@ router.get('/pagos', authMiddleware, PagosController.getPagos);
  *       404:
  *         description: Pago no encontrado.
  */
-router.get('/pagos/:id', authMiddleware, PagosController.getPago);
-
-/**
- * @swagger
- * /pagos:
- *   post:
- *     summary: Registrar un nuevo pago
- *     description: Permite registrar un nuevo pago en el sistema.
- *     tags:
- *       - Pagos
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Pago'
- *     responses:
- *       201:
- *         description: Pago registrado exitosamente.
- *       400:
- *         description: Datos del pago inválidos.
- */
-router.post('/pagos', authMiddleware, PagosController.addPago);
+router.get('/pagos/:id', authMiddleware, PagosController.getPagoById);
 
 /**
  * @swagger
@@ -205,43 +181,5 @@ router.get('/pagos/clientes/:id_cliente', authMiddleware, PagosController.getPag
  */
 router.get('/pagos/pendientes', authMiddleware, PagosController.getPagosPendientes);
 
-/**
- * @swagger
- * /pagos/{id}:
- *   patch:
- *     summary: Actualizar el estado de un pago
- *     description: Permite actualizar el estado de un pago existente.
- *     tags:
- *       - Pagos
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: ID del pago.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               estado:
- *                 type: string
- *                 description: Nuevo estado del pago.
- *             example:
- *               estado: "Completado"
- *     responses:
- *       200:
- *         description: Estado del pago actualizado exitosamente.
- *       404:
- *         description: Pago no encontrado.
- *       400:
- *         description: Datos inválidos.
- */
-router.patch('/pagos/:id', authMiddleware, PagosController.editPago);
 
 module.exports = router;
