@@ -16,21 +16,20 @@ const getUserById = async (gym_id, id) => {
 };
 
 const createUser = async (userData) => {
-    // Validar que los datos obligatorios estén presentes
+    // Validar campos obligatorios
     if (!userData.gym_id || !userData.username || !userData.password) {
         throw new Error('Faltan datos obligatorios: gym_id, username, password');
     }
 
-    const newUser = new User(
-        null, // id se generará automáticamente en la BD
-        userData.gym_id,
-        userData.username,
-        userData.password,
-        userData.nombre_completo || null, // Campo opcional
-        userData.email || null,          // Campo opcional
-        userData.telefono || null,       // Campo opcional
-        userData.fecha_registro || new Date() // Fecha actual como predeterminado
-    );
+    const newUser = {
+        gym_id: userData.gym_id,
+        username: userData.username,
+        password: userData.password,
+        nombre_completo: userData.nombre_completo || null,
+        email: userData.email || null,
+        telefono: userData.telefono || null,
+        fecha_registro: userData.fecha_registro || new Date() // Usa la fecha actual si no se proporciona
+    };
 
     return await userRepository.createUser(newUser);
 };
