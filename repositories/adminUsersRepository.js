@@ -1,46 +1,68 @@
 const db = require('../db');
 
-const getPaginatedUsers = async (limit, offset) => {
+const getPaginatedUsers = async (gym_id, limit, offset) => {
     const query = `
         SELECT * FROM usuarios
-        LIMIT $1 OFFSET $2;
+        WHERE gym_id = $1
+        LIMIT $2 OFFSET $3;
     `;
-    const { rows } = await db.query(query, [limit, offset]);
+    const { rows } = await db.query(query, [gym_id, limit, offset]);
     return rows;
 };
 
-const getTotalUsers = async () => {
-    const query = `SELECT COUNT(*) FROM usuarios;`;
-    const { rows } = await db.query(query);
+const getTotalUsers = async (gym_id) => {
+    const query = `SELECT COUNT(*) FROM usuarios WHERE gym_id = $1;`;
+    const { rows } = await db.query(query, [gym_id]);
     return parseInt(rows[0].count, 10);
 };
 
-const getUserById = async (id) => {
-    const result = await db.query('SELECT * FROM usuarios WHERE id = $1', [id]);
+const getUserById = async (gym_id, id) => {
+    const query = `SELECT * FROM usuarios WHERE id = $1 AND gym_id = $2;`;
+    const result = await db.query(query, [id, gym_id]);
     return result.rows[0];
 };
 
 const createUser = async (user) => {
     const query = `
-        INSERT INTO usuarios (nombre_completo, fecha_registro, telefono, activo, username, password)
-        VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`;
-    const values = [user.nombre_completo, user.fecha_registro, user.telefono, user.activo, user.username, user.password];
+        INSERT INTO usuarios (gym_id, username, password, nombre_completo, email, telefono, fecha_registro)
+        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;
+    `;
+    const values = [
+        user.gym_id,
+        user.username,
+        user.password,
+        user.nombre_completo,
+        user.email,
+        user.telefono,
+        user.fecha_registro,
+    ];
     const result = await db.query(query, values);
     return result.rows[0];
 };
 
-const updateUser = async (id, userData) => {
+const updateUser = async (gym_id, id, userData) => {
     const query = `
         UPDATE usuarios
-        SET nombre_completo = $1, fecha_registro = $2, telefono = $3, activo = $4, username = $5, password = $6
-        WHERE id = $7 RETURNING *`;
-    const values = [userData.nombre_completo, userData.fecha_registro, userData.telefono, userData.activo, userData.username, userData.password, id];
+        SET username = $1, password = $2, nombre_completo = $3, email = $4, telefono = $5
+        WHERE id = $6 AND gym_id = $7
+        RETURNING *;
+    `;
+    const values = [
+        userData.username,
+        userData.password,
+        userData.nombre_completo,
+        userData.email,
+        userData.telefono,
+        id,
+        gym_id,
+    ];
     const result = await db.query(query, values);
     return result.rows[0];
 };
 
-const deleteUser = async (id) => {
-    await db.query('DELETE FROM usuarios WHERE id = $1', [id]);
+const deleteUser = async (gym_id, id) => {
+    const query = `DELETE FROM usuarios WHERE id = $1 AND gym_id = $2;`;
+    await db.query(query, [id, gym_id]);
 };
 
 module.exports = {
