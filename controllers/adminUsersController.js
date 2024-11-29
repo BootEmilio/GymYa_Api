@@ -37,16 +37,19 @@ const getUserById = async (req, res) => {
 
 const createUser = async (req, res) => {
     try {
-        const gym_id = req.user.gym_id; // Extrae el gym_id del token JWT
-        const userData = { ...req.body, gym_id }; // Agrega gym_id al cuerpo de la solicitud
+        console.log('Cuerpo de la solicitud:', req.body); // Depurar el cuerpo recibido
+        const gym_id = req.user.gym_id;
+        console.log('Gym ID:', gym_id); // Depurar gym_id extraído del token
+        const userData = { ...req.body, gym_id };
         const newUser = await userService.createUser(userData);
 
         res.status(201).json(newUser);
     } catch (error) {
-        console.error('Error al crear el usuario:', error);
-        res.status(500).json({ error: 'Error al crear el usuario' });
+        console.error('Error al crear el usuario:', error.message);
+        res.status(500).json({ error: error.message });
     }
 };
+
 
 const updateUser = async (req, res) => {
     try {

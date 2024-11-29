@@ -31,14 +31,15 @@ const createUser = async (user) => {
         user.gym_id,
         user.username,
         user.password,
-        user.nombre_completo || null,
-        user.email || null,
-        user.telefono || null,
-        user.fecha_registro || new Date(),
+        user.nombre_completo,
+        user.email,
+        user.telefono,
+        user.fecha_registro,
     ];
     const result = await db.query(query, values);
     return result.rows[0];
 };
+
 
 const updateUser = async (gym_id, id, userData) => {
     const query = `
