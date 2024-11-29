@@ -37,10 +37,19 @@ const getUserById = async (req, res) => {
 
 const createUser = async (req, res) => {
     try {
+        // Verifica si el token proporciona el gym_id
+        const gym_id = req.user?.gym_id;
+        if (!gym_id) {
+            return res.status(400).json({ error: 'El token no contiene el gym_id' });
+        }
+
         console.log('Cuerpo de la solicitud:', req.body); // Depurar el cuerpo recibido
-        const gym_id = req.user.gym_id;
         console.log('Gym ID:', gym_id); // Depurar gym_id extraído del token
+
+        // Agrega gym_id al cuerpo de la solicitud
         const userData = { ...req.body, gym_id };
+
+        // Llama al servicio para crear el usuario
         const newUser = await userService.createUser(userData);
 
         res.status(201).json(newUser);
@@ -49,7 +58,6 @@ const createUser = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
-
 
 const updateUser = async (req, res) => {
     try {

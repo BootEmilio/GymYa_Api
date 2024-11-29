@@ -29,14 +29,16 @@ const createUser = async (user) => {
     `;
 
     const values = [
-        user.gym_id,           // $1
-        user.username,         // $2
-        user.password,         // $3
-        user.nombre_completo,  // $4
-        user.email,            // $5
-        user.telefono,         // $6
-        user.fecha_registro || new Date().toISOString(), // $7
+        user.gym_id,
+        user.username,
+        user.password,
+        user.nombre_completo,
+        user.email,
+        user.telefono,
+        user.fecha_registro || new Date().toISOString(),
     ];
+
+    console.log('Valores para insertar usuario:', values); // Depurar valores
 
     try {
         const result = await db.query(query, values);
@@ -46,8 +48,6 @@ const createUser = async (user) => {
         throw new Error('No se pudo crear el usuario');
     }
 };
-
-
 
 const updateUser = async (gym_id, id, userData) => {
     const query = `
