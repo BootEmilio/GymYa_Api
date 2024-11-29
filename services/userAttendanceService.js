@@ -1,25 +1,22 @@
 const userAttendanceRepository = require('../repositories/userAttendanceRepository');
 
-// Crear una nueva asistencia
-const createAsistencia = async (userId, tipo_acceso, gymId) => {
-    if (!['entrada', 'salida'].includes(tipo_acceso)) {
-        throw new Error('El tipo de acceso debe ser "entrada" o "salida"');
+const createAsistencia = async (usuario_id, tipo_acceso) => {
+    if (!tipo_acceso) {
+        throw new Error('El tipo de acceso es obligatorio');
     }
-    return await userAttendanceRepository.createAsistencia(userId, tipo_acceso, gymId);
+
+    return await userAttendanceRepository.createAsistencia(usuario_id, tipo_acceso);
 };
 
-// Obtener las asistencias de un usuario con paginación
-const getAsistenciasByUserId = async (userId, limit, offset) => {
-    return await userAttendanceRepository.getAsistenciasByUserId(userId, limit, offset);
-};
+const getAsistenciasByUserId = async (usuario_id, limit, offset) => {
+    const data = await userAttendanceRepository.getAsistenciasByUserId(usuario_id, limit, offset);
+    const totalItems = await userAttendanceRepository.getTotalAsistenciasByUserId(usuario_id);
 
-// Obtener el total de asistencias de un usuario
-const getTotalAsistenciasByUserId = async (userId) => {
-    return await userAttendanceRepository.getTotalAsistenciasByUserId(userId);
+    const totalPages = Math.ceil(totalItems / limit);
+    return { data, totalItems, totalPages };
 };
 
 module.exports = {
     createAsistencia,
     getAsistenciasByUserId,
-    getTotalAsistenciasByUserId,
 };
