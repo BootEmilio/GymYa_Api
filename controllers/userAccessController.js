@@ -1,6 +1,6 @@
+// controllers/userAccessController.js
 const userAccessService = require('../services/userAccessService');
 
-// Crear un nuevo acceso para el usuario (POST)
 const createAcceso = async (req, res) => {
     try {
         const userId = req.user.id; // Obtener el ID del usuario desde el JWT
@@ -15,7 +15,6 @@ const createAcceso = async (req, res) => {
     }
 };
 
-// Obtener los accesos del usuario autenticado (GET)
 const getAccesos = async (req, res) => {
     try {
         const userId = req.user.id; // Obtener el ID del usuario desde el JWT
@@ -23,7 +22,6 @@ const getAccesos = async (req, res) => {
         const limit = parseInt(req.query.limit) || 10;
         const offset = (page - 1) * limit;
 
-        // Obtener los accesos solo del usuario autenticado
         const data = await userAccessService.getAccesosByUserId(userId, limit, offset);
         const totalItems = await userAccessService.getTotalAccesosByUserId(userId);
 
