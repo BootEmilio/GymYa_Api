@@ -2,10 +2,14 @@ const userAttendanceService = require('../services/userAttendanceService');
 
 const createAsistencia = async (req, res) => {
     try {
-        const usuario_id = req.user.id; // Extraer el ID del usuario desde el token JWT
-        const { tipo_acceso } = req.body; // Recibe solo el tipo de acceso desde el cuerpo
+        const usuario_id = req.user.id; // Extraer el ID del usuario desde el JWT
+        const { tipo_acceso, gym_id } = req.body; // gym_id se proporciona en el cuerpo
 
-        const asistencia = await userAttendanceService.createAsistencia(usuario_id, tipo_acceso);
+        if (!gym_id) {
+            return res.status(400).json({ message: 'El gym_id es obligatorio' });
+        }
+
+        const asistencia = await userAttendanceService.createAsistencia(usuario_id, tipo_acceso, gym_id);
 
         res.status(201).json({
             message: 'Asistencia registrada exitosamente',
@@ -19,7 +23,7 @@ const createAsistencia = async (req, res) => {
 
 const getAsistencias = async (req, res) => {
     try {
-        const usuario_id = req.user.id; // Extraer el ID del usuario desde el token JWT
+        const usuario_id = req.user.id; // Extraer el ID del usuario desde el JWT
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const offset = (page - 1) * limit;

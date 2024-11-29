@@ -1,11 +1,15 @@
 const userAttendanceRepository = require('../repositories/userAttendanceRepository');
 
-const createAsistencia = async (usuario_id, tipo_acceso) => {
+const createAsistencia = async (usuario_id, tipo_acceso, gym_id) => {
     if (!tipo_acceso) {
         throw new Error('El tipo de acceso es obligatorio');
     }
 
-    return await userAttendanceRepository.createAsistencia(usuario_id, tipo_acceso);
+    if (!gym_id) {
+        throw new Error('El gym_id es obligatorio');
+    }
+
+    return await userAttendanceRepository.createAsistencia(usuario_id, tipo_acceso, gym_id);
 };
 
 const getAsistenciasByUserId = async (usuario_id, limit, offset) => {
