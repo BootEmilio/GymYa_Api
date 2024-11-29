@@ -15,7 +15,12 @@ const authenticateAdmin = async (username, password) => {
     if (result.rows.length > 0) {
       const admin = result.rows[0];
       const token = jwt.sign(
-        { id: admin.id, username: admin.username, role: 'administrador' },
+        { 
+          id: admin.id, 
+          username: admin.username, 
+          role: 'administrador', 
+          gym_id: admin.gym_id // Asegúrate de que gym_id está en la tabla administradores
+        },
         secretKey,
         { expiresIn: tokenExpiration }
       );
@@ -27,5 +32,6 @@ const authenticateAdmin = async (username, password) => {
     throw new Error('Error al autenticar');
   }
 };
+
 
 module.exports = { authenticateAdmin };
