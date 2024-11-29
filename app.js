@@ -7,6 +7,7 @@ const addGymRoutes = require('./routes/addGymAdmin');
 const userAuthRoutes = require('./routes/userAuthRoutes');
 const adminUsersRoutes = require('./routes/adminUsersRoutes'); // Rutas de clientes
 const adminPaymentsRoutes = require ('./routes/adminPaymentsRoutes');
+const userAccessRoutes = require('./routes/userAccessRoutes');
 const adminAccessRoutes = require('./routes/adminAccessRoutes');
 const authMiddleware = require('./middlewares/authMiddleware');
 const loggerMiddleware = require('./middlewares/loggerMiddleware');
@@ -28,6 +29,7 @@ app.use(authMiddleware);
 app.use('/api', adminUsersRoutes);
 app.use('/api', adminPaymentsRoutes);
 app.use('/api', adminAccessRoutes);
+app.use('/api', userAccessRoutes);
 
 
 const PORT = process.env.PORT || 3000;

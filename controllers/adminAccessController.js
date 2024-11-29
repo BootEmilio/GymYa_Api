@@ -1,16 +1,33 @@
-const accesosService = require('../services/adminAccessService');
+const userAccessService = require('../services/userAccessService');
 
-const getAllAccesos = async (req, res) => {
+// Crear un nuevo acceso para el usuario (POST)
+const createAcceso = async (req, res) => {
     try {
-        // Obtener el gym_id desde el token del administrador
-        const gymId = req.user.gym_id;
-        if (!gymId) return res.status(400).json({ error: 'gym_id no encontrado en el token' });
+        const userId = req.user.id; // Obtener el ID del usuario desde el JWT
+        const acceso = await userAccessService.createAcceso(userId);
+        res.status(201).json({
+            message: 'Acceso creado exitosamente',
+            acceso,
+        });
+    } catch (error) {
+        console.error('Error al crear el acceso:', error);
+        res.status(500).json({ message: 'Error al crear el acceso' });
+    }
+};
 
+// Obtener los accesos del usuario autenticado (GET)
+const getAccesos = async (req, res) => {
+    try {
+        const userId = req.user.id; // Obtener el ID del usuario desde el JWT
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const offset = (page - 1) * limit;
 
-        const { data, totalItems, totalPages } = await accesosService.getPaginatedAccesos(gymId, limit, offset);
+        // Obtener los accesos solo del usuario autenticado
+        const data = await userAccessService.getAccesosByUserId(userId, limit, offset);
+        const totalItems = await userAccessService.getTotalAccesosByUserId(userId);
+
+        const totalPages = Math.ceil(totalItems / limit);
 
         res.status(200).json({
             currentPage: page,
@@ -20,27 +37,11 @@ const getAllAccesos = async (req, res) => {
         });
     } catch (error) {
         console.error('Error al obtener los accesos:', error);
-        res.status(500).json({ error: 'Error al obtener los accesos' });
+        res.status(500).json({ message: 'Error al obtener los accesos' });
     }
 };
 
-const getAccesosById = async (req, res) => {
-    try {
-        const id = parseInt(req.params.id);
-        if (isNaN(id)) return res.status(400).json({ error: 'El ID debe ser un número' });
-
-        // Obtener el gym_id desde el token del administrador
-        const gymId = req.user.gym_id;
-        if (!gymId) return res.status(400).json({ error: 'gym_id no encontrado en el token' });
-
-        const acceso = await accesosService.getAccesosById(id, gymId);
-        if (!acceso) return res.status(404).json({ error: 'Acceso no encontrado' });
-
-        res.status(200).json(acceso);
-    } catch (error) {
-        console.error('Error al obtener el acceso:', error);
-        res.status(500).json({ error: 'Error al obtener el acceso' });
-    }
+module.exports = {
+    createAcceso,
+    getAccesos,
 };
-
-module.exports = { getAllAccesos, getAccesosById };
