@@ -2,12 +2,12 @@ const userService = require('../services/adminUsersService');
 
 const getPaginatedUsers = async (req, res) => {
     try {
-        const gym_id = req.user.gym_id; // Extrae el gym_id del token JWT
+        const adminId = req.user.id; // Extrae el ID del administrador autenticado
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const offset = (page - 1) * limit;
 
-        const { data, totalItems, totalPages } = await userService.getPaginatedUsers(gym_id, limit, offset);
+        const { data, totalItems, totalPages } = await userService.getPaginatedUsers(adminId, limit, offset);
 
         res.status(200).json({
             currentPage: page,

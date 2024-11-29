@@ -1,13 +1,17 @@
 const userRepository = require('../repositories/adminUsersRepository');
 
-const getPaginatedUsers = async (gym_id, limit, offset) => {
-    if (!gym_id) {
-        throw new Error('El gym_id es obligatorio para obtener los usuarios');
+const getPaginatedUsers = async (adminId, limit, offset) => {
+    if (!adminId) {
+        throw new Error('El ID del administrador es obligatorio para obtener los usuarios');
+    }
+    
+    const gymId = await userRepository.getGymIdByAdminId(adminId);
+    if (!gymId) {
+        throw new Error('No se encontró un gimnasio relacionado con este administrador');
     }
 
-    const data = await userRepository.getPaginatedUsers(gym_id, limit, offset);
-    const totalItems = await userRepository.getTotalUsers(gym_id);
-
+    const data = await userRepository.getPaginatedUsers(gymId, limit, offset);
+    const totalItems = await userRepository.getTotalUsers(gymId);
     const totalPages = Math.ceil(totalItems / limit);
 
     return { data, totalItems, totalPages };

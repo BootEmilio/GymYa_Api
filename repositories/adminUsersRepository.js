@@ -1,5 +1,11 @@
 const db = require('../db');
 
+const getGymIdByAdminId = async (adminId) => {
+    const query = `SELECT gym_id FROM administradores WHERE id = $1;`;
+    const { rows } = await db.query(query, [adminId]);
+    return rows[0]?.gym_id || null;
+};
+
 const getPaginatedUsers = async (gym_id, limit, offset) => {
     const query = `
         SELECT * FROM usuarios
@@ -14,12 +20,6 @@ const getTotalUsers = async (gym_id) => {
     const query = `SELECT COUNT(*) FROM usuarios WHERE gym_id = $1;`;
     const { rows } = await db.query(query, [gym_id]);
     return parseInt(rows[0].count, 10);
-};
-
-const getUserById = async (gym_id, id) => {
-    const query = `SELECT * FROM usuarios WHERE id = $1 AND gym_id = $2;`;
-    const result = await db.query(query, [id, gym_id]);
-    return result.rows[0];
 };
 
 const createUser = async (adminId, user) => {
@@ -79,7 +79,7 @@ const deleteUser = async (gym_id, id) => {
 module.exports = {
     getPaginatedUsers,
     getTotalUsers,
-    getUserById,
+    getGymIdByAdminId,
     createUser,
     updateUser,
     deleteUser,
