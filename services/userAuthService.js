@@ -6,36 +6,31 @@ const secretKey = process.env.JWT_SECRET;
 const tokenExpiration = process.env.JWT_EXPIRATION || '2h';
 
 const authenticateUser = async (username, password) => {
-  console.log('Intentando autenticar usuario:', username);
-
   try {
     const result = await db.query(
       'SELECT * FROM usuarios WHERE username = $1 AND password = $2',
       [username, password]
     );
 
-    console.log('Resultado de la consulta:', result.rows);
-
-    if (result.rows.length === 0) {
-      console.log('Usuario no encontrado');
-      return null;
+    if (result.rows.length > 0) {
+      const user = result.rows[0];
+      const token = jwt.sign(
+        { 
+          id: user.id, 
+          username: user.username, 
+          role: 'usuario', 
+          gym_id: user.gym_id // Asegúrate de que gym_id está en la tabla usuarios
+        },
+        secretKey,
+        { expiresIn: tokenExpiration }
+      );
+      return { token, user };
     }
-
-    const user = result.rows[0];
-    console.log('Usuario autenticado:', user);
-
-    const token = jwt.sign(
-      { id: user.id, username: user.username, role: 'usuario' },
-      secretKey,
-      { expiresIn: tokenExpiration }
-    );
-
-    return { token, user };
+    return null;
   } catch (error) {
     console.error('Error autenticando al usuario:', error);
     throw new Error('Error al autenticar');
   }
 };
-
 
 module.exports = { authenticateUser };
