@@ -30,11 +30,11 @@ const createUser = async (userData) => {
         nombre_completo: userData.nombre_completo || null,
         email: userData.email || null,
         telefono: userData.telefono || null,
-        fecha_registro: userData.fecha_registro || new Date(), // Usa la fecha actual si no se proporciona
+        fecha_registro: userData.fecha_registro || new Date() // Usa la fecha actual si no se proporciona
     };
-
     return await userRepository.createUser(newUser);
 };
+
 
 const updateUser = async (gym_id, id, userData) => {
     if (!id || isNaN(id) || !gym_id || isNaN(gym_id)) {

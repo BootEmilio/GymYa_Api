@@ -28,13 +28,13 @@ const createUser = async (user) => {
         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;
     `;
     const values = [
-        user.gym_id,
-        user.username,
-        user.password,
-        user.nombre_completo,
-        user.email,
-        user.telefono,
-        user.fecha_registro,
+        user.gym_id,           // $1
+        user.username,         // $2
+        user.password,         // $3
+        user.nombre_completo,  // $4
+        user.email,            // $5
+        user.telefono,         // $6
+        user.fecha_registro || new Date() // $7
     ];
     const result = await db.query(query, values);
     return result.rows[0];
