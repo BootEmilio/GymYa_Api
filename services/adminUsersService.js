@@ -4,7 +4,7 @@ const getPaginatedUsers = async (adminId, limit, offset) => {
     if (!adminId) {
         throw new Error('El ID del administrador es obligatorio para obtener los usuarios');
     }
-    
+
     const gymId = await userRepository.getGymIdByAdminId(adminId);
     if (!gymId) {
         throw new Error('No se encontró un gimnasio relacionado con este administrador');
@@ -38,12 +38,17 @@ const createUser = async (adminId, userData) => {
     });
 };
 
-const updateUser = async (gym_id, id, userData) => {
-    if (!id || isNaN(id) || !gym_id || isNaN(gym_id)) {
-        throw new Error('El ID proporcionado o el gym_id no son válidos');
+const updateUser = async (adminId, userId, userData) => {
+    // Obtener el gym_id basado en el ID del administrador
+    const gymId = await userRepository.getGymIdByAdminId(adminId);
+    if (!gymId) {
+        throw new Error('No se encontró un gimnasio asociado al administrador');
     }
 
-    return await userRepository.updateUser(gym_id, id, userData);
+    // Llamar al repositorio para actualizar el usuario
+    const updatedUser = await userRepository.updateUser(gymId, userId, userData);
+
+    return updatedUser;
 };
 
 const deleteUser = async (gym_id, id) => {

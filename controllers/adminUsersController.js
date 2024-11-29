@@ -49,13 +49,32 @@ const createUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
     try {
-        const gym_id = req.user.gym_id; // Extrae el gym_id del token JWT
-        const updatedUser = await userService.updateUser(gym_id, req.params.id, req.body);
+        // Obtén el ID del administrador desde el token
+        const adminId = req.user.id;
+        const userId = req.params.id;  // El ID del usuario que se quiere actualizar
 
+        // Validar que el ID del usuario es válido (puedes agregar más validaciones si lo deseas)
+        if (!userId || isNaN(userId)) {
+            return res.status(400).json({ error: 'El ID del usuario no es válido' });
+        }
+
+        // Datos del usuario a actualizar desde el cuerpo de la solicitud
+        const userData = req.body;
+
+        // Actualiza el usuario llamando al servicio
+        const updatedUser = await userService.updateUser(adminId, userId, userData);
+
+        // Si no se encuentra el usuario, retorna un error
+        if (!updatedUser) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+
+        // Responde con el usuario actualizado
         res.status(200).json(updatedUser);
+
     } catch (error) {
         console.error('Error al actualizar el usuario:', error);
-        res.status(500).json({ error: 'Error al actualizar el usuario' });
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 };
 

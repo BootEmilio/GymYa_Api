@@ -51,24 +51,31 @@ const createUser = async (adminId, user) => {
     return result.rows[0];
 };
 
-const updateUser = async (gym_id, id, userData) => {
+const updateUser = async (gym_id, user_id, userData) => {
     const query = `
         UPDATE usuarios
-        SET username = $1, password = $2, nombre_completo = $3, email = $4, telefono = $5
+        SET 
+            username = $1, 
+            password = $2, 
+            nombre_completo = $3, 
+            email = $4, 
+            telefono = $5
         WHERE id = $6 AND gym_id = $7
         RETURNING *;
     `;
+
     const values = [
         userData.username,
         userData.password,
         userData.nombre_completo,
         userData.email,
         userData.telefono,
-        id,
+        user_id,
         gym_id,
     ];
+
     const result = await db.query(query, values);
-    return result.rows[0];
+    return result.rows[0]; // Retorna el usuario actualizado
 };
 
 const deleteUser = async (gym_id, id) => {
