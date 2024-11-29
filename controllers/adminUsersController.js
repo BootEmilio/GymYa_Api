@@ -1,12 +1,13 @@
 const userService = require('../services/adminUsersService');
 
-const getAllUsers = async (req, res) => {
+const getPaginatedUsers = async (req, res) => {
     try {
+        const gym_id = req.user.gym_id; // Extrae el gym_id del token JWT
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const offset = (page - 1) * limit;
 
-        const { data, totalItems, totalPages } = await userService.getPaginatedUsers(limit, offset);
+        const { data, totalItems, totalPages } = await userService.getPaginatedUsers(gym_id, limit, offset);
 
         res.status(200).json({
             currentPage: page,
@@ -16,13 +17,15 @@ const getAllUsers = async (req, res) => {
         });
     } catch (error) {
         console.error('Error al obtener los usuarios:', error);
-        res.status(500).json({ error: 'Error al obtener los usuarios' });
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 };
 
 const getUserById = async (req, res) => {
     try {
-        const user = await userService.getUserById(req.params.id);
+        const gym_id = req.user.gym_id; // Extrae el gym_id del token JWT
+        const user = await userService.getUserById(gym_id, req.params.id);
+
         if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
 
         res.status(200).json(user);
@@ -34,7 +37,10 @@ const getUserById = async (req, res) => {
 
 const createUser = async (req, res) => {
     try {
-        const newUser = await userService.createUser(req.body);
+        const gym_id = req.user.gym_id; // Extrae el gym_id del token JWT
+        const userData = { ...req.body, gym_id }; // Agrega gym_id al cuerpo de la solicitud
+        const newUser = await userService.createUser(userData);
+
         res.status(201).json(newUser);
     } catch (error) {
         console.error('Error al crear el usuario:', error);
@@ -44,7 +50,9 @@ const createUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
     try {
-        const updatedUser = await userService.updateUser(req.params.id, req.body);
+        const gym_id = req.user.gym_id; // Extrae el gym_id del token JWT
+        const updatedUser = await userService.updateUser(gym_id, req.params.id, req.body);
+
         res.status(200).json(updatedUser);
     } catch (error) {
         console.error('Error al actualizar el usuario:', error);
@@ -54,7 +62,9 @@ const updateUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
     try {
-        await userService.deleteUser(req.params.id);
+        const gym_id = req.user.gym_id; // Extrae el gym_id del token JWT
+        await userService.deleteUser(gym_id, req.params.id);
+
         res.status(204).end();
     } catch (error) {
         console.error('Error al eliminar el usuario:', error);
@@ -63,7 +73,7 @@ const deleteUser = async (req, res) => {
 };
 
 module.exports = {
-    getAllUsers,
+    getPaginatedUsers,
     getUserById,
     createUser,
     updateUser,
