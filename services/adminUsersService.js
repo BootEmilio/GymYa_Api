@@ -51,12 +51,17 @@ const updateUser = async (adminId, userId, userData) => {
     return updatedUser;
 };
 
-const deleteUser = async (gym_id, id) => {
-    if (!id || isNaN(id) || !gym_id || isNaN(gym_id)) {
-        throw new Error('El ID proporcionado o el gym_id no son válidos');
+const deleteUser = async (adminId, userId) => {
+    // Obtener el gym_id basado en el ID del administrador
+    const gymId = await userRepository.getGymIdByAdminId(adminId);
+    if (!gymId) {
+        throw new Error('No se encontró un gimnasio asociado al administrador');
     }
 
-    return await userRepository.deleteUser(gym_id, id);
+    // Llamar al repositorio para eliminar el usuario
+    const result = await userRepository.deleteUser(gymId, userId);
+
+    return result;
 };
 
 module.exports = {

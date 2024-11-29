@@ -78,9 +78,12 @@ const updateUser = async (gym_id, user_id, userData) => {
     return result.rows[0]; // Retorna el usuario actualizado
 };
 
-const deleteUser = async (gym_id, id) => {
-    const query = `DELETE FROM usuarios WHERE id = $1 AND gym_id = $2;`;
-    await db.query(query, [id, gym_id]);
+const deleteUser = async (gym_id, user_id) => {
+    const query = `DELETE FROM usuarios WHERE id = $1 AND gym_id = $2 RETURNING *;`;
+    const { rows } = await db.query(query, [user_id, gym_id]);
+    
+    // Si no se encuentra el usuario, retorna null
+    return rows.length > 0 ? rows[0] : null;
 };
 
 module.exports = {

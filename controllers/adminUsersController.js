@@ -80,13 +80,29 @@ const updateUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
     try {
-        const gym_id = req.user.gym_id; // Extrae el gym_id del token JWT
-        await userService.deleteUser(gym_id, req.params.id);
+        // Obtén el ID del administrador desde el token
+        const adminId = req.user.id;
+        const userId = req.params.id;  // El ID del usuario que se quiere eliminar
 
-        res.status(204).end();
+        // Validar que el ID del usuario es válido (puedes agregar más validaciones si lo deseas)
+        if (!userId || isNaN(userId)) {
+            return res.status(400).json({ error: 'El ID del usuario no es válido' });
+        }
+
+        // Eliminar el usuario llamando al servicio
+        const result = await userService.deleteUser(adminId, userId);
+
+        // Si no se encuentra el usuario, retorna un error
+        if (!result) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+
+        // Responde con un mensaje de éxito
+        res.status(204).json();
+
     } catch (error) {
         console.error('Error al eliminar el usuario:', error);
-        res.status(500).json({ error: 'Error al eliminar el usuario' });
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 };
 
