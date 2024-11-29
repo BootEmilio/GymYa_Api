@@ -18,7 +18,6 @@ const getUserById = async (gym_id, id) => {
 };
 
 const createUser = async (userData) => {
-    // Validar campos obligatorios
     if (!userData.gym_id || !userData.username || !userData.password) {
         throw new Error('Faltan datos obligatorios: gym_id, username, password');
     }
@@ -30,10 +29,17 @@ const createUser = async (userData) => {
         nombre_completo: userData.nombre_completo || null,
         email: userData.email || null,
         telefono: userData.telefono || null,
-        fecha_registro: userData.fecha_registro || new Date() // Usa la fecha actual si no se proporciona
+        fecha_registro: userData.fecha_registro || new Date().toISOString(),
     };
-    return await userRepository.createUser(newUser);
+
+    try {
+        return await userRepository.createUser(newUser);
+    } catch (error) {
+        console.error('Error en el servicio al crear usuario:', error.message);
+        throw new Error('No se pudo crear el usuario');
+    }
 };
+
 
 
 const updateUser = async (gym_id, id, userData) => {

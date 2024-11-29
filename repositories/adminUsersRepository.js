@@ -27,6 +27,7 @@ const createUser = async (user) => {
         INSERT INTO usuarios (gym_id, username, password, nombre_completo, email, telefono, fecha_registro)
         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;
     `;
+
     const values = [
         user.gym_id,           // $1
         user.username,         // $2
@@ -34,11 +35,18 @@ const createUser = async (user) => {
         user.nombre_completo,  // $4
         user.email,            // $5
         user.telefono,         // $6
-        user.fecha_registro || new Date() // $7
+        user.fecha_registro || new Date().toISOString(), // $7
     ];
-    const result = await db.query(query, values);
-    return result.rows[0];
+
+    try {
+        const result = await db.query(query, values);
+        return result.rows[0];
+    } catch (error) {
+        console.error('Error en el repositorio al crear usuario:', error.message);
+        throw new Error('No se pudo crear el usuario');
+    }
 };
+
 
 
 const updateUser = async (gym_id, id, userData) => {
