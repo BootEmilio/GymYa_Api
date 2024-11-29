@@ -33,5 +33,32 @@ const authenticateAdmin = async (username, password) => {
   }
 };
 
+const authenticateUser = async (username, password) => {
+  try {
+    const result = await db.query(
+      'SELECT * FROM usuarios WHERE username = $1 AND password = $2',
+      [username, password]
+    );
 
-module.exports = { authenticateAdmin };
+    if (result.rows.length > 0) {
+      const user = result.rows[0];
+      const token = jwt.sign(
+        { 
+          id: user.id, 
+          username: user.username, 
+          role: 'usuario', 
+          gym_id: user.gym_id // Asegúrate de que gym_id está en la tabla usuarios
+        },
+        secretKey,
+        { expiresIn: tokenExpiration }
+      );
+      return { token, user };
+    }
+    return null;
+  } catch (error) {
+    console.error('Error autenticando al usuario:', error);
+    throw new Error('Error al autenticar');
+  }
+};
+
+module.exports = { authenticateAdmin, authenticateUser };

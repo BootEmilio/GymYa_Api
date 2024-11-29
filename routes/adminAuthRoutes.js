@@ -47,4 +47,6 @@ const router = express.Router();
  */
 router.post('/login', AuthAdminController.loginAdmin);
 
+router.post('login/user', AuthAdminController.loginUser);
+
 module.exports = router;

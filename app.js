@@ -21,7 +21,7 @@ app.use(loggerMiddleware);
 
 app.use('/api/admin', addGymRoutes);
 app.use('/api/admin', adminAuthRoutes); // Login para administradores
-app.use('/api/user', userAuthRoutes); // Login para usuarios
+app.use('/api/', userAuthRoutes); // Login para usuarios
 
 app.use(authMiddleware);
 
