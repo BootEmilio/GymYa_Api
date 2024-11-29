@@ -22,31 +22,33 @@ const getUserById = async (gym_id, id) => {
     return result.rows[0];
 };
 
-const createUser = async (user) => {
+const createUser = async (adminId, user) => {
+    // Obtener el gym_id del administrador
+    const gymResult = await db.query('SELECT gym_id FROM administradores WHERE id = $1', [adminId]);
+    const gym_id = gymResult.rows[0]?.gym_id;
+
+    if (!gym_id) {
+        throw new Error('El administrador no está asociado a ningún gimnasio');
+    }
+
+    // Crear usuario asociado al gimnasio del administrador
     const query = `
         INSERT INTO usuarios (gym_id, username, password, nombre_completo, email, telefono, fecha_registro)
         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;
     `;
 
     const values = [
-        user.gym_id,
-        user.username,
-        user.password,
-        user.nombre_completo,
-        user.email,
-        user.telefono,
-        user.fecha_registro || new Date().toISOString(),
+        gym_id,                // $1: gym_id deducido
+        user.username,         // $2
+        user.password,         // $3
+        user.nombre_completo,  // $4
+        user.email,            // $5
+        user.telefono,         // $6
+        user.fecha_registro || new Date().toISOString(), // $7
     ];
 
-    console.log('Valores para insertar usuario:', values); // Depurar valores
-
-    try {
-        const result = await db.query(query, values);
-        return result.rows[0];
-    } catch (error) {
-        console.error('Error en el repositorio al crear usuario:', error.message);
-        throw new Error('No se pudo crear el usuario');
-    }
+    const result = await db.query(query, values);
+    return result.rows[0];
 };
 
 const updateUser = async (gym_id, id, userData) => {
