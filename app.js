@@ -3,6 +3,8 @@ const cors = require('cors');
 const swaggerUI = require("swagger-ui-express");
 const specs = require("./swagger/swagger");
 const adminAuthRoutes = require('./routes/adminAuthRoutes');
+const gymRoutes = require('./routes/gymRoutes');
+const planesRoutes = require('./routes/planesRoutes');
 const addGymRoutes = require('./routes/addGymAdmin');
 const userAuthRoutes = require('./routes/userAuthRoutes');
 const adminUsersRoutes = require('./routes/adminUsersRoutes'); // Rutas de clientes
@@ -19,6 +21,9 @@ app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 
 app.use(loggerMiddleware);
 
+
+app.use('/api', gymRoutes); //Agregar y editar gimnasio
+app.use('/api', planesRoutes); //Agregar, ver y editar planes de membresía
 app.use('/api/admin', addGymRoutes);
 app.use('/api/admin', adminAuthRoutes); // Login para administradores
 app.use('/api/user', userAuthRoutes); // Login para usuarios
