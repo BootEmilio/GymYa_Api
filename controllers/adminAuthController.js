@@ -1,5 +1,17 @@
 const AuthAdminService = require('../services/adminAuthService');
 
+//Controlador para crear administrador
+const crearAdministrador = async (req, res) => {
+  try{
+    const {gym_id, username, password, nombre_completo, email, telefono, fecha_registro} = req.body;
+    const nuevoAdmin = await AuthAdminService.crearAdministrador(gym_id, username, password, nombre_completo, email, telefono, fecha_registro);
+    res.status(201).json(nuevoAdmin);
+  }catch (error){
+    res.status(500).json({error: 'Error al crear nuevo administrador'});
+  }
+};
+
+//Controlador para hacer login como administrador
 const loginAdmin = async (req, res) => {
   const { username, password } = req.body;
 
@@ -25,4 +37,4 @@ const loginAdmin = async (req, res) => {
   }
 };
 
-module.exports = { loginAdmin };
+module.exports = { crearAdministrador, loginAdmin };

@@ -1,3 +1,5 @@
+//A ver que pedo
+
 const db = require('../db');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();

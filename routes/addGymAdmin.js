@@ -1,3 +1,5 @@
+//Por revisar (utilidad)
+
 const express = require('express');
 const router = express.Router();
 const { registerGym } = require('../controllers/addGymAdmin');
