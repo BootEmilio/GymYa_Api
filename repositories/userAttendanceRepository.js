@@ -1,11 +1,12 @@
 const db = require('../db');
 
-const createAsistencia = async (usuario_id, tipo_acceso, gym_id) => {
+const createAsistencia = async (gym_id, usuario_id) => {
     const query = `
-        INSERT INTO asistencias (usuario_id, tipo_acceso, gym_id)
-        VALUES ($1, $2, $3) RETURNING *;
+      INSERT INTO asistencias (gym_id, usuario_id)
+      VALUES ($1, $2)
+      RETURNING *;
     `;
-    const values = [usuario_id, tipo_acceso, gym_id];
+    const values = [gym_id, usuario_id];
     const result = await db.query(query, values);
     return result.rows[0];
 };

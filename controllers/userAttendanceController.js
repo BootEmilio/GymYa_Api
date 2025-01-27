@@ -2,22 +2,24 @@ const userAttendanceService = require('../services/userAttendanceService');
 
 const createAsistencia = async (req, res) => {
     try {
-        const usuario_id = req.user.id; // Extraer el ID del usuario desde el JWT
-        const { tipo_acceso, gym_id } = req.body; // gym_id se proporciona en el cuerpo
+        const { usuario_id } = req.body;
 
-        if (!gym_id) {
-            return res.status(400).json({ message: 'El gym_id es obligatorio' });
+        // Extraer el id_gimnasio del token (agregado por el middleware de autenticación)
+        const gym_id = req.user.gym_id;
+
+        if (!usuario_id) {
+            return res.status(400).json({ message: 'El usuario_id es obligatorio' });
         }
 
-        const asistencia = await userAttendanceService.createAsistencia(usuario_id, tipo_acceso, gym_id);
+        const nuevaAsistencia = await userAttendanceService.createAsistencia(gym_id, usuario_id);
 
         res.status(201).json({
-            message: 'Asistencia registrada exitosamente',
-            asistencia,
+            message: 'Asistencia creada exitosamente',
+            asistencia: nuevaAsistencia,
         });
     } catch (error) {
-        console.error('Error al registrar la asistencia:', error);
-        res.status(500).json({ message: error.message });
+        console.error('Error al crear asistencia:', error);
+        res.status(500).json({ error: error.message });
     }
 };
 
