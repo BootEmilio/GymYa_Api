@@ -47,7 +47,7 @@ const token = require('../middlewares/authMiddleware');
  *         description: Credenciales inválidas
  */
 //ruta para agregar el primer administrador
-router.post('/register', AuthAdminController.registro);
+router.post('/registro', AuthAdminController.registro);
 //ruta para agregar otro administrador
 router.post('/addAdmin', token, AuthAdminController.crearAdministrador);
 //ruta para logear administrador
