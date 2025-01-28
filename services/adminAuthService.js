@@ -6,6 +6,21 @@ require('dotenv').config();
 const secretKey = process.env.JWT_SECRET;
 const tokenExpiration = process.env.JWT_EXPIRATION || '2h';
 
+
+//Servicio para agregar el primer administrador
+const registro = async (username, password, nombre_completo, email, telefono, fecha_registro) => {
+    try {
+      const result = await db.query(
+        'CALL registro($1,$2,$3,$4,$5,$6);',
+        [username, password, nombre_completo, email, telefono, fecha_registro]
+      );
+      return { success: true, message: 'Registro exitoso', data: result.rows[0] };
+    } catch (error){
+      console.error('Erros al registrar el primer administrador:', error);
+      throw new Error('Error al registrar el primer administrador');
+    }
+};
+
 //Servicio para agregar un administrador
 const crearAdministrador = async (gym_id, username, password, nombre_completo, email, telefono, fecha_registro) => {
   try{
@@ -49,4 +64,4 @@ const authenticateAdmin = async (username, password) => {
   }
 };
 
-module.exports = { crearAdministrador, authenticateAdmin };
+module.exports = { registro, crearAdministrador, authenticateAdmin };

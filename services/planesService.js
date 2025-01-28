@@ -18,7 +18,7 @@ const crearPlanes = async (gym_id, nombre, descripcion, costo, duracion, fecha_c
 //Servicio para mostrar todos los planes de membresía
 const mostrarPlanes = async (gymId) => {
     try {
-        let query = 'SELECT id, gym_id, nombre, descripcion, costo, duracion FROM planes WHERE activo = TRUE AND gym_id = $1';
+        let query = 'SELECT nombre, descripcion, costo, duracion_meses FROM planes WHERE activo = TRUE AND gym_id = $1';
         const values = [gymId];  // gym_id es obligatorio, así que siempre será el primer valor
 
         // Ordenamos por costo de menor a mayor

@@ -1,5 +1,16 @@
 const AuthAdminService = require('../services/adminAuthService');
 
+//Controlador para registrar primer administrador
+const registro = async (req, res) => {
+  try{
+    const {username, password, nombre_completo, email, telefono, fecha_registro} = req.body;
+    const primerAdmin = await AuthAdminService.registro(username, password, nombre_completo, email, telefono, fecha_registro);
+    res.status(201).json(primerAdmin);
+  }catch (error) {
+    res.status(500).json({error: 'Error al registrar el primer administrador'});
+  }
+};
+
 //Controlador para crear administrador
 const crearAdministrador = async (req, res) => {
   try{
@@ -37,4 +48,4 @@ const loginAdmin = async (req, res) => {
   }
 };
 
-module.exports = { crearAdministrador, loginAdmin };
+module.exports = { registro, crearAdministrador, loginAdmin };

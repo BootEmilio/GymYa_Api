@@ -14,7 +14,7 @@ const crearGimnasio = async (nombre, direccion, telefono, fechaRegistro) => {
       console.error('Erros al crear un gimnasio nuevo:', error);
       throw new Error('Error al crear el gimnasio');
     }
-  };
+};
 
 //Servicio para editar datos del gimnasio
 const editarGimnasio = async (id, nombre, direccion, telefono) => {
