@@ -17,7 +17,7 @@ const editarGimnasio = async (req, res) => {
         const { nombre, direccion, telefono } = req.body;
 
         // Verificamos que el gimnasio a editar es el del administrador autenticado
-        const gymId = req.admin.gym_id; 
+        const gymId = req.user.gym_id; 
         if (gymId !== parseInt(req.params.id)) {
             return res.status(403).json({ error: 'No tienes permiso para editar este gimnasio' });
         }

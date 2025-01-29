@@ -4,7 +4,7 @@ const planesService = require('../services/planesService')
 const crearPlanes = async (req, res) => {
     try{
         const { nombre, descripcion, costo, duracion_meses, fecha_creacion } = req.body;
-        const gym_id = req.admin.gym_id; //Usamos el gum_id del token
+        const gym_id = req.user.gym_id; //Usamos el gum_id del token
 
         const nuevoPlan = await planesService.crearPlanes(gym_id, nombre, descripcion, costo, duracion_meses, fecha_creacion);
         res.status(201).json(nuevoPlan);
@@ -16,7 +16,7 @@ const crearPlanes = async (req, res) => {
 //Controlador para mostrar planes de membresía
 const mostrarPlanes = async (req, res) => {
     try {
-        const gym_id = req.admin.gym_id; //Usamos el gum_id del token
+        const gym_id = req.user.gym_id; //Usamos el gum_id del token
         const planes = await planesService.mostrarPlanes(gym_id);
         res.status(200).json(planes);
     } catch (error) {
@@ -28,7 +28,7 @@ const mostrarPlanes = async (req, res) => {
 const editarPlanes = async (req, res) => {
     try{
         const { nombre, descripcion, costo, duracion } = req.body;
-        const gym_id = req.admin.gym_id; //Usamos el gum_id del token
+        const gym_id = req.user.gym_id; //Usamos el gym_id del token
         const actualizado = await gymService.editarPlanes(req.params.id, gym_id, nombre, descripcion, costo, duracion);
         if(!actualizado){
             return res.status(404).json({error: 'Plan de membresía no encontrado'});
@@ -42,7 +42,7 @@ const editarPlanes = async (req, res) => {
 // Controlador para "eliminar" un plan de membresía
 const eliminarPlan = async (req, res) => {
     try {
-        const gym_id = req.admin.gym_id;
+        const gym_id = req.user.gym_id;
         const eliminado = await planesService.eliminarPlan(req.params.id, gym_id);
 
         if (!eliminado) {
