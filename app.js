@@ -21,11 +21,10 @@ app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 
 app.use(loggerMiddleware);
 
-
+app.use('/api/admin', adminAuthRoutes); // Registro y Login para administradores
 app.use('/api/admin', gymRoutes); //Agregar y editar gimnasio
 app.use('/api/admin', planesRoutes); //Agregar, ver y editar planes de membresía
 app.use('/api/admin', addGymRoutes);
-app.use('/api/admin', adminAuthRoutes); // Login para administradores
 app.use('/api/user', userAuthRoutes); // Login para usuarios
 
 app.use(authMiddleware);
