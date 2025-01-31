@@ -78,10 +78,15 @@ const authenticateAdmin = async (username, password) => {
     // Buscar el administrador por username
     const admin = await Admin.findOne({ username });
 
-     // Verificar si el administrador existe y la contraseña es correcta
-    if (!admin || admin.password !== password) {
-      return null;  // Retornar null si no coincide el username o la contraseña
+    if (!admin) {
+      throw new Error('Administrador no encontrado');
     }
+
+     // Verificar si el administrador existe y la contraseña es correcta
+     const isPasswordValid = await bcrypt.compare(password, admin.password);
+     if (!isPasswordValid) {
+       throw new Error('Contraseña incorrecta');
+     }
 
     const token = jwt.sign(
       { 
