@@ -83,18 +83,12 @@ const authenticateAdmin = async (username, password) => {
       return null;  // Retornar null si no coincide el username o la contraseña
     }
 
-    // Convertir el gym_id a ObjectId si es un string
-    let gym_id = admin.gym_id;
-    if (typeof gym_id === 'string') {
-      gym_id = new mongoose.Types.ObjectId(gym_id);
-    }
-
     const token = jwt.sign(
       { 
-        id: admin._id, //Ahora retornamos el ObjectId
+        id: admin._id.toString(), //Ahora retornamos el ObjectId
         username: admin.username, 
         role: 'administrador',
-        gym_id: admin.gym_id
+        gym_id: admin.gym_id.toString()
       },
       secretKey,
       { expiresIn: tokenExpiration }
