@@ -6,7 +6,6 @@ const loginUser = async (req, res) => {
   if (!username || !password) {
     return res.status(400).json({ message: 'Username y contraseña son requeridos' });
   }
-
   try {
     const authResult = await userAuthService.authenticateUser(username, password);
 

@@ -11,6 +11,7 @@ const registro = async (req, res) => {
   }
 };
 
+/*
 //Controlador para crear administrador
 const crearAdministrador = async (req, res) => {
   try{
@@ -21,6 +22,7 @@ const crearAdministrador = async (req, res) => {
     res.status(500).json({error: 'Error al crear nuevo administrador'});
   }
 };
+*/
 
 //Controlador para hacer login como administrador
 const loginAdmin = async (req, res) => {
@@ -48,4 +50,4 @@ const loginAdmin = async (req, res) => {
   }
 };
 
-module.exports = { registro, crearAdministrador, loginAdmin };
+module.exports = { registro, loginAdmin };

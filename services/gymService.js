@@ -1,7 +1,10 @@
 //Aquí se encuentran los services para el manejo de gimnasios
+const Gym = require('../models/gym');
 const db = require('../db');
 require('dotenv').config();
 
+
+/*
 //Servicio para agregar un gimnasio
 const crearGimnasio = async (nombre, direccion, telefono, fechaRegistro) => {
     try {
@@ -15,51 +18,40 @@ const crearGimnasio = async (nombre, direccion, telefono, fechaRegistro) => {
       throw new Error('Error al crear el gimnasio');
     }
 };
+*/
 
-//Servicio para editar datos del gimnasio
+// Servicio para editar datos del gimnasio
 const editarGimnasio = async (id, nombre, direccion, telefono) => {
-    try{
-        let fields = [];
-        let values = [];
-        let index = 1;
+    try {
+        // Construimos un objeto con los campos que fueron proporcionados
+        const updateFields = {};
 
-        if (nombre) {
-            fields.push(`nombre = $${index++}`);
-            values.push(nombre); 
-        }
-        if (direccion) {
-            fields.push(`direccion = $${index++}`);
-            values.push(direccion); 
-        }
-        if (telefono) {
-            fields.push(`telefono = $${index++}`);
-            values.push(telefono); 
-        }
+        if (nombre) updateFields.nombre = nombre;
+        if (direccion) updateFields.direccion = direccion;
+        if (telefono) updateFields.telefono = telefono;
 
-        if (fields.length === 0) {
+        // Si no se proporcionaron campos, lanzamos un error
+        if (Object.keys(updateFields).length === 0) {
             throw new Error('No se han proporcionado datos para actualizar.');
-        } 
+        }
 
-        values.push(id);
+        // Actualizamos el gimnasio usando su ID
+        const gimnasioActualizado = await Gym.findByIdAndUpdate(
+            id,  // ID del gimnasio que se va a actualizar
+            { $set: updateFields },  // Solo actualizamos los campos proporcionados
+            { new: true }  // Para devolver el documento actualizado
+        );
 
-        const query = `
-            UPDATE gimnasios
-            SET ${fields.join(', ')}
-            WHERE id = $${index}
-            RETURNING *;
-        `;
-
-        const result = await db.query(query, values);
-
-        if (result.rows.length === 0) {
+        // Si no se encontró el gimnasio, lanzamos un error
+        if (!gimnasioActualizado) {
             throw new Error('Gimnasio no encontrado');
         }
 
-        return result.rows[0];
-    }catch (error) {
+        return gimnasioActualizado;
+    } catch (error) {
         console.error('Error al editar gimnasio:', error);
         throw new Error('Error al editar el gimnasio');
     }
-}
+};
 
-module.exports = { crearGimnasio, editarGimnasio };
+module.exports = { editarGimnasio };

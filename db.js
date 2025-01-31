@@ -1,14 +1,19 @@
 // db.js
-const { Pool } = require('pg');
-require('dotenv').config();
+const mongoose = require('mongoose');
+require('dotenv').config();  // Cargar las variables de entorno desde el archivo .env
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false // Solo si la base de datos requiere SSL
+// Función para conectar a MongoDB
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.DATABASE_URL, {
+      useNewUrlParser: true,       // Opciones recomendadas por Mongoose
+      useUnifiedTopology: true,    // Usar el nuevo motor de topología unificada
+    });
+    console.log('Conectado a MongoDB correctamente');
+  } catch (error) {
+    console.error('Error al conectar a MongoDB:', error);
+    process.exit(1);  // Termina la aplicación si no puede conectarse a la base de datos
   }
-});
-
-module.exports = {
-  query: (text, params) => pool.query(text, params),
 };
+
+module.exports = connectDB;

@@ -1,7 +1,7 @@
 const express = require('express');
 const AuthAdminController  = require('../controllers/adminAuthController');
 const router = express.Router();
-const token = require('../middlewares/authMiddleware');
+//const token = require('../middlewares/authMiddleware');
 
 /**
  * @swagger
@@ -50,7 +50,9 @@ const token = require('../middlewares/authMiddleware');
 router.post('/registro', AuthAdminController.registro);
 //ruta para logear administrador
 router.post('/login', AuthAdminController.loginAdmin);
+/*
 //ruta para agregar otro administrador
 router.post('/addAdmin', token, AuthAdminController.crearAdministrador);
+*/
 
 module.exports = router;

@@ -1,5 +1,7 @@
 const gymService = require('../services/gymService')
 
+
+/*
 //Controlador para agregar gimnasios
 const crearGimnasio = async (req, res) => {
     try{
@@ -10,6 +12,7 @@ const crearGimnasio = async (req, res) => {
         res.status(500).json({error: 'Error al crear nuevo gimnasio'});
     }
 }
+*/
 
 //Controlador para editar gimnasios
 const editarGimnasio = async (req, res) => {
@@ -18,7 +21,7 @@ const editarGimnasio = async (req, res) => {
 
         // Verificamos que el gimnasio a editar es el del administrador autenticado
         const gymId = req.user.gym_id; 
-        if (gymId !== parseInt(req.params.id)) {
+        if (gymId.toString() !== req.params.id) {
             return res.status(403).json({ error: 'No tienes permiso para editar este gimnasio' });
         }
 
@@ -32,4 +35,4 @@ const editarGimnasio = async (req, res) => {
     }
 }
 
-module.exports = { crearGimnasio, editarGimnasio };
+module.exports = { editarGimnasio };

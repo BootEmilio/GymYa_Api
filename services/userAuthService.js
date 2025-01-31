@@ -1,3 +1,4 @@
+const user = require('../models/usuarios')
 const jwt = require('jsonwebtoken');
 const db = require('../db'); // Conexión a la base de datos
 require('dotenv').config();
@@ -5,28 +6,29 @@ require('dotenv').config();
 const secretKey = process.env.JWT_SECRET;
 const tokenExpiration = process.env.JWT_EXPIRATION || '2h';
 
+// Servicio para hacer login como usuario
 const authenticateUser = async (username, password) => {
   try {
-    const result = await db.query(
-      'SELECT * FROM usuarios WHERE username = $1 AND password = $2',
-      [username, password]
+    // Buscar el usuario por username
+    const usuario = await user.findOne({ username });
+
+    // Verificar si el usuario existe y la contraseña es correcta
+    if (!usuario || usuario.password !== password) {
+      return null; // Retornar null si no coincide el username o la contraseña
+    }
+
+    const token = jwt.sign(
+      {
+        id: usuario._id,
+        username: usuario.username,
+        role: 'usuario',
+        gym_id: usuario.gym_id
+      },
+      secretKey,
+      { expiresIn: tokenExpiration }
     );
 
-    if (result.rows.length > 0) {
-      const user = result.rows[0];
-      const token = jwt.sign(
-        { 
-          id: user.id, 
-          username: user.username, 
-          role: 'usuario', 
-          gym_id: user.gym_id // Asegúrate de que gym_id está en la tabla usuarios
-        },
-        secretKey,
-        { expiresIn: tokenExpiration }
-      );
-      return { token, user };
-    }
-    return null;
+    return { token, usuario };  
   } catch (error) {
     console.error('Error autenticando al usuario:', error);
     throw new Error('Error al autenticar');
