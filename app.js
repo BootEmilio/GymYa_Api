@@ -1,4 +1,5 @@
 const express = require('express');
+const connectDB = require('./db');
 const cors = require('cors');
 const swaggerUI = require("swagger-ui-express");
 const specs = require("./swagger/swagger");
@@ -13,6 +14,7 @@ const userAttendanceRoutes = require('./routes/userAttendanceRoutes');
 const authMiddleware = require('./middlewares/authMiddleware');
 const loggerMiddleware = require('./middlewares/loggerMiddleware');
 const app = express();
+connectDB();
 
 app.use(cors({ origin: 'https://bootemilio.github.io' }));
 app.use(express.json());
