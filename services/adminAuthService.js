@@ -9,7 +9,7 @@ const secretKey = process.env.JWT_SECRET;
 const tokenExpiration = process.env.JWT_EXPIRATION || '2h';
 
 //Servicio para agregar el primer administrador
-const registroService = async (username, password, nombre_completo, email, telefono) => {
+const registro = async (username, password, nombre_completo, email, telefono) => {
     const session = await mongoose.startSession();  // Iniciar una sesión para la transacción
     session.startTransaction();
 
@@ -20,7 +20,7 @@ const registroService = async (username, password, nombre_completo, email, telef
         direccion: 'Dirección del gimnasio',
         telefono: 'Teléfono del gimnasio',
         administradores: [],
-        planes_membresias: [],
+        planes_membresias: []
       }], { session });
 
       const gym_id = nuevoGimnasio[0]._id; //Obtenemos el objectId del gimnasio nuevo que creamos
@@ -105,4 +105,4 @@ const authenticateAdmin = async (username, password) => {
   }
 };
 
-module.exports = { registroService, authenticateAdmin };
+module.exports = { registro, authenticateAdmin };
