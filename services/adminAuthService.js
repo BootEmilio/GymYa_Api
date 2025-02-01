@@ -1,5 +1,4 @@
 //Aquí se van a encontrar todos los services para crear, validar y editar a los administradores
-const mongoose = require('mongoose');
 const Gym = require('../models/gym');
 const Admin = require('../models/admin');
 const jwt = require('jsonwebtoken');
@@ -10,44 +9,41 @@ const tokenExpiration = process.env.JWT_EXPIRATION || '2h';
 
 //Servicio para agregar el primer administrador
 const registro = async (username, password, nombre_completo, email, telefono) => {
-    const session = await mongoose.startSession();  // Iniciar una sesión para la transacción
-    session.startTransaction();
+  try {
+    // Hash de la contraseña
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    try {
-      //Creamos el nuevo gimnasio al que pertenecerá el administrador
-      const nuevoGimnasio = await Gym.create([{
+    // Crear el gimnasio
+    const nuevoGimnasio = await Gym.create({
         nombre: 'Nombre del gimnasio',
         direccion: 'Dirección del gimnasio',
         telefono: 'Teléfono del gimnasio',
         administradores: [],
-        planes_membresias: []
-      }], { session });
+        planes_membresias: [],
+    });
 
-      const gym_id = nuevoGimnasio[0]._id; //Obtenemos el objectId del gimnasio nuevo que creamos
+    const gym_id = nuevoGimnasio._id;
 
-      //Creamos el primer administrador
-      const nuevoAdmin = await Admin.create([{
+    // Crear el administrador con la contraseña hasheada
+    const nuevoAdmin = await Admin.create({
         gym_id,
         username,
-        password,
+        password: hashedPassword,
         nombre_completo,
         email,
         telefono
-      }], { session });
+    });
 
-      const admin_id = nuevoAdmin[0]._id; //Obtenemos el objectId del administrador que creamos
+    const admin_id = nuevoAdmin._id;
 
-      await Gym.findByIdAndUpdate(
+    // Agregar el administrador al gimnasio
+    await Gym.findByIdAndUpdate(
         gym_id,
-        { $push: { administradores: admin_id } }, //Agregamos el ObjectId del administrador en el array administradores
-        { session, new: true }
-      );
+        { $push: { administradores: admin_id } },
+        { new: true }
+    );
 
-      await session.commitTransaction();
-      session.endSession();
-
-      return { success: true, message: 'Registro exitoso', gimnasio: nuevoGimnasio[0], admin: nuevoAdmin[0] };
-
+    return { success: true, message: 'Registro exitoso', gimnasio: nuevoGimnasio, admin: nuevoAdmin };
     } catch (error){
       await session.abortTransaction();  // Revertir la transacción en caso de error
       session.endSession();
