@@ -7,6 +7,6 @@ const AdminSchema = new mongoose.Schema({
     nombre_completo: { type: String, required: true },
     email: { type: String, required: true },
     telefono: { type: String, required: true }
-});
+}, { collection: 'administradores' }); // Nombre de la colección en MongoDB
 
-module.exports = mongoose.model('Admin', AdminSchema);
+module.exports = mongoose.model('Admin', AdminSchema); // Nombre del modelo

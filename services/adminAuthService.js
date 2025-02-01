@@ -2,7 +2,7 @@
 const Gym = require('../models/gym');
 const Admin = require('../models/admin');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
 const secretKey = process.env.JWT_SECRET;
