@@ -82,11 +82,10 @@ const authenticateAdmin = async (username, password) => {
       throw new Error('Administrador no encontrado');
     }
 
-     // Verificar si el administrador existe y la contraseña es correcta
-     const isPasswordValid = await bcrypt.compare(password, admin.password);
-     if (!isPasswordValid) {
-       throw new Error('Contraseña incorrecta');
-     }
+     // Comparación temporal de contraseñas sin bcrypt (¡NO ES SEGURO!)
+    if (password !== admin.password) {
+      throw new Error('Contraseña incorrecta');
+    }
 
     const token = jwt.sign(
       { 
