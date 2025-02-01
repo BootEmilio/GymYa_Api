@@ -47,7 +47,7 @@ const router = express.Router();
  *         description: Credenciales inválidas
  */
 //ruta para agregar el primer administrador
-router.post('/registro', AuthAdminController.registroController);
+router.post('/registro', AuthAdminController.registro);
 //ruta para logear administrador
 router.post('/login', AuthAdminController.loginAdmin);
 /*
