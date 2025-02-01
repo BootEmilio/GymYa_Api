@@ -9,7 +9,7 @@ const secretKey = process.env.JWT_SECRET;
 const tokenExpiration = process.env.JWT_EXPIRATION || '2h';
 
 //Servicio para agregar el primer administrador
-const registro = async (username, password, nombre_completo, email, telefono) => {
+const registroService = async (username, password, nombre_completo, email, telefono) => {
     const session = await mongoose.startSession();  // Iniciar una sesión para la transacción
     session.startTransaction();
 

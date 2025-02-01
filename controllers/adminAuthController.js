@@ -1,9 +1,15 @@
 const AuthAdminService = require('../services/adminAuthService');
 
 //Controlador para registrar primer administrador
-const registro = async (req, res) => {
+const registroController = async (req, res) => {
   try{
     const {username, password, nombre_completo, email, telefono} = req.body;
+
+    // Validar que todos los campos estén presentes
+    if (!username || !password || !nombre_completo || !email || !telefono) {
+      return res.status(400).json({ error: 'Todos los campos son obligatorios' });
+    }
+
     const primerAdmin = await AuthAdminService.registro(username, password, nombre_completo, email, telefono);
     res.status(201).json(primerAdmin);
   }catch (error) {
@@ -50,4 +56,4 @@ const loginAdmin = async (req, res) => {
   }
 };
 
-module.exports = { registro, loginAdmin };
+module.exports = { registroController, loginAdmin };
