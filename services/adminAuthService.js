@@ -10,9 +10,6 @@ const tokenExpiration = process.env.JWT_EXPIRATION || '2h';
 //Servicio para agregar el primer administrador
 const registro = async (username, password, nombre_completo, email, telefono) => {
   try {
-    // Hash de la contraseña
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-
     // Crear el gimnasio
     const nuevoGimnasio = await Gym.create({
         nombre: 'Nombre del gimnasio',
@@ -28,7 +25,7 @@ const registro = async (username, password, nombre_completo, email, telefono) =>
     const nuevoAdmin = await Admin.create({
         gym_id,
         username,
-        password: hashedPassword,
+        password,
         nombre_completo,
         email,
         telefono
