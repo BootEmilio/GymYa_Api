@@ -5,7 +5,7 @@ const PagoSchema = new mongoose.Schema({
     gym_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Gym', required: true },
     fecha_hora: { type: Date, default: Date.now},
     concepto: { type: String, required: true },
-    monto: { type: Float64Array, required: true },
+    monto: { type: Number, required: true },
 });
 
 module.exports = mongoose.model('Pago', PagoSchema);
