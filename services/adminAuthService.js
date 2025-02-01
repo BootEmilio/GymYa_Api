@@ -2,7 +2,7 @@
 const Gym = require('../models/gym');
 const Admin = require('../models/admin');
 const jwt = require('jsonwebtoken');
-const db = require('../db');
+const bcrypt = require('bcrypt');
 require('dotenv').config();
 
 const secretKey = process.env.JWT_SECRET;
@@ -90,10 +90,10 @@ const authenticateAdmin = async (username, password) => {
 
     const token = jwt.sign(
       { 
-        id: admin._id.toString(), //Ahora retornamos el ObjectId
+        id: admin._id, //Ahora retornamos el ObjectId
         username: admin.username, 
         role: 'administrador',
-        gym_id: admin.gym_id.toString()
+        gym_id: admin.gym_id
       },
       secretKey,
       { expiresIn: tokenExpiration }
