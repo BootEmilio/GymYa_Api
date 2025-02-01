@@ -1,4 +1,5 @@
 //Aquí se van a encontrar todos los services para crear, validar y editar a los administradores
+const mongoose = require('mongoose');
 const Gym = require('../models/gym');
 const Admin = require('../models/admin');
 const jwt = require('jsonwebtoken');
