@@ -105,4 +105,4 @@ const authenticateAdmin = async (username, password) => {
   }
 };
 
-module.exports = { registro, authenticateAdmin };
+module.exports = { registroService, authenticateAdmin };

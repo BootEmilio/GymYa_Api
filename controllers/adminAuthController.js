@@ -10,7 +10,7 @@ const registroController = async (req, res) => {
       return res.status(400).json({ error: 'Todos los campos son obligatorios' });
     }
 
-    const primerAdmin = await AuthAdminService.registro(username, password, nombre_completo, email, telefono);
+    const primerAdmin = await AuthAdminService.registroService(username, password, nombre_completo, email, telefono);
     res.status(201).json(primerAdmin);
   }catch (error) {
     res.status(500).json({error: 'Error al registrar el primer administrador'});
