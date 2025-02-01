@@ -1,31 +1,33 @@
-const db = require('../db');
+const Plan = require('../models/planes');
 require('dotenv').config();
 
 // Servicio para agregar un tipo de plan de membresía
-const crearPlanes = async (gym_id, nombre, descripcion, costo, duracion, fecha_creacion) => {
+const crearPlanes = async (gym_id, nombre, descripcion, costo, duracion_meses) => {
     try {
-        const result = await db.query(
-            'INSERT INTO planes (gym_id, nombre, descripcion, costo, duracion_meses, fecha_creacion, activo) VALUES ($1, $2, $3, $4, $5, $6, TRUE) RETURNING *',
-            [gym_id, nombre, descripcion, costo, duracion, fecha_creacion]
-        );
-        return result.rows[0];
+        const nuevoPlan = new Plan({
+            gym_id,
+            nombre,
+            descripcion,
+            costo,
+            duracion_meses,
+            activa: true // Definimos que el nuevo plan es activo por defecto
+        });
+        const result = await nuevoPlan.save();
+        return result;
     } catch (error) {
         console.error('Error al crear membresía:', error);
         throw new Error('Error al crear la membresía');
     }
 };
 
-//Servicio para mostrar todos los planes de membresía
+// Servicio para mostrar todos los planes de membresía
 const mostrarPlanes = async (gymId) => {
     try {
-        let query = 'SELECT nombre, descripcion, costo, duracion_meses FROM planes WHERE activo = TRUE AND gym_id = $1';
-        const values = [gymId];  // gym_id es obligatorio, así que siempre será el primer valor
-
-        // Ordenamos por costo de menor a mayor
-        query += ' ORDER BY costo ASC';
-
-        const planes = await db.query(query, values);
-        return planes.rows;
+        // Filtrar por gym_id y solo planes que estén activos (activa: true)
+        const planes = await Plan.find({ gym_id: gymId, activa: true })
+            .select('nombre descripcion costo duracion_meses') // Solo seleccionar los campos necesarios
+            .sort({ costo: 1 }); // Ordenar por costo de menor a mayor
+        return planes;
     } catch (error) {
         console.error('Error al mostrar los planes de membresía:', error);
         throw new Error('Error al mostrar los planes de membresía');
@@ -33,73 +35,52 @@ const mostrarPlanes = async (gymId) => {
 };
 
 // Servicio para editar un plan existente de membresía
-const editarPlanes = async (id, gymId, nombre, descripcion, costo, duracion) => {
+const editarPlanes = async (id, gymId, nombre, descripcion, costo, duracion_meses) => {
     try {
-        let fields = [];
-        let values = [];
-        let index = 1;
+        const fieldsToUpdate = {};
 
-        if (nombre) {
-            fields.push(`nombre = $${index++}`);
-            values.push(nombre);
-        }
-        if (descripcion) {
-            fields.push(`descripcion = $${index++}`);
-            values.push(descripcion);
-        }
-        if (costo) {
-            fields.push(`costo = $${index++}`);
-            values.push(costo);
-        }
-        if (duracion) {
-            fields.push(`duracion_meses = $${index++}`);
-            values.push(duracion);
-        }
+        if (nombre) fieldsToUpdate.nombre = nombre;
+        if (descripcion) fieldsToUpdate.descripcion = descripcion;
+        if (costo) fieldsToUpdate.costo = costo;
+        if (duracion_meses) fieldsToUpdate.duracion_meses = duracion_meses;
 
-        if (fields.length === 0) {
+        if (Object.keys(fieldsToUpdate).length === 0) {
             throw new Error('No se han proporcionado datos para actualizar.');
         }
 
-        values.push(id); // El ID siempre es el último parámetro
+        // Buscar el plan por su id y gym_id, y actualizarlo
+        const planActualizado = await Plan.findOneAndUpdate(
+            { _id: id, gym_id: gymId },
+            { $set: fieldsToUpdate },
+            { new: true } // Retorna el plan actualizado
+        );
 
-        const query = `
-            UPDATE planes
-            SET ${fields.join(', ')}
-            WHERE id = $${index} AND gym_id = $${index + 1}
-            RETURNING *;
-        `;
-        values.push(gymId);
-
-        const result = await db.query(query, values);
-
-        if (result.rows.length === 0) {
+        if (!planActualizado) {
             throw new Error('Plan no encontrado o no pertenece al gimnasio');
         }
 
-        return result.rows[0];
+        return planActualizado;
     } catch (error) {
         console.error('Error al editar el plan:', error);
         throw new Error('Error al editar el plan');
     }
 };
 
-//Servicio para "eliminar" planes de membresía
+// Servicio para "eliminar" planes de membresía (desactivarlo)
 const eliminarPlan = async (id, gymId) => {
     try {
-        const query = `
-            UPDATE planes
-            SET activo = FALSE
-            WHERE id = $1 AND gym_id = $2
-            RETURNING *;
-        `;
-        const values = [id, gymId];
-        const result = await db.query(query, values);
+        // "Eliminar" el plan estableciendo activa a false
+        const planEliminado = await Plan.findOneAndUpdate(
+            { _id: id, gym_id: gymId },
+            { $set: { activa: false } }, // Cambiar el estado a inactivo
+            { new: true }
+        );
 
-        if (result.rows.length === 0) {
+        if (!planEliminado) {
             throw new Error('Plan no encontrado o no pertenece al gimnasio');
         }
 
-        return result.rows[0];
+        return planEliminado;
     } catch (error) {
         console.error('Error al eliminar el plan:', error);
         throw new Error('Error al eliminar el plan');

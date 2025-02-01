@@ -1,6 +1,5 @@
 //Aquí se encuentran los services para el manejo de gimnasios
 const Gym = require('../models/gym');
-const db = require('../db');
 require('dotenv').config();
 
 

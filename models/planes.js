@@ -5,7 +5,8 @@ const PlanSchema = new mongoose.Schema({
     nombre: { type: String, required: true },
     descripcion: { type: String, required: true },
     costo: {type: Float64Array, required: true},
-    duracion_meses: { type: Int32Array, required: true }
-});
+    duracion_meses: { type: Int32Array, required: true },
+    activa: { type: Boolean, default: true }
+}, { collection: 'planes' }); // Nombre de la colección en MongoDB
 
 module.exports = mongoose.model('Plan', PlanSchema);
