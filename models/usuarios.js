@@ -8,6 +8,6 @@ const UsuarioSchema = new mongoose.Schema({
     email: { type: String, required: true },
     telefono: { type: String, required: true },
     imagen: { type: String, default: 'User.jpg' }
-});
+}, { collection: 'usuarios' }); // Nombre de la colección en MongoDB;;
 
 module.exports = mongoose.model('Usuario', UsuarioSchema);

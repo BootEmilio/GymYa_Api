@@ -1,5 +1,4 @@
-const gymService = require('../services/gymService')
-
+const gymService = require('../services/gymService');
 
 /*
 //Controlador para agregar gimnasios

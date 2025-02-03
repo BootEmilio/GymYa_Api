@@ -1,7 +1,6 @@
 const express = require('express');
 const gymController = require('../controllers/gymController');
 const token = require('../middlewares/authMiddleware');
-
 const router = express.Router();
 
 // Ruta para editar un gimnasio

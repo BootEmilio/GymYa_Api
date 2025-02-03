@@ -1,34 +1,78 @@
-const db = require('../db');
+const mongoose = require('mongoose')
+const Membresia = require('../models/membresias');
+const Usuario = require('../models/usuarios');
+const Plan = require('../models/planes');
+const { default: mongoose } = require('mongoose');
 require('dotenv').config();
 
-//Servicio para obtener todas las membresías activas de un gimnasio
-const getActivas = async (gymId) => {
+//Servicio para obtener las membresías activas o inactivas de un gimnasio
+const getMembresias = async (gymId, status) => {
     try{
-        let query = "SELECT * FROM membresias_activas($1);"
-        const values = [gymId];
+        // Verificar si gymId es un ObjectId válido
+        if (!mongoose.Types.ObjectId.isValid(gymId)) {
+            throw new Error('El gymId proporcionado no es válido');
+        }
 
-        const result = await db.query(query, values);
-        return result.rows;
+        let dateCondition;
+        if (status === 'activas') {
+            dateCondition = { $gt: new Date() }; // Membresías activas
+        } else if (status === 'expiradas') {
+            dateCondition = { $lt: new Date() }; // Membresías expiradas
+        } else {
+            throw new Error('El estado proporcionado no es válido. Use "activas" o "expiradas".');
+        }
+
+        // Agregación en MongoDB con la condición dinámica
+        const membresias = await Membresia.aggregate([
+            {
+                $match: {
+                    fecha_fin: dateCondition, // Condición dinámica según el estado
+                    gym_id: mongoose.Types.ObjectId(gymId) // Asegurar que gymId es un ObjectId
+                }
+            },
+            {
+                $lookup: {
+                    from: 'usuarios', // Colección usuarios
+                    localField: 'usuario_id', // Campo en membresias
+                    foreignField: '_id', // Campo en usuarios
+                    as: 'usuario'
+                }
+            },
+            { $unwind: '$usuario' }, // Descomprimir el array de usuarios
+            {
+                $lookup: {
+                    from: 'planes', // Colección planes
+                    localField: 'plan_id', // Campo en membresias
+                    foreignField: '_id', // Campo en planes
+                    as: 'plan'
+                }
+            },
+            { $unwind: '$plan' }, // Descomprimir el array de plane
+            {
+                $project: {
+                    membresia_id: '$_id', // Seleccionamos los campos deseados
+                    fecha_inicio: 1,
+                    fecha_fin: 1,
+                    usuario_id: '$usuario._id',
+                    nombre_completo: '$usuario.nombre_completo',
+                    username: '$usuario.username',
+                    nombre_plan: '$plan.nombre',
+                    _id: 0
+                }
+            }
+        ]);
+
+        // Verificar si no se encontraron membresías
+        if (membresias.length === 0) {
+            return `No se encontraron membresías ${status} para el gimnasio con id: ${gymId}`;
+        }
+        return membresias;
     }catch (error){
-        console.error('Error al mostrar las membresías activas:', error);
-        throw new Error('Error al mostrar las membresías activas');
-    }
-};
-
-//Servicio para obtener todas las membresías activas de un gimnasio
-const getDesactivadas = async (gymId) => {
-    try{
-        let query = "SELECT * FROM membresias_desactivadas($1);"
-        const values = [gymId];
-
-        const result = await db.query(query, values);
-        return result.rows;
-    }catch (error){
-        console.error('Error al mostrar las membresías desactivadas:', error);
-        throw new Error('Error al mostrar las membresías desactivadas');
+        console.error(`Error al mostrar las membresías ${status} para gymId: ${gymId}:`, error);
+        throw new Error(`Error al mostrar las membresías ${status}`);
     }
 };
 
 //Servicio para aplazar fecha_fin
 
-module.exports = { getActivas, getDesactivadas };
+module.exports = { getMembresias };
