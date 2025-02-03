@@ -26,7 +26,7 @@ const getMembresias = async (gymId, status) => {
             {
                 $match: {
                     fecha_fin: dateCondition, // Condición dinámica según el estado
-                    gym_id: mongoose.Types.ObjectId(gymId) // Asegurar que gymId es un ObjectId
+                    gym_id: new mongoose.Types.ObjectId(gymId) // Asegurar que gymId es un ObjectId
                 }
             },
             {
