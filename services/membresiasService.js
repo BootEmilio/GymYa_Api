@@ -2,7 +2,6 @@ const mongoose = require('mongoose')
 const Membresia = require('../models/membresias');
 const Usuario = require('../models/usuarios');
 const Plan = require('../models/planes');
-const { default: mongoose } = require('mongoose');
 require('dotenv').config();
 
 //Servicio para obtener las membresías activas o inactivas de un gimnasio
