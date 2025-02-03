@@ -20,7 +20,7 @@ const crearPlanes = async (gym_id, nombre, descripcion, costo, duracion_meses) =
     }
 };
 
-// Servicio para mostrar todos los planes de membresía
+// Servicio para mostrar los planes de membresía activos
 const mostrarPlanes = async (gymId) => {
     try {
         // Filtrar por gym_id y solo planes que estén activos (activa: true)

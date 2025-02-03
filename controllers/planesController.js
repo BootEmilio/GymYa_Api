@@ -27,10 +27,10 @@ const mostrarPlanes = async (req, res) => {
 //Controlador para editar planes de membresía
 const editarPlanes = async (req, res) => {
     try{
-        const { nombre, descripcion, costo, duracion } = req.body;
+        const { nombre, descripcion, costo, duracion_meses } = req.body;
         const id = req.params.id;
         const gym_id = req.user.gym_id; //Usamos el gym_id del token
-        const actualizado = await gymService.editarPlanes(id, gym_id, nombre, descripcion, costo, duracion);
+        const actualizado = await planesService.editarPlanes(id, gym_id, nombre, descripcion, costo, duracion_meses);
         if(!actualizado){
             return res.status(404).json({error: 'Plan de membresía no encontrado'});
         }
