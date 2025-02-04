@@ -42,8 +42,6 @@ const registro = async (username, password, nombre_completo, email, telefono) =>
 
     return { success: true, message: 'Registro exitoso', gimnasio: nuevoGimnasio, admin: nuevoAdmin };
     } catch (error){
-      await session.abortTransaction();  // Revertir la transacción en caso de error
-      session.endSession();
       console.error('Erros al registrar el primer administrador:', error);
       throw new Error('Error al registrar el primer administrador');
     }

@@ -7,9 +7,8 @@ const adminAuthRoutes = require('./routes/adminAuthRoutes'); // Rutas de adminis
 const gymRoutes = require('./routes/gymRoutes');
 const planesRoutes = require('./routes/planesRoutes');
 const membresiasRoutes = require('./routes/membresiasRoutes');
-const addGymRoutes = require('./routes/addGymAdmin');
-const userAuthRoutes = require('./routes/userAuthRoutes');
-const adminUsersRoutes = require('./routes/adminUsersRoutes'); // Rutas de clientes
+const adminUsersRoutes = require('./routes/adminUsersRoutes');
+const userAuthRoutes = require('./routes/userAuthRoutes'); // Rutas de clientes 
 const adminPaymentsRoutes = require ('./routes/adminPaymentsRoutes');
 const userAttendanceRoutes = require('./routes/userAttendanceRoutes');
 const authMiddleware = require('./middlewares/authMiddleware');
@@ -30,7 +29,6 @@ app.use('/api/admin', adminAuthRoutes); // Registro y Login para administradores
 app.use('/api/admin', gymRoutes); //Agregar y editar gimnasio
 app.use('/api/admin', planesRoutes); //Agregar, ver y editar planes de membresía
 app.use('/api/admin', membresiasRoutes); //Agregar, ver y editar membresias
-app.use('/api/admin', addGymRoutes);
 //Rutas para usuarios
 app.use('/api/user', userAuthRoutes); // Login para usuarios
 app.use('/api/user', userAttendanceRoutes); // Ver asistencias agregar
