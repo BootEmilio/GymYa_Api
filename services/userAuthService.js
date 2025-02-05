@@ -36,4 +36,4 @@ const authenticateUser = async (username, password) => {
   }
 };
 
-module.exports = { registroUsuario, authenticateUser };
+module.exports = { authenticateUser };
