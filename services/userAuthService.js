@@ -1,6 +1,4 @@
 const user = require('../models/usuarios');
-const membresia = require('../models/membresias');
-const plan = require('../models/planes');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 

@@ -7,7 +7,7 @@ const registroUsuario = async (req, res) => {
     const {gym_id} = req.params;
 
     // Validar que todos los campos estén presentes
-    if (!gym_id || !plan_id || !username || !password || !nombre_completo || !email || !telefono) {
+    if (!plan_id || !username || !password || !nombre_completo || !email || !telefono) {
       return res.status(400).json({ error: 'Todos los campos son obligatorios' });
     }
 
