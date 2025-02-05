@@ -4,7 +4,7 @@ const membresiasService = require('../services/membresiasService');
 const registroUsuario = async (req, res) => {
   try{
     const {plan_id, username, password, nombre_completo, email, telefono} = req.body;
-    const {gym_id} = req.params;
+    const gym_id = req.user.gym_id; //Usamos el gym_id del token
 
     // Validar que todos los campos estén presentes
     if (!plan_id || !username || !password || !nombre_completo || !email || !telefono) {

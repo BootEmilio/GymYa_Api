@@ -4,7 +4,7 @@ const planesService = require('../services/planesService')
 const crearPlanes = async (req, res) => {
     try{
         const { nombre, descripcion, costo, duracion_meses } = req.body;
-        const gym_id = req.user.gym_id; //Usamos el gum_id del token
+        const gym_id = req.user.gym_id; //Usamos el gym_id del token
 
         const nuevoPlan = await planesService.crearPlanes(gym_id, nombre, descripcion, costo, duracion_meses);
         res.status(201).json(nuevoPlan);
