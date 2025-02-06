@@ -25,7 +25,6 @@ app.use(express.json());
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 
 app.use(loggerMiddleware);
-app.use(authMiddleware);
 
 //Rutas para administradores
 app.use('/api/admin', adminAuthRoutes); // Registro y Login para administradores
@@ -39,6 +38,7 @@ app.use('/api/user', userAttendanceRoutes); // Ver asistencias agregar
 app.use('/api', adminUsersRoutes);
 app.use('/api', adminPaymentsRoutes);
 
+app.use(authMiddleware);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
