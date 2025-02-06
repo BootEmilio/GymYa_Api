@@ -20,10 +20,12 @@ app.use(cors({
   origin: ['https://bootemilio.github.io', 'http://localhost:5173'],
 }));
 
+app.use(express.json()):
+
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 
 app.use(loggerMiddleware);
-
+app.use(authMiddleware);
 
 //Rutas para administradores
 app.use('/api/admin', adminAuthRoutes); // Registro y Login para administradores
@@ -33,8 +35,6 @@ app.use('/api/admin', membresiasRoutes); //Agregar, ver y editar membresias
 //Rutas para usuarios
 app.use('/api/user', userAuthRoutes); // Login para usuarios
 app.use('/api/user', userAttendanceRoutes); // Ver asistencias agregar
-
-app.use(authMiddleware);
 
 app.use('/api', adminUsersRoutes);
 app.use('/api', adminPaymentsRoutes);
