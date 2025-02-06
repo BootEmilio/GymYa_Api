@@ -116,5 +116,53 @@ const getMembresias = async (gymId, status) => {
 };
 
 //Servicio para aplazar fecha_fin
+const aplazarMembresia = async(membresia_id, plan_id) => {
+    try{
+        //Buscamos la membresia por su _id
+        membresia = await Membresia.findById(membresia_id);
+        if(!membresia){
+            throw new Error('La membresía no existe');
+        }
 
-module.exports = { registroUsuario, getMembresias };
+        //Obtener el plan seleccionado
+        planSeleccionado = await plan.findById(plan_id);
+        if(!planSeleccionado){
+            throw new Error('El plan seleccionado no existe');
+        }
+
+        //Obtenemos las fechas
+        const fecha_fin_original = membresia.fecha_fin; //La fecha fin original
+        const fecha_actual = new Date(); //fecha actual
+        const duracion_meses = planSeleccionado.duracion_meses; //la duración en meses de 
+
+        let nueva_fecha_fin; 
+
+        //Si la fecha_fin original es mayor a la fecha actual
+        if (fecha_fin_original > fecha_actual) {
+            //Sumar duracion_meses a la fecha_fin original
+            nueva_fecha_fin = new Date(fecha_fin_original);
+            nueva_fecha_fin.setMonth(nueva_fecha_fin.getMonth() + duracion_meses);
+        } else {
+            //Si la fecha_fin original es menor a la fecha actual, sumar duracion_meses a la fecha actual
+            nueva_fecha_fin = new Date(fecha_actual);
+            nueva_fecha_fin.setMonth(nueva_fecha_fin.getMonth() + duracion_meses);
+        }
+
+        //Condición para el cambio de plan_id
+        if (plan_id !== membresia.plan_id.toString()) {
+            //Si la fecha_fin original es mayor a la fecha actual, no cambiar el plan_id hasta que la fecha original haya pasado
+            if (fecha_fin_original <= fecha_actual) {
+                membresia.plan_id = plan_id; // Cambiar el plan_id si ya pasó la fecha_fin original
+            }
+        }
+
+        //Actualizar la membresía con la nueva fecha_fin y posiblemente nuevo plan_id
+        membresia.fecha_fin = nueva_fecha_fin;
+        await membresia.save();
+    }catch (error){
+        console.error('Error al aplazar la membresía:', error);
+        throw new Error('Error al aplazar la membresía');
+    }
+};
+
+module.exports = { registroUsuario, getMembresias, aplazarMembresia };
