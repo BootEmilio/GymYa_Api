@@ -17,7 +17,9 @@ const app = express();
 connectDB();
 
 app.use(cors({
-  origin: ['https://gymya-web.vercel.app/', 'https://gymya-web-bootemilios-projects.vercel.app/'], // Múltiples orígenes
+  origin: 'http://localhost:5173', // Permitir solicitudes solo desde esta URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
+  allowedHeaders: ['Content-Type', 'Authorization'] // Encabezados permitidos
 }));
 
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
