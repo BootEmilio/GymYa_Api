@@ -20,7 +20,7 @@ app.use(cors({
   origin: ['https://bootemilio.github.io', 'http://localhost:5173'],
 }));
 
-app.use(express.json()):
+app.use(express.json());
 
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 
