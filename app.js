@@ -16,8 +16,9 @@ const loggerMiddleware = require('./middlewares/loggerMiddleware');
 const app = express();
 connectDB();
 
-app.use(cors({ origin: 'https://bootemilio.github.io' }));
-app.use(express.json());
+app.use(cors({
+  origin: ['https://gymya-web.vercel.app/', 'https://gymya-web-bootemilios-projects.vercel.app/'], // Múltiples orígenes
+}));
 
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 
