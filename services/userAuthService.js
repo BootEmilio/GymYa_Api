@@ -1,4 +1,4 @@
-const user = require('../models/usuarios');
+const user   = require('../models/usuarios');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
@@ -11,9 +11,13 @@ const authenticateUser = async (username, password) => {
     // Buscar el usuario por username
     const usuario = await user.findOne({ username });
 
+    if (!usuario) {
+      throw new Error('Usuario no encontrado');
+    }
+
     // Verificar si el usuario existe y la contraseña es correcta
-    if (!usuario || usuario.password !== password) {
-      return null; // Retornar null si no coincide el username o la contraseña
+    if (password !== usuario.password) {
+      throw new Error('Contraseña incorrecta');
     }
 
     const token = jwt.sign(
