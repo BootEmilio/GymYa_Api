@@ -16,7 +16,7 @@ const loginUser = async (req, res) => {
     res.status(200).json({
       message: 'Login exitoso',
       token: authResult.token,
-      user: authResult.user,
+      user: authResult.usuario,
     });
   } catch (error) {
     console.error('Error en el proceso de login del usuario:', error);
