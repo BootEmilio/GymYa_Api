@@ -22,7 +22,8 @@ const registroUsuario = async (req, res) => {
 //Controlador para ver membresias activas y expiradas
 const getMembresias = async (req, res) => {
     try{
-        const { gymId, status } = req.params;
+        const gym_id = req.user.gym_id; //Usamos el gym_id del token
+        const { status } = req.params; //Usamos el status de la URL
 
         // Validar si el status es "activas" o "expiradas"
         if (status !== 'activas' && status !== 'expiradas') {
@@ -30,7 +31,7 @@ const getMembresias = async (req, res) => {
         }
 
         // Llamar al servicio para obtener las membresías
-        const membresias = await membresiasService.getMembresias(gymId, status);
+        const membresias = await membresiasService.getMembresias(gym_id, status);
 
         // Devolver los resultados como respuesta
         res.status(200).json(membresias);
@@ -43,11 +44,10 @@ const getMembresias = async (req, res) => {
 //controlador para aplazar las membresías existentes
 const aplazarMembresia = async (req, res) => {
   try{
-    const { _id } = req.params;
-    const { plan_id } = req.body;
+    const { membresia_id, plan_id } = req.body;
 
     // Llamar al servicio para obtener aplazar las membresias
-    const membresia = await membresiasService.aplazarMembresia(_id, plan_id);
+    const membresia = await membresiasService.aplazarMembresia(membresia_id, plan_id);
 
     // Devolver la membresía actualizada como respuesta, incluyendo la nueva fecha_fin
     res.status(200).json({
