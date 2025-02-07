@@ -43,13 +43,8 @@ const getMembresias = async (req, res) => {
 //controlador para aplazar las membresías existentes
 const aplazarMembresia = async (req, res) => {
   try{
-    const { gym_id, membresia_id } = req.params;
+    const { membresia_id } = req.params;
     const { plan_id } = req.body;
-
-    //validar gym_id
-    if (!gym_id) {
-      return res.status(404).json({ error: 'gym_id inválido o no proporcionado' })
-    }
 
     // Llamar al servicio para obtener aplazar las membresias
     const membresia = await membresiasService.aplazarMembresia(membresia_id, plan_id);
