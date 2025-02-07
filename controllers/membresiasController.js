@@ -43,11 +43,11 @@ const getMembresias = async (req, res) => {
 //controlador para aplazar las membresías existentes
 const aplazarMembresia = async (req, res) => {
   try{
-    const { membresia_id } = req.params;
+    const { membresiaId } = req.params;
     const { plan_id } = req.body;
 
     // Llamar al servicio para obtener aplazar las membresias
-    const membresia = await membresiasService.aplazarMembresia(membresia_id, plan_id);
+    const membresia = await membresiasService.aplazarMembresia(membresiaId, plan_id);
 
     if (!membresia) {
       return res.status(404).json({ error: 'Membresía no encontrada' });
