@@ -159,6 +159,8 @@ const aplazarMembresia = async(membresia_id, plan_id) => {
         //Actualizar la membresía con la nueva fecha_fin y posiblemente nuevo plan_id
         membresia.fecha_fin = nueva_fecha_fin;
         await membresia.save();
+
+        return membresia; // Retornar la membresía actualizada
     }catch (error){
         console.error('Error al aplazar la membresía:', error);
         throw new Error('Error al aplazar la membresía');
