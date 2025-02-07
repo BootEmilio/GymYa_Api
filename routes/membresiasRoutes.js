@@ -8,5 +8,5 @@ router.post('/membresias/:gymId', token, membresiasController.registroUsuario);
 // Ruta para obtener las membresías activas o expiradas
 router.get('/membresias/:gymId/:status', token, membresiasController.getMembresias);
 // Ruta para aplazar las membresías existentes
-router.put('/membresias/:membresiaId', token, membresiasController.aplazarMembresia);
+router.put('/membresias/:membresia_id', token, membresiasController.aplazarMembresia);
 module.exports = router;

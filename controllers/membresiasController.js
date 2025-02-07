@@ -43,7 +43,7 @@ const getMembresias = async (req, res) => {
 //controlador para aplazar las membresías existentes
 const aplazarMembresia = async (req, res) => {
   try{
-    const { membresiaId } = req.params;
+    const { membresia_id } = req.params;
     const { plan_id } = req.body;
 
     // Llamar al servicio para obtener aplazar las membresias
