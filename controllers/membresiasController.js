@@ -1,3 +1,4 @@
+const gym = require('../models/gym');
 const membresiasService = require('../services/membresiasService');
 
 //Controlador para registrar usuarios con sus membresias
@@ -39,4 +40,37 @@ const getMembresias = async (req, res) => {
     }
 };
 
-module.exports = { registroUsuario, getMembresias };
+//controlador para aplazar las membresías existentes
+const aplazarMembresia = async (req, res) => {
+  try{
+    const { gym_id, membresia_id } = req.params;
+    const { plan_id } = req.body;
+
+    //validar gym_id
+    if (!gym_id) {
+      return res.status(404).json({ error: 'gym_id inválido o no proporcionado' })
+    }
+
+    // Llamar al servicio para obtener aplazar las membresias
+    const membresia = await membresiasService.aplazarMembresia(membresia_id, plan_id);
+
+    if (!membresia) {
+      return res.status(404).json({ error: 'Membresía no encontrada' });
+    }
+
+    // Devolver la membresía actualizada como respuesta, incluyendo la nueva fecha_fin
+    res.status(200).json({
+      message: 'Membresía actualizada correctamente',
+      membresia: {
+        _id: membresia._id,
+        gym_id: membresia.gym_id,
+        plan_id: membresia.plan_id,
+        fecha_fin: membresia.fecha_fin, // Nueva fecha_fin
+      }
+    });
+  }catch (error){
+    res.status(500).json({ error: 'Ocurrió un error al aplazar la fecha fin de la membresía.' });
+  }
+}; 
+
+module.exports = { registroUsuario, getMembresias, aplazarMembresia };

@@ -119,13 +119,13 @@ const getMembresias = async (gymId, status) => {
 const aplazarMembresia = async(membresia_id, plan_id) => {
     try{
         //Buscamos la membresia por su _id
-        membresia = await Membresia.findById(membresia_id);
+        const membresia = await Membresia.findById(membresia_id);
         if(!membresia){
             throw new Error('La membresía no existe');
         }
 
         //Obtener el plan seleccionado
-        planSeleccionado = await plan.findById(plan_id);
+        const planSeleccionado = await plan.findById(plan_id);
         if(!planSeleccionado){
             throw new Error('El plan seleccionado no existe');
         }

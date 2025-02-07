@@ -28,9 +28,9 @@ app.use(loggerMiddleware);
 
 //Rutas para administradores
 app.use('/api/admin', adminAuthRoutes); // Registro y Login para administradores
-app.use('/api/admin', gymRoutes); //Agregar y editar gimnasio
-app.use('/api/admin', planesRoutes); //Agregar, ver y editar planes de membresía
-app.use('/api/admin', membresiasRoutes); //Agregar, ver y editar membresias
+app.use('/api/admin', gymRoutes); // Solo editar gimnasio
+app.use('/api/admin', planesRoutes); // Agregar, ver, editar y "eliminar" planes de membresía
+app.use('/api/admin', membresiasRoutes); //Agregar membresias y usuarios nuevas, ver y aplazar membresía existentes
 //Rutas para usuarios
 app.use('/api/user', userAuthRoutes); // Login para usuarios
 app.use('/api/user', userAttendanceRoutes); // Ver asistencias agregar
