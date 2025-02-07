@@ -116,10 +116,10 @@ const getMembresias = async (gymId, status) => {
 };
 
 //Servicio para aplazar fecha_fin
-const aplazarMembresia = async(membresia_id, plan_id) => {
+const aplazarMembresia = async(_id, plan_id) => {
     try{
         //Buscamos la membresia por su _id
-        const membresia = await Membresia.findById(membresia_id);
+        const membresia = await Membresia.findById(_id);
         if(!membresia){
             throw new Error('La membresía no existe');
         }
