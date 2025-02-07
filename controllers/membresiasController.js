@@ -49,10 +49,6 @@ const aplazarMembresia = async (req, res) => {
     // Llamar al servicio para obtener aplazar las membresias
     const membresia = await membresiasService.aplazarMembresia(membresiaId, plan_id);
 
-    if (!membresia) {
-      return res.status(404).json({ error: 'Membresía no encontrada' });
-    }
-
     // Devolver la membresía actualizada como respuesta, incluyendo la nueva fecha_fin
     res.status(200).json({
       message: 'Membresía actualizada correctamente',
