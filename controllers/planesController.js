@@ -19,8 +19,8 @@ const crearPlanes = async (req, res) => {
         }
 
         //Validaciones para el costo
-        if (costo !== undefined && costo<0) {
-            return res.status(400).json({ error: 'El costo no puede ser negativo.' });
+        if (costo === undefined || costo<0) {
+            return res.status(400).json({ error: 'El costo debe de estar definido y no puede ser negativo.' });
         }
 
         const nuevoPlan = await planesService.crearPlanes(gym_id, nombre, descripcion, costo, duracion_meses, duracion_semanas, duracion_dias);
