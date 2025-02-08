@@ -28,7 +28,7 @@ const mostrarPlanes = async (req, res) => {
 const editarPlanes = async (req, res) => {
     try{
         const { nombre, descripcion, costo, duracion_meses } = req.body;
-        const id = req.params.id;
+        const id = req.params.id; // Obtenemos el _id del plan
         const gym_id = req.user.gym_id; //Usamos el gym_id del token
         const actualizado = await planesService.editarPlanes(id, gym_id, nombre, descripcion, costo, duracion_meses);
         if(!actualizado){
@@ -43,8 +43,8 @@ const editarPlanes = async (req, res) => {
 // Controlador para "eliminar" un plan de membresía
 const eliminarPlan = async (req, res) => {
     try {
-        const gym_id = req.user.gym_id;
-        const eliminado = await planesService.eliminarPlan(req.params.id, gym_id);
+        const gym_id = req.user.gym_id; //Usamos el gym_id del token
+        const eliminado = await planesService.eliminarPlan(req.params.id, gym_id); // Obtenemos el _id del plan
 
         if (!eliminado) {
             return res.status(404).json({ error: 'Plan de membresía no encontrado' });

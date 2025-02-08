@@ -18,13 +18,8 @@ const editarGimnasio = async (req, res) => {
     try{
         const { nombre, direccion, telefono } = req.body;
 
-        // Verificamos que el gimnasio a editar es el del administrador autenticado
-        const gymId = req.user.gym_id; 
-        if (gymId.toString() !== req.params.id) {
-            return res.status(403).json({ error: 'No tienes permiso para editar este gimnasio' });
-        }
-
-        const actualizado = await gymService.editarGimnasio(req.params.id, nombre, direccion, telefono);
+        const gym_id = req.user.gym_id; //Obtenemos gym_id por medio del token
+        const actualizado = await gymService.editarGimnasio(gym_id, nombre, direccion, telefono);
         if(!actualizado){
             return res.status(404).json({error: 'Gimnasio no encontrado'});
         }
