@@ -26,10 +26,20 @@ const registroUsuario = async(gym_id, plan_id, username, password, nombre_comple
 
         //Obtenemos la fecha de hoy
         const fecha_inicio = new Date();
-        //Calculamos la fecha en la que termina la membresía
-        const meses = planSeleccionado.duracion_meses;
+
+        // Calculamos la fecha de finalización en función de la duración del plan
         const fecha_fin = new Date(fecha_inicio);
-        fecha_fin.setMonth(fecha_fin.getMonth() + meses);
+
+
+        if (planSeleccionado.duracion_meses) {
+            fecha_fin.setMonth(fecha_fin.getMonth() + planSeleccionado.duracion_meses);
+        } else if (planSeleccionado.duracion_semanas) {
+            fecha_fin.setDate(fecha_fin.getDate() + (planSeleccionado.duracion_semanas * 7)); // Sumar semanas
+        } else if (planSeleccionado.duracion_dias) {
+            fecha_fin.setDate(fecha_fin.getDate() + planSeleccionado.duracion_dias); // Sumar días
+        } else {
+            throw new Error('El plan no tiene una duración válida');
+        }
 
         //Crear la nueva membresía
         const nuevaMembresia = await Membresia.create({
@@ -133,19 +143,25 @@ const aplazarMembresia = async(membresia_id, plan_id) => {
         //Obtenemos las fechas
         const fecha_fin_original = membresia.fecha_fin; //La fecha fin original
         const fecha_actual = new Date(); //fecha actual
-        const duracion_meses = planSeleccionado.duracion_meses; //la duración en meses de 
-
         let nueva_fecha_fin; 
 
-        //Si la fecha_fin original es mayor a la fecha actual
+        // Si la fecha_fin original es mayor a la fecha actual, sumar a la fecha_fin original
         if (fecha_fin_original > fecha_actual) {
-            //Sumar duracion_meses a la fecha_fin original
             nueva_fecha_fin = new Date(fecha_fin_original);
-            nueva_fecha_fin.setMonth(nueva_fecha_fin.getMonth() + duracion_meses);
         } else {
-            //Si la fecha_fin original es menor a la fecha actual, sumar duracion_meses a la fecha actual
+            // Si la fecha_fin original ya pasó, sumar a la fecha actual
             nueva_fecha_fin = new Date(fecha_actual);
-            nueva_fecha_fin.setMonth(nueva_fecha_fin.getMonth() + duracion_meses);
+        }
+
+        // Calcular la nueva fecha fin en función del plan seleccionado
+        if (planSeleccionado.duracion_meses) {
+            nueva_fecha_fin.setMonth(nueva_fecha_fin.getMonth() + planSeleccionado.duracion_meses);
+        } else if (planSeleccionado.duracion_semanas) {
+            nueva_fecha_fin.setDate(nueva_fecha_fin.getDate() + (planSeleccionado.duracion_semanas * 7)); // Sumar semanas
+        } else if (planSeleccionado.duracion_dias) {
+            nueva_fecha_fin.setDate(nueva_fecha_fin.getDate() + planSeleccionado.duracion_dias); // Sumar días
+        } else {
+            throw new Error('El plan no tiene una duración válida');
         }
 
         //Condición para el cambio de plan_id
