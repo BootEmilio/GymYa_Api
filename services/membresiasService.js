@@ -78,13 +78,17 @@ const getMembresias = async (gymId, status, page = 1, limit = 10, search = '') =
         // Crear condición de búsqueda
         let searchCondition = {};
         if (search) {
-            searchCondition = {
-                $or: [
-                    { 'usuario.nombre_completo': { $regex: search, $options: 'i' } },
-                    { 'usuario.username': { $regex: search, $options: 'i' } },
-                    { '_id': new mongoose.Types.ObjectId(search) } // Buscar por membresia_id
-                ]
-            };
+            const searchConditions = [
+                { 'usuario.nombre_completo': { $regex: search, $options: 'i' } },
+                { 'usuario.username': { $regex: search, $options: 'i' } }
+            ];
+
+            // Solo agregar la búsqueda por _id si search es un ObjectId válido
+            if (mongoose.Types.ObjectId.isValid(search)) {
+                searchConditions.push({ '_id': new mongoose.Types.ObjectId(search) });
+            }
+
+            searchCondition = { $or: searchConditions };
         }
 
         // Agregación en MongoDB con la condición dinámica
