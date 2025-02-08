@@ -2,16 +2,29 @@ const Plan = require('../models/planes');
 require('dotenv').config();
 
 // Servicio para agregar un tipo de plan de membresía
-const crearPlanes = async (gym_id, nombre, descripcion, costo, duracion_meses) => {
+const crearPlanes = async (gym_id, nombre, descripcion, costo, duracion_meses, duracion_semanas, duracion_dias) => {
     try {
         const nuevoPlan = new Plan({
             gym_id,
             nombre,
             descripcion,
             costo,
-            duracion_meses,
             activa: true // Definimos que el nuevo plan es activo por defecto
         });
+
+        // Solo agregar los campos de duración si se proporcionan
+        if (duracion_meses !== undefined) {
+            nuevoPlan.duracion_meses = duracion_meses;
+        }
+
+        if (duracion_semanas !== undefined) {
+            nuevoPlan.duracion_semanas = duracion_semanas;
+        }
+
+        if (duracion_dias !== undefined) {
+            nuevoPlan.duracion_dias = duracion_dias;
+        }
+
         const result = await nuevoPlan.save();
         return result;
     } catch (error) {
@@ -35,7 +48,7 @@ const mostrarPlanes = async (gymId) => {
 };
 
 // Servicio para editar un plan existente de membresía
-const editarPlanes = async (id, gymId, nombre, descripcion, costo, duracion_meses) => {
+const editarPlanes = async (id, gymId, nombre, descripcion, costo, duracion_meses, duracion_semanas, duracion_dias) => {
     try {
         const fieldsToUpdate = {};
 
@@ -43,6 +56,8 @@ const editarPlanes = async (id, gymId, nombre, descripcion, costo, duracion_mese
         if (descripcion) fieldsToUpdate.descripcion = descripcion;
         if (costo) fieldsToUpdate.costo = costo;
         if (duracion_meses) fieldsToUpdate.duracion_meses = duracion_meses;
+        if (duracion_semanas) fieldsToUpdate.duracion_semanas = duracion_semanas;
+        if (duracion_dias) fieldsToUpdate.duracion_dias = duracion_dias;
 
         if (Object.keys(fieldsToUpdate).length === 0) {
             throw new Error('No se han proporcionado datos para actualizar.');

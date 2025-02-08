@@ -3,15 +3,20 @@ const planesService = require('../services/planesService')
 //Controlador para agregar planes de membrbesía
 const crearPlanes = async (req, res) => {
     try{
-        const { nombre, descripcion, costo, duracion_meses } = req.body;
+        const { nombre, descripcion, costo, duracion_meses, duracion_semanas, duracion_dias } = req.body;
         const gym_id = req.user.gym_id; //Usamos el gym_id del token
 
-        const nuevoPlan = await planesService.crearPlanes(gym_id, nombre, descripcion, costo, duracion_meses);
+        // Validar que al menos una duración sea proporcionada
+        if (duracion_meses === undefined && duracion_semanas === undefined && duracion_dias === undefined) {
+            return res.status(400).json({ error: 'Debe proporcionar al menos una duración (meses, semanas o días).' });
+        }
+
+        const nuevoPlan = await planesService.crearPlanes(gym_id, nombre, descripcion, costo, duracion_meses, duracion_semanas, duracion_dias);
         res.status(201).json(nuevoPlan);
     }catch (error) {
         res.status(500).json({error: 'Error al crear nuevo plan de membresía'});
     }
-}
+};
 
 //Controlador para mostrar planes de membresía
 const mostrarPlanes = async (req, res) => {
@@ -27,10 +32,10 @@ const mostrarPlanes = async (req, res) => {
 //Controlador para editar planes de membresía
 const editarPlanes = async (req, res) => {
     try{
-        const { nombre, descripcion, costo, duracion_meses } = req.body;
-        const id = req.params.id; // Obtenemos el _id del plan
+        const { nombre, descripcion, costo, duracion_meses, duracion_semanas, duracion_dias } = req.body;
+        const id = req.params.id; // Obtenemos el _id del plan por medio de la URL
         const gym_id = req.user.gym_id; //Usamos el gym_id del token
-        const actualizado = await planesService.editarPlanes(id, gym_id, nombre, descripcion, costo, duracion_meses);
+        const actualizado = await planesService.editarPlanes(id, gym_id, nombre, descripcion, costo, duracion_meses, duracion_semanas, duracion_dias);
         if(!actualizado){
             return res.status(404).json({error: 'Plan de membresía no encontrado'});
         }
