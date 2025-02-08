@@ -38,7 +38,7 @@ const mostrarPlanes = async (gymId) => {
     try {
         // Filtrar por gym_id y solo planes que estén activos (activa: true)
         const planes = await Plan.find({ gym_id: gymId, activa: true })
-            .select('nombre descripcion costo duracion_meses') // Solo seleccionar los campos necesarios
+            .select('nombre descripcion costo duracion_meses duracion_semanas duracion_dias') // Solo seleccionar los campos necesarios
             .sort({ costo: 1 }); // Ordenar por costo de menor a mayor
         return planes;
     } catch (error) {
@@ -55,18 +55,46 @@ const editarPlanes = async (id, gymId, nombre, descripcion, costo, duracion_mese
         if (nombre) fieldsToUpdate.nombre = nombre;
         if (descripcion) fieldsToUpdate.descripcion = descripcion;
         if (costo) fieldsToUpdate.costo = costo;
-        if (duracion_meses) fieldsToUpdate.duracion_meses = duracion_meses;
-        if (duracion_semanas) fieldsToUpdate.duracion_semanas = duracion_semanas;
-        if (duracion_dias) fieldsToUpdate.duracion_dias = duracion_dias;
 
-        if (Object.keys(fieldsToUpdate).length === 0) {
-            throw new Error('No se han proporcionado datos para actualizar.');
+        // Si duracion_meses es proporcionado, lo actualizamos; si es 0, lo eliminamos
+        if (duracion_meses !== undefined) {
+            if (duracion_meses === 0) {
+                fieldsToUnset.duracion_meses = ""; // Indicamos que queremos eliminar este campo
+            } else {
+                fieldsToUpdate.duracion_meses = duracion_meses;
+            }
+        }
+
+        // Si duracion_semanas es proporcionado, lo actualizamos; si es 0, lo eliminamos
+        if (duracion_semanas !== undefined) {
+            if (duracion_semanas === 0) {
+                fieldsToUnset.duracion_semanas = ""; // Eliminamos este campo
+            } else {
+                fieldsToUpdate.duracion_semanas = duracion_semanas;
+            }
+        }
+
+        // Si duracion_dias es proporcionado, lo actualizamos; si es 0, lo eliminamos
+        if (duracion_dias !== undefined) {
+            if (duracion_dias === 0) {
+                fieldsToUnset.duracion_dias = ""; // Eliminamos este campo
+            } else {
+                fieldsToUpdate.duracion_dias = duracion_dias;
+            }
+        }
+
+        // Validamos que haya algo que actualizar o eliminar
+        if (Object.keys(fieldsToUpdate).length === 0 && Object.keys(fieldsToUnset).length === 0) {
+            throw new Error('No se han proporcionado datos para actualizar o eliminar.');
         }
 
         // Buscar el plan por su id y gym_id, y actualizarlo
         const planActualizado = await Plan.findOneAndUpdate(
             { _id: id, gym_id: gymId },
-            { $set: fieldsToUpdate },
+            { 
+                $set: fieldsToUpdate,
+                $unset: fieldsToUnset //Elimina campos que deben de quedar como undefined
+            },
             { new: true } // Retorna el plan actualizado
         );
 
