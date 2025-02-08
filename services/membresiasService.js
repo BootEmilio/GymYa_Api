@@ -31,14 +31,15 @@ const registroUsuario = async(gym_id, plan_id, username, password, nombre_comple
         const fecha_fin = new Date(fecha_inicio);
 
 
+        // Sumar meses, semanas y días según lo definido en el plan
         if (planSeleccionado.duracion_meses) {
             fecha_fin.setMonth(fecha_fin.getMonth() + planSeleccionado.duracion_meses);
-        } else if (planSeleccionado.duracion_semanas) {
+        }
+        if (planSeleccionado.duracion_semanas) {
             fecha_fin.setDate(fecha_fin.getDate() + (planSeleccionado.duracion_semanas * 7)); // Sumar semanas
-        } else if (planSeleccionado.duracion_dias) {
+        }
+        if (planSeleccionado.duracion_dias) {
             fecha_fin.setDate(fecha_fin.getDate() + planSeleccionado.duracion_dias); // Sumar días
-        } else {
-            throw new Error('El plan no tiene una duración válida');
         }
 
         //Crear la nueva membresía
@@ -153,15 +154,15 @@ const aplazarMembresia = async(membresia_id, plan_id) => {
             nueva_fecha_fin = new Date(fecha_actual);
         }
 
-        // Calcular la nueva fecha fin en función del plan seleccionado
+        // Sumar meses, semanas y días según lo definido en el plan
         if (planSeleccionado.duracion_meses) {
             nueva_fecha_fin.setMonth(nueva_fecha_fin.getMonth() + planSeleccionado.duracion_meses);
-        } else if (planSeleccionado.duracion_semanas) {
+        }
+        if (planSeleccionado.duracion_semanas) {
             nueva_fecha_fin.setDate(nueva_fecha_fin.getDate() + (planSeleccionado.duracion_semanas * 7)); // Sumar semanas
-        } else if (planSeleccionado.duracion_dias) {
+        }
+        if (planSeleccionado.duracion_dias) {
             nueva_fecha_fin.setDate(nueva_fecha_fin.getDate() + planSeleccionado.duracion_dias); // Sumar días
-        } else {
-            throw new Error('El plan no tiene una duración válida');
         }
 
         //Condición para el cambio de plan_id
