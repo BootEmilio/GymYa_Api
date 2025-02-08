@@ -11,6 +11,18 @@ const crearPlanes = async (req, res) => {
             return res.status(400).json({ error: 'Debe proporcionar al menos una duración (meses, semanas o días).' });
         }
 
+        // Validar que las duraciones no sean negativas
+        if ((duracion_meses !== undefined && duracion_meses < 0) ||
+            (duracion_semanas !== undefined && duracion_semanas < 0) ||
+            (duracion_dias !== undefined && duracion_dias < 0)) {
+            return res.status(400).json({ error: 'Las duraciones no pueden ser negativas.' });
+        }
+
+        //Validaciones para el costo
+        if (costo !== undefined && costo<0) {
+            return res.status(400).json({ error: 'El costo no puede ser negativo.' });
+        }
+
         const nuevoPlan = await planesService.crearPlanes(gym_id, nombre, descripcion, costo, duracion_meses, duracion_semanas, duracion_dias);
         res.status(201).json(nuevoPlan);
     }catch (error) {
@@ -35,6 +47,24 @@ const editarPlanes = async (req, res) => {
         const { nombre, descripcion, costo, duracion_meses, duracion_semanas, duracion_dias } = req.body;
         const id = req.params.id; // Obtenemos el _id del plan por medio de la URL
         const gym_id = req.user.gym_id; //Usamos el gym_id del token
+
+        // Validaciones para costo y duraciones
+        if (costo !== undefined && costo < 0) {
+            return res.status(400).json({ error: 'El costo no puede ser negativo.' });
+        }
+
+        if (duracion_meses !== undefined && duracion_meses < 0) {
+            return res.status(400).json({ error: 'La duración en meses no puede ser negativa.' });
+        }
+
+        if (duracion_semanas !== undefined && duracion_semanas < 0) {
+            return res.status(400).json({ error: 'La duración en semanas no puede ser negativa.' });
+        }
+
+        if (duracion_dias !== undefined && duracion_dias < 0) {
+            return res.status(400).json({ error: 'La duración en días no puede ser negativa.' });
+        }
+
         const actualizado = await planesService.editarPlanes(id, gym_id, nombre, descripcion, costo, duracion_meses, duracion_semanas, duracion_dias);
         if(!actualizado){
             return res.status(404).json({error: 'Plan de membresía no encontrado'});
