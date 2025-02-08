@@ -15,30 +15,37 @@ const registroUsuario = async (req, res) => {
     const usuarioNuevo = await membresiasService.registroUsuario(gym_id, plan_id, username, password, nombre_completo, email, telefono);
     res.status(201).json(usuarioNuevo);
   }catch (error) {
-    res.status(500).json({error: 'Error al registrar el primer administrador'});
+    res.status(500).json({error: 'Error al registrar el usuario junto a su membresía'});
   }
 };
 
 //Controlador para ver membresias activas y expiradas
 const getMembresias = async (req, res) => {
-    try{
-        const gym_id = req.user.gym_id; //Usamos el gym_id del token
-        const { status } = req.params; //Usamos el status de la URL
+  try {
+      const gym_id = req.user.gym_id; // Usamos el gym_id del token
+      const { status } = req.params; // Usamos el status de la URL
+      const { page = 1, limit = 10, search } = req.query; // Parámetros de paginación y búsqueda
 
-        // Validar si el status es "activas" o "expiradas"
-        if (status !== 'activas' && status !== 'expiradas') {
-            return res.status(400).json({ error: 'Estado inválido. Use "activas" o "expiradas".' });
-        }
+      // Validar si el status es "activas" o "expiradas"
+      if (status !== 'activas' && status !== 'expiradas') {
+          return res.status(400).json({ error: 'Estado inválido. Use "activas" o "expiradas".' });
+      }
 
-        // Llamar al servicio para obtener las membresías
-        const membresias = await membresiasService.getMembresias(gym_id, status);
+      // Llamar al servicio para obtener las membresías
+      const { membresias, total } = await membresiasService.getMembresias(gym_id, status, page, limit, search);
 
-        // Devolver los resultados como respuesta
-        res.status(200).json(membresias);
-    } catch (error){
-        console.error('Error en obtenerMembresias:', error);
-        res.status(500).json({ error: 'Ocurrió un error al obtener las membresías.' });
-    }
+      // Devolver los resultados como respuesta
+      res.status(200).json({
+          membresias,
+          total,
+          page: parseInt(page),
+          limit: parseInt(limit),
+          totalPages: Math.ceil(total / limit)
+      });
+  } catch (error) {
+      console.error('Error en obtenerMembresias:', error);
+      res.status(500).json({ error: 'Ocurrió un error al obtener las membresías.' });
+  }
 };
 
 //controlador para aplazar las membresías existentes

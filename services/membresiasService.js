@@ -59,8 +59,8 @@ const registroUsuario = async(gym_id, plan_id, username, password, nombre_comple
 };
 
 //Servicio para obtener las membresías activas o inactivas de un gimnasio
-const getMembresias = async (gymId, status) => {
-    try{
+const getMembresias = async (gymId, status, page = 1, limit = 10, search = '') => {
+    try {
         // Verificar si gymId es un ObjectId válido
         if (!mongoose.Types.ObjectId.isValid(gymId)) {
             throw new Error('El gymId proporcionado no es válido');
@@ -73,6 +73,18 @@ const getMembresias = async (gymId, status) => {
             dateCondition = { $lt: new Date() }; // Membresías expiradas
         } else {
             throw new Error('El estado proporcionado no es válido. Use "activas" o "expiradas".');
+        }
+
+        // Crear condición de búsqueda
+        let searchCondition = {};
+        if (search) {
+            searchCondition = {
+                $or: [
+                    { 'usuario.nombre_completo': { $regex: search, $options: 'i' } },
+                    { 'usuario.username': { $regex: search, $options: 'i' } },
+                    { '_id': new mongoose.Types.ObjectId(search) } // Buscar por membresia_id
+                ]
+            };
         }
 
         // Agregación en MongoDB con la condición dinámica
@@ -100,7 +112,10 @@ const getMembresias = async (gymId, status) => {
                     as: 'plan'
                 }
             },
-            { $unwind: '$plan' }, // Descomprimir el array de plane
+            { $unwind: '$plan' }, // Descomprimir el array de planes
+            {
+                $match: searchCondition // Aplicar la condición de búsqueda
+            },
             {
                 $project: {
                     membresia_id: '$_id', // Seleccionamos los campos deseados
@@ -112,15 +127,23 @@ const getMembresias = async (gymId, status) => {
                     nombre_plan: '$plan.nombre',
                     _id: 0
                 }
+            },
+            {
+                $facet: {
+                    metadata: [{ $count: "total" }, { $addFields: { page: parseInt(page), limit: parseInt(limit) } }],
+                    data: [{ $skip: (page - 1) * limit }, { $limit: parseInt(limit) }] // Paginación
+                }
             }
         ]);
 
         // Verificar si no se encontraron membresías
-        if (membresias.length === 0) {
-            return `No se encontraron membresías ${status} para el gimnasio con id: ${gymId}`;
+        if (membresias[0].data.length === 0) {
+            return { membresias: [], total: 0 };
         }
-        return membresias;
-    }catch (error){
+
+        const total = membresias[0].metadata[0].total;
+        return { membresias: membresias[0].data, total };
+    } catch (error) {
         console.error(`Error al mostrar las membresías ${status} para gymId: ${gymId}:`, error);
         throw new Error(`Error al mostrar las membresías ${status}`);
     }
