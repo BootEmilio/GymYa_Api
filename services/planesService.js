@@ -51,6 +51,7 @@ const mostrarPlanes = async (gymId) => {
 const editarPlanes = async (id, gymId, nombre, descripcion, costo, duracion_meses, duracion_semanas, duracion_dias) => {
     try {
         const fieldsToUpdate = {};
+        const fieldsToUnset = {}; // Campos que queremos eliminar
 
         if (nombre) fieldsToUpdate.nombre = nombre;
         if (descripcion) fieldsToUpdate.descripcion = descripcion;
