@@ -8,9 +8,9 @@ const gymRoutes = require('./routes/gymRoutes');
 const planesRoutes = require('./routes/planesRoutes');
 const membresiasRoutes = require('./routes/membresiasRoutes');
 const adminUsersRoutes = require('./routes/adminUsersRoutes');
-const userAuthRoutes = require('./routes/userAuthRoutes'); // Rutas de clientes 
+const userAuthRoutes = require('./routes/userAuthRoutes'); // Rutas de clientes
+const asistenciasRoutes = require('./routes/asistenciasRoutes'); 
 const adminPaymentsRoutes = require ('./routes/adminPaymentsRoutes');
-const userAttendanceRoutes = require('./routes/userAttendanceRoutes');
 const authMiddleware = require('./middlewares/authMiddleware');
 const loggerMiddleware = require('./middlewares/loggerMiddleware');
 const app = express();
@@ -33,7 +33,7 @@ app.use('/api/admin', planesRoutes); // Agregar, ver, editar y "eliminar" planes
 app.use('/api/admin', membresiasRoutes); //Agregar membresias y usuarios nuevas, ver y aplazar membresía existentes
 //Rutas para usuarios
 app.use('/api/user', userAuthRoutes); // Login para usuarios
-app.use('/api/user', userAttendanceRoutes); // Ver asistencias agregar
+app.use('/api/user', asistenciasRoutes); // Ver asistencias agregar
 
 app.use('/api', adminUsersRoutes);
 app.use('/api', adminPaymentsRoutes);
