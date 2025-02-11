@@ -177,9 +177,6 @@ const getMembresia = async (usuario_id) =>{
             },
             { $unwind: '$plan' }, // Descomprimir el array de planes
             {
-                $match: searchCondition // Aplicar la condición de búsqueda
-            },
-            {
                 $project: {
                     membresia_id: '$_id', // Seleccionamos los campos deseados
                     fecha_inicio: 1,
@@ -187,6 +184,7 @@ const getMembresia = async (usuario_id) =>{
                     usuario_id: '$usuario._id',
                     nombre_completo: '$usuario.nombre_completo',
                     username: '$usuario.username',
+                    plan_id: '$plan._id',
                     nombre_plan: '$plan.nombre',
                     _id: 0
                 }
@@ -194,11 +192,11 @@ const getMembresia = async (usuario_id) =>{
         ]);
 
         // Verificar si no se encontraron membresías
-        if (resultado[0].data.length === 0) {
+        if (resultado.length === 0) {
             return { error: 'No se ha encontrado ninguna membresía con ese usuario_id' };
         }
 
-        return resultado[0];
+        return resultado;
     }catch(error){
         throw new Error('Error al obtener la membresía del usuario');
     }
