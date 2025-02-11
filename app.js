@@ -17,7 +17,7 @@ const app = express();
 connectDB();
 
 app.use(cors({
-  origin: ['https://bootemilio.github.io', 'https://gymya-web.onrender.com'],
+  origin: ['https://bootemilio.github.io', 'https://gymya-web.onrender.com/'],
 }));
 
 app.use(express.json());
