@@ -205,7 +205,7 @@ const verAsistencias = async (gym_id, fecha = null, search = '', page = 1, limit
 };
 
 //Servicio para que el usuario su última asistencia
-const verAsistencia = async () => {
+const verAsistencia = async () => { //Comentario para ver pq no me hace commit en render
     try{
 
     }catch(error){
