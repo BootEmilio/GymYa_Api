@@ -24,12 +24,14 @@ const verAsistencias = async (req, res) => {
         const gym_id = req.user.gym_id; //Obtiene el gym_id por medio de su token
         const {fecha, search, page = 1, limit = 10} = req.query; //Obtenemos la busqueda por medio de la URL
 
-        const asistencias = await asistenciasService.verAsistencias(gym_id, fecha, search, page = 1, limit = 10);
+        const asistencias = await asistenciasService.verAsistencias(gym_id, fecha, search, page, limit);
 
         res.status(200).json({
-            success: true,
-            message: 'Asistencias obtenidas correctamente',
-            asistencias: asistencias
+            asistencias: asistencias,
+            total,
+            page: parseInt(page),
+            limit: parseInt(limit),
+            totalPages: Math.ceil(total / limit)
         });
     }catch (error){
         console.error('Error en obtener las asistencias:', error);
