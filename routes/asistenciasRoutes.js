@@ -4,7 +4,7 @@ const token = require('../middlewares/authMiddleware');
 const router = express.Router();
 
 //Ruta para registrar entradas y salidas (pronto cambiar a QR)
-router.post('nuevaAsistencia', token, asistenciasController.registrarAsistencia);
+router.post('/nuevaAsistencia', token, asistenciasController.registrarAsistencia);
 
 // Ruta para registrar una nueva asistencia
 //router.post('/asistencias', token, asistenciasController.createAsistencia);

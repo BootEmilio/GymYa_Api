@@ -35,7 +35,7 @@ app.use('/api/user', userAuthRoutes); // Login para usuarios
 
 //Rutas para ambos
 app.use('/api', membresiasRoutes); //Agregar membresias y usuarios nuevas, ver y aplazar membresía existentes
-app.use('/api', asistenciasRoutes); // Ver asistencias agregar
+app.use('/api', asistenciasRoutes); // Registrar entradas y salidas, consultarlas como admin y user
 
 app.use('/api', adminUsersRoutes);
 app.use('/api', adminPaymentsRoutes);
