@@ -130,8 +130,8 @@ const verAsistencias = async (gym_id, fecha = null, search = '') => {
             },
             {
                 $group: {
-                    _id: {
-                        usuario_id: '$usuario_id',
+                    usuario: {
+                        id: '$usuario_id',
                         nombre_completo: '$usuario.nombre_completo'
                     },
                     entradas: {
