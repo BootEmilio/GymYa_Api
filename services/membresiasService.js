@@ -153,6 +153,57 @@ const getMembresias = async (gymId, status, page = 1, limit = 10, search = '') =
     }
 };
 
+//Servicio para mostrar la membresía del usuario
+const getMembresia = async (usuario_id) =>{
+    try{
+        const resultado = await Membresia.aggregate([
+            { $match: { usuario_id: new mongoose.Types.ObjectId(usuario_id) } },
+            {
+                $lookup: {
+                    from: 'usuarios', // Colección usuarios
+                    localField: 'usuario_id', // Campo en membresias
+                    foreignField: '_id', // Campo en usuarios
+                    as: 'usuario'
+                }
+            },
+            { $unwind: '$usuario' },
+            {
+                $lookup: {
+                    from: 'planes', // Colección planes
+                    localField: 'plan_id', // Campo en membresias
+                    foreignField: '_id', // Campo en planes
+                    as: 'plan'
+                }
+            },
+            { $unwind: '$plan' }, // Descomprimir el array de planes
+            {
+                $match: searchCondition // Aplicar la condición de búsqueda
+            },
+            {
+                $project: {
+                    membresia_id: '$_id', // Seleccionamos los campos deseados
+                    fecha_inicio: 1,
+                    fecha_fin: 1,
+                    usuario_id: '$usuario._id',
+                    nombre_completo: '$usuario.nombre_completo',
+                    username: '$usuario.username',
+                    nombre_plan: '$plan.nombre',
+                    _id: 0
+                }
+            }
+        ]);
+
+        // Verificar si no se encontraron membresías
+        if (resultado[0].data.length === 0) {
+            return { error: 'No se ha encontrado ninguna membresía con ese usuario_id' };
+        }
+
+        return resultado[0];
+    }catch(error){
+        throw new Error('Error al obtener la membresía del usuario');
+    }
+};
+
 //Servicio para aplazar fecha_fin
 const aplazarMembresia = async(membresia_id, plan_id) => {
     try{
@@ -211,4 +262,4 @@ const aplazarMembresia = async(membresia_id, plan_id) => {
     }
 };
 
-module.exports = { registroUsuario, getMembresias, aplazarMembresia };
+module.exports = { registroUsuario, getMembresias, getMembresia, aplazarMembresia };

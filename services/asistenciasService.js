@@ -1,4 +1,3 @@
-const QR = require('qrcode');
 const Membresia = require('../models/membresias');
 //const User = require('../models/usuarios');
 //const Plan = require('../models/planes');

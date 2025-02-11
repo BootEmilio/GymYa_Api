@@ -48,6 +48,27 @@ const getMembresias = async (req, res) => {
   }
 };
 
+//Controlador para ver membresias activas y expiradas
+const getMembresia = async (req, res) => {
+  try {
+      const usuario_id = req.user.id; // Usamos el id del usuario dentro del token
+
+      // Validar si existe ese ObjectId
+      if (!usuario_id) {
+          return res.status(400).json({ error: 'No se ha encontrado ningún usuario con ese objectId' });
+      }
+
+      // Llamar al servicio para obtener las membresía
+      const membresia = await membresiasService.getMembresia(usuario_id);
+
+      // Devolver los resultados como respuesta
+      res.status(200).json(membresia);
+  } catch (error) { 
+      console.error('Error en obtener Membresia:', error);
+      res.status(500).json({ error: 'Ocurrió un error al obtener la membresía.' });
+  }
+};
+
 //controlador para aplazar las membresías existentes
 const aplazarMembresia = async (req, res) => {
   try{
@@ -72,4 +93,4 @@ const aplazarMembresia = async (req, res) => {
   }
 }; 
 
-module.exports = { registroUsuario, getMembresias, aplazarMembresia };
+module.exports = { registroUsuario, getMembresias,  getMembresia, aplazarMembresia };

@@ -7,6 +7,8 @@ const router = express.Router();
 router.post('/membresias', token, membresiasController.registroUsuario);
 // Ruta para obtener las membresías activas o expiradas
 router.get('/membresias/:status', token, membresiasController.getMembresias);
+// Ruta para obtener las membresía del usuario
+router.get('/membresia', token, membresiasController.getMembresia);
 // Ruta para aplazar las membresías existentes
 router.put('/membresias/:membresia_id', token, membresiasController.aplazarMembresia);
 module.exports = router;
