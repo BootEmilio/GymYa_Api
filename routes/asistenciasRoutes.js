@@ -5,7 +5,8 @@ const router = express.Router();
 
 //Ruta para registrar entradas y salidas (pronto cambiar a QR)
 router.post('/nuevaAsistencia', token, asistenciasController.registrarAsistencia);
-
+//Ruta para ver las entradas y salidas del gimnasio
+router.get('/asistencias', token, asistenciasController.verAsistencias);
 // Ruta para registrar una nueva asistencia
 //router.post('/asistencias', token, asistenciasController.createAsistencia);
 
