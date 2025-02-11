@@ -22,9 +22,9 @@ const registrarAsistencia = async (req, res) => {
 const verAsistencias = async (req, res) => {
     try{
         const gym_id = req.user.gym_id; //Obtiene el gym_id por medio de su token
-        const {fecha, search} = req.query; //Obtenemos la busqueda por medio de la URL
+        const {fecha, search, page = 1, limit = 10} = req.query; //Obtenemos la busqueda por medio de la URL
 
-        const asistencias = await asistenciasService.verAsistencias(gym_id, fecha, search);
+        const asistencias = await asistenciasService.verAsistencias(gym_id, fecha, search, page = 1, limit = 10);
 
         res.status(200).json({
             success: true,

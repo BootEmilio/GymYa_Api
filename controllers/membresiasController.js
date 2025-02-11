@@ -1,4 +1,3 @@
-const gym = require('../models/gym');
 const membresiasService = require('../services/membresiasService');
 
 //Controlador para registrar usuarios con sus membresias
