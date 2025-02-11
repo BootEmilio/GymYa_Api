@@ -132,7 +132,7 @@ const verAsistencias = async (gym_id, fecha = null, search = '') => {
                 $group: {
                     _id: {
                         usuario_id: '$usuario_id',
-                        gym_id: '$gym_id'
+                        nombre_completo: '$usuario.nombre_completo'
                     },
                     entradas: {
                         $push: {
@@ -140,8 +140,6 @@ const verAsistencias = async (gym_id, fecha = null, search = '') => {
                                 asistencia_id: '$_id',
                                 fecha_hora: '$fecha_hora',
                                 tipo_acceso: '$tipo_acceso',
-                                nombre_completo: '$usuario.nombre_completo',
-                                usuario_id: '$usuario._id'
                             }, null]
                         }
                     },
@@ -151,8 +149,6 @@ const verAsistencias = async (gym_id, fecha = null, search = '') => {
                                 asistencia_id: '$_id',
                                 fecha_hora: '$fecha_hora',
                                 tipo_acceso: '$tipo_acceso',
-                                nombre_completo: '$usuario.nombre_completo',
-                                usuario_id: '$usuario._id'
                             }, null]
                         }
                     }
