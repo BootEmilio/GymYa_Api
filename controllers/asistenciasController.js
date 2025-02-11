@@ -22,12 +22,15 @@ const registrarAsistencia = async (req, res) => {
 const verAsistencias = async (req, res) => {
     try{
         const gym_id = req.user.gym_id; //Obtiene el gym_id por medio de su token
-        const fecha = req.body; //Obtenemos la fecha por medio del body
-        const search = req.query; //Obtenemos la busqueda por medio de la URL
+        const {fecha, search} = req.query; //Obtenemos la busqueda por medio de la URL
 
         const asistencias = await asistenciasService.verAsistencias(gym_id, fecha, search);
 
-        res.status(200).json(asistencias)
+        res.status(200).json({
+            success: true,
+            message: 'Asistencias obtenidas correctamente',
+            asistencias: asistencias
+        });
     }catch (error){
         console.error('Error en obtener las asistencias:', error);
         res.status(500).json({ error: 'Ocurrió un error al obtener las asistencias.' });

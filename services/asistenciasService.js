@@ -72,10 +72,10 @@ const registrarAsistencia = async (membresia_id, fecha_fin) => {
 
 //Servicio para que el administrador vea las asistencias (paginadas y poder cambiar los días a ver)
 const verAsistencias = async (gym_id, fecha = null, search = '') => {
-    try{
+    try {
         // Verificar si gymId es un ObjectId válido
         if (!mongoose.Types.ObjectId.isValid(gym_id)) {
-            throw new Error('El gymId proporcionado no es válido');
+            throw new Error('El gym_id proporcionado no es válido');
         }
 
         // Crear condición de búsqueda
@@ -129,13 +129,57 @@ const verAsistencias = async (gym_id, fecha = null, search = '') => {
                 $match: searchCondition // Aplicar la condición de búsqueda
             },
             {
+                $group: {
+                    _id: {
+                        usuario_id: '$usuario_id',
+                        gym_id: '$gym_id'
+                    },
+                    entradas: {
+                        $push: {
+                            $cond: [{ $eq: ['$tipo_acceso', 'Entrada'] }, {
+                                asistencia_id: '$_id',
+                                fecha_hora: '$fecha_hora',
+                                tipo_acceso: '$tipo_acceso',
+                                nombre_completo: '$usuario.nombre_completo',
+                                usuario_id: '$usuario._id'
+                            }, null]
+                        }
+                    },
+                    salidas: {
+                        $push: {
+                            $cond: [{ $eq: ['$tipo_acceso', 'Salida'] }, {
+                                asistencia_id: '$_id',
+                                fecha_hora: '$fecha_hora',
+                                tipo_acceso: '$tipo_acceso',
+                                nombre_completo: '$usuario.nombre_completo',
+                                usuario_id: '$usuario._id'
+                            }, null]
+                        }
+                    }
+                }
+            },
+            {
                 $project: {
-                    asistencia_id: '$_id', // Mostrar el ID de la asistencia
-                    fecha_hora: 1, // Mostrar la fecha y hora de la asistencia
-                    tipo_acceso: 1, // Mostrar el tipo de acceso (entrada/salida)
-                    nombre_completo: '$usuario.nombre_completo', // Mostrar el nombre completo del usuario
-                    usuario_id: '$usuario._id',
-                    _id: 0
+                    entradas: { $filter: { input: '$entradas', as: 'item', cond: { $ne: ['$$item', null] } } },
+                    salidas: { $filter: { input: '$salidas', as: 'item', cond: { $ne: ['$$item', null] } } }
+                }
+            },
+            {
+                $unwind: {
+                    path: '$entradas',
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $unwind: {
+                    path: '$salidas',
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $sort: {
+                    'entradas.fecha_hora': 1, // Ordenar las entradas cronológicamente
+                    'salidas.fecha_hora': 1  // Ordenar las salidas cronológicamente
                 }
             }
         ]);
