@@ -51,13 +51,10 @@ const getMembresias = async (req, res) => {
 //Controlador para ver membresias activas y expiradas
 const getMembresia = async (req, res) => {
   try {
-      const usuario_id = req.user.id; // Usamos el id del usuario dentro del token
-
-      // Validar si existe ese ObjectId
-      if (!usuario_id) {
-          return res.status(400).json({ error: 'No se ha encontrado ningún usuario con ese objectId' });
-      }
-
+    const { id: usuario_id } = req.user || {}; //Obtenemos el _id del token del usuario
+    if(!usuario_id){
+        return res.status(400).json({ error: 'No se encontró el usuario en la solicitud.' });
+    }
       // Llamar al servicio para obtener las membresía
       const membresia = await membresiasService.getMembresia(usuario_id);
 
