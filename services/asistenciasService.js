@@ -71,7 +71,7 @@ const registrarAsistencia = async (membresia_id, fecha_fin) => {
 };
 
 //Servicio para que el administrador vea las asistencias (paginadas y poder cambiar los días a ver)
-const verAsistencias = async (gym_id, fecha = null, search = '') => {
+const verAsistencias = async (gym_id, fecha = null, search = '', page = 1, limit = 10) => {
     try {
         // Verificar si gymId es un ObjectId válido
         if (!mongoose.Types.ObjectId.isValid(gym_id)) {
@@ -130,8 +130,8 @@ const verAsistencias = async (gym_id, fecha = null, search = '') => {
             },
             {
                 $group: {
-                    usuario: {
-                        id: '$usuario_id',
+                    _id: {
+                        usuario_id: '$usuario_id',
                         nombre_completo: '$usuario.nombre_completo'
                     },
                     entradas: {
@@ -176,6 +176,12 @@ const verAsistencias = async (gym_id, fecha = null, search = '') => {
                 $sort: {
                     'entradas.fecha_hora': 1, // Ordenar las entradas cronológicamente
                     'salidas.fecha_hora': 1  // Ordenar las salidas cronológicamente
+                }
+            },
+            {
+                $facet: {
+                    metadata: [{ $count: "total" }, { $addFields: { page: parseInt(page), limit: parseInt(limit) } }],
+                    data: [{ $skip: (page - 1) * limit }, { $limit: parseInt(limit) }] // Paginación
                 }
             }
         ]);
