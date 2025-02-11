@@ -109,8 +109,7 @@ const verAsistencias = async (gym_id, fecha = null, search = '', page = 1, limit
             fechaFin = new Date(fechaConsulta.setHours(23, 59, 59, 999)); // Fin del día consultado
         }
 
-        // Agregación con paginación
-        const resultado = await Asistencia.aggregate([
+        const asistencias = await Asistencia.aggregate([
             {
                 $match: {
                     gym_id: new mongoose.Types.ObjectId(gym_id),
@@ -135,48 +134,70 @@ const verAsistencias = async (gym_id, fecha = null, search = '', page = 1, limit
                         usuario_id: '$usuario_id',
                         nombre_completo: '$usuario.nombre_completo'
                     },
-                    entradas: {
+                    asistencias: {
                         $push: {
-                            $cond: [{ $eq: ['$tipo_acceso', 'Entrada'] }, {
-                                asistencia_id: '$_id',
-                                fecha_hora: '$fecha_hora',
-                                tipo_acceso: '$tipo_acceso',
-                            }, null]
-                        }
-                    },
-                    salidas: {
-                        $push: {
-                            $cond: [{ $eq: ['$tipo_acceso', 'Salida'] }, {
-                                asistencia_id: '$_id',
-                                fecha_hora: '$fecha_hora',
-                                tipo_acceso: '$tipo_acceso',
-                            }, null]
+                            asistencia_id: '$_id',
+                            fecha_hora: '$fecha_hora',
+                            tipo_acceso: '$tipo_acceso'
                         }
                     }
                 }
             },
             {
-                $project: {
-                    entradas: { $filter: { input: '$entradas', as: 'item', cond: { $ne: ['$$item', null] } } },
-                    salidas: { $filter: { input: '$salidas', as: 'item', cond: { $ne: ['$$item', null] } } }
+                $sort: {
+                    'asistencias.fecha_hora': 1 // Ordenar cronológicamente las asistencias
                 }
             },
             {
                 $facet: {
                     metadata: [{ $count: "total" }],
                     data: [
-                        { $skip: (page - 1) * limit }, 
+                        { $skip: (page - 1) * limit },
                         { $limit: parseInt(limit) }
                     ] // Paginación
                 }
             }
         ]);
 
-        // Extraer metadata y data del resultado
-        const asistencias = resultado[0].data;
-        const total = resultado[0].metadata.length > 0 ? resultado[0].metadata[0].total : 0;
+        const resultado = asistencias[0].data;
+        const total = asistencias[0].metadata.length > 0 ? asistencias[0].metadata[0].total : 0;
 
-        return { asistencias, total };
+        // Procesar el resultado para emparejar entradas con salidas
+        const asistenciasEmparejadas = resultado.map(usuario => {
+            const { _id, asistencias } = usuario;
+            const emparejadas = [];
+
+            let entradaActual = null;
+
+            asistencias.forEach(asistencia => {
+                if (asistencia.tipo_acceso === 'Entrada') {
+                    // Si ya hay una entrada en curso, emparejarla con la siguiente salida
+                    if (entradaActual) {
+                        emparejadas.push({ entrada: entradaActual, salida: null });
+                    }
+                    // Establecer la nueva entrada actual
+                    entradaActual = asistencia;
+                } else if (asistencia.tipo_acceso === 'Salida' && entradaActual) {
+                    // Si hay una entrada en curso, emparejarla con esta salida
+                    emparejadas.push({ entrada: entradaActual, salida: asistencia });
+                    // Resetear la entrada actual
+                    entradaActual = null;
+                }
+            });
+
+            // Si quedó alguna entrada sin emparejar, la añadimos con salida null
+            if (entradaActual) {
+                emparejadas.push({ entrada: entradaActual, salida: null });
+            }
+
+            return {
+                usuario_id: _id.usuario_id,
+                nombre_completo: _id.nombre_completo,
+                asistencias: emparejadas
+            };
+        });
+
+        return { asistencias: asistenciasEmparejadas, total };
     } catch (error) {
         console.error(`Error al mostrar las asistencias del día ${fecha} para gymId: ${gym_id}:`, error);
         throw new Error(`Error al mostrar las asistencias del día ${fecha}`);
