@@ -109,7 +109,8 @@ const verAsistencias = async (gym_id, fecha = null, search = '', page = 1, limit
             fechaFin = new Date(fechaConsulta.setHours(23, 59, 59, 999)); // Fin del día consultado
         }
 
-        const asistencias = await Asistencia.aggregate([
+        // Agregación con paginación
+        const resultado = await Asistencia.aggregate([
             {
                 $match: {
                     gym_id: new mongoose.Types.ObjectId(gym_id),
@@ -161,35 +162,24 @@ const verAsistencias = async (gym_id, fecha = null, search = '', page = 1, limit
                 }
             },
             {
-                $unwind: {
-                    path: '$entradas',
-                    preserveNullAndEmptyArrays: true
-                }
-            },
-            {
-                $unwind: {
-                    path: '$salidas',
-                    preserveNullAndEmptyArrays: true
-                }
-            },
-            {
-                $sort: {
-                    'entradas.fecha_hora': 1, // Ordenar las entradas cronológicamente
-                    'salidas.fecha_hora': 1  // Ordenar las salidas cronológicamente
-                }
-            },
-            {
                 $facet: {
-                    metadata: [{ $count: "total" }, { $addFields: { page: parseInt(page), limit: parseInt(limit) } }],
-                    data: [{ $skip: (page - 1) * limit }, { $limit: parseInt(limit) }] // Paginación
+                    metadata: [{ $count: "total" }],
+                    data: [
+                        { $skip: (page - 1) * limit }, 
+                        { $limit: parseInt(limit) }
+                    ] // Paginación
                 }
             }
         ]);
 
-        return asistencias;
-    }catch(error){
-        console.error(`Error al mostrar las membresías del día ${fecha} para gymId: ${gym_id}:`, error);
-        throw new Error(`Error al mostrar las membresías del día ${fecha}`);
+        // Extraer metadata y data del resultado
+        const asistencias = resultado[0].data;
+        const total = resultado[0].metadata.length > 0 ? resultado[0].metadata[0].total : 0;
+
+        return { asistencias, total };
+    } catch (error) {
+        console.error(`Error al mostrar las asistencias del día ${fecha} para gymId: ${gym_id}:`, error);
+        throw new Error(`Error al mostrar las asistencias del día ${fecha}`);
     }
 };
 
