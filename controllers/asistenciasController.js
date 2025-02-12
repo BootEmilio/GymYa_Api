@@ -21,23 +21,25 @@ const registrarAsistencia = async (req, res) => {
 //Controlador para que el admin vea las asistencias del día u otra fecha
 const verAsistencias = async (req, res) => {
     try {
-        const gym_id = req.user.gym_id; //Obtiene el gym_id por medio de su token
-        const { fecha, search, page = 1, limit = 10 } = req.query; //Obtenemos la búsqueda por medio de la URL
+        const gym_id = req.user.gym_id; // Obtener el gym_id desde el token del usuario
+        const { fecha, search, page = 1, limit = 10 } = req.query; // Parámetros opcionales
 
-        // Llamada al servicio
+        // Llamada al servicio para obtener las asistencias paginadas
         const { asistencias, total } = await asistenciasService.verAsistencias(gym_id, fecha, search, parseInt(page), parseInt(limit));
 
-        // Devolver la respuesta con los resultados
+        // Responder con los datos paginados
         res.status(200).json({
-            asistencias: asistencias,
-            total,
-            page: parseInt(page),
-            limit: parseInt(limit),
-            totalPages: Math.ceil(total / limit) // Calcular número de páginas
+            asistencias,        // Lista de asistencias (emparejadas)
+            total,              // Total de registros
+            page: parseInt(page), // Página actual
+            limit: parseInt(limit), // Límite de resultados por página
+            totalPages: Math.ceil(total / limit) // Calcular número de páginas totales
         });
     } catch (error) {
         console.error('Error en obtener las asistencias:', error);
-        res.status(500).json({ error: 'Ocurrió un error al obtener las asistencias.' });
+        res.status(500).json({
+            error: 'Ocurrió un error al obtener las asistencias.'
+        });
     }
 };
 
