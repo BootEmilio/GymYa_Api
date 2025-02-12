@@ -46,7 +46,7 @@ const verAsistencias = async (req, res) => {
 //Controlador para que el usuario vea todas sus asitencias agrupadas
 const verAsistenciasUser = async (req, res) => {
     try {
-        const usuario_id = req.user._id; // Obtener el usuario_id desde el token de autenticación
+        const usuario_id = req.user.id; // Obtener el usuario_id desde el token de autenticación
         const { page = 1, limit = 10 } = req.query; // Parámetros opcionales de paginación
 
         // Llamada al servicio para obtener las asistencias del usuario
