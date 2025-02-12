@@ -145,7 +145,7 @@ const verAsistencias = async (gym_id, fecha = null, search = '', page = 1, limit
             },
             {
                 $sort: {
-                    'asistencias.fecha_hora': 1 // Ordenar cronológicamente las asistencias
+                    'asistencias.fecha_hora': -1 // Ordenar cronológicamente las asistencias
                 }
             },
             {
@@ -230,7 +230,7 @@ const verAsistenciasUser = async (usuario_id, page = 1, limit = 10) => {
             },
             {
                 $sort: {
-                    fecha_hora: 1 // Ordenar cronológicamente las asistencias
+                    fecha_hora: -1 // Ordenar cronológicamente las asistencias
                 }
             },
             {
