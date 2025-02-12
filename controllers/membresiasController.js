@@ -1,4 +1,3 @@
-const gym = require('../models/gym');
 const membresiasService = require('../services/membresiasService');
 
 //Controlador para registrar usuarios con sus membresias
@@ -43,7 +42,7 @@ const getMembresias = async (req, res) => {
           totalPages: Math.ceil(total / limit)
       });
   } catch (error) {
-      console.error('Error en obtenerMembresias:', error);
+      console.error('Error en obtener Membresias:', error);
       res.status(500).json({ error: 'Ocurrió un error al obtener las membresías.' });
   }
 };
