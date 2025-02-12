@@ -229,16 +229,14 @@ const verAsistenciasUser = async (usuario_id, page = 1, limit = 10) => {
                 }
             },
             {
-                $lookup: {
-                    from: 'usuarios', // Colección de usuario
-                    localField: 'usuario_id', // Campo en asistencias
-                    foreignField: '_id', // Campo en colección de usuarios
-                    as: 'usuario'
+                $sort: {
+                    'asistencias.fecha_hora': 1 // Ordenar cronológicamente las asistencias
                 }
             },
             { $unwind: '$usuario' }, // Descomprimir el array de usuarios
             {
                 $group: {
+                    _id: null,
                     asistencias: {
                         $push: {
                             asistencia_id: '$_id',
@@ -246,11 +244,6 @@ const verAsistenciasUser = async (usuario_id, page = 1, limit = 10) => {
                             tipo_acceso: '$tipo_acceso'
                         }
                     }
-                }
-            },
-            {
-                $sort: {
-                    'asistencias.fecha_hora': 1 // Ordenar cronológicamente las asistencias
                 }
             },
             {
@@ -295,12 +288,13 @@ const verAsistenciasUser = async (usuario_id, page = 1, limit = 10) => {
                 emparejadas.push({ entrada: entradaActual, salida: null });
             }
 
-            return {
-                asistencias: emparejadas
-            };
+            return emparejadas;
         });
 
-        return { asistencias: asistenciasEmparejadas, total };
+        // Aplanar el array de arrays para que el total de asistencias sea preciso
+        const asistenciasAplanadas = asistenciasEmparejadas.flat();
+
+        return { asistencias: asistenciasAplanadas, total: asistenciasAplanadas.length };
     } catch (error) {
         console.error(`Error al mostrar las asistencias para usuario_id ${usuario_id}:`, error);
         throw new Error('Error al mostrar las asistencias');
