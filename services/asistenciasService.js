@@ -218,7 +218,7 @@ const verAsistenciasUser = async (usuario_id, page = 1, limit = 10) => {
     try {
         // Verificar si usuario_id es un ObjectId válido
         if (!mongoose.Types.ObjectId.isValid(usuario_id)) {
-            throw new Error('El usuario_id proporcionado no es válido');
+            throw new Error(`El usuario_id proporcionado no es válido: ${usuario_id}`);
         }
 
         // Realizar la consulta agregando el filtro por usuario_id
@@ -230,13 +230,12 @@ const verAsistenciasUser = async (usuario_id, page = 1, limit = 10) => {
             },
             {
                 $sort: {
-                    'asistencias.fecha_hora': 1 // Ordenar cronológicamente las asistencias
+                    fecha_hora: 1 // Ordenar cronológicamente las asistencias
                 }
             },
-            { $unwind: '$usuario' }, // Descomprimir el array de usuarios
             {
                 $group: {
-                    _id: null,
+                    _id: null, // No necesitamos agrupar por usuario, solo contar asistencias
                     asistencias: {
                         $push: {
                             asistencia_id: '$_id',
@@ -269,21 +268,16 @@ const verAsistenciasUser = async (usuario_id, page = 1, limit = 10) => {
 
             asistencias.forEach(asistencia => {
                 if (asistencia.tipo_acceso === 'Entrada') {
-                    // Si ya hay una entrada en curso, emparejarla con la siguiente salida
                     if (entradaActual) {
                         emparejadas.push({ entrada: entradaActual, salida: null });
                     }
-                    // Establecer la nueva entrada actual
                     entradaActual = asistencia;
                 } else if (asistencia.tipo_acceso === 'Salida' && entradaActual) {
-                    // Si hay una entrada en curso, emparejarla con esta salida
                     emparejadas.push({ entrada: entradaActual, salida: asistencia });
-                    // Resetear la entrada actual
                     entradaActual = null;
                 }
             });
 
-            // Si quedó alguna entrada sin emparejar, la añadimos con salida null
             if (entradaActual) {
                 emparejadas.push({ entrada: entradaActual, salida: null });
             }
@@ -296,8 +290,8 @@ const verAsistenciasUser = async (usuario_id, page = 1, limit = 10) => {
 
         return { asistencias: asistenciasAplanadas, total: asistenciasAplanadas.length };
     } catch (error) {
-        console.error(`Error al mostrar las asistencias para usuario_id ${usuario_id}:`, error);
-        throw new Error('Error al mostrar las asistencias');
+        console.error(`Error al mostrar las asistencias para usuario_id ${usuario_id}:`, error.message);
+        throw new Error(`Error al mostrar las asistencias para usuario_id ${usuario_id}: ${error.message}`);
     }
 };
 
