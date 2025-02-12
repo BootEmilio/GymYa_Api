@@ -230,7 +230,7 @@ const verAsistenciasUser = async (usuario_id, page = 1, limit = 10) => {
             },
             {
                 $sort: {
-                    fecha_hora: 1 // Ordenar cronológicamente las asistencias de más antiguo a más reciente
+                    fecha_hora: 1 // Ordenar cronológicamente las asistencias
                 }
             },
             {
@@ -259,40 +259,36 @@ const verAsistenciasUser = async (usuario_id, page = 1, limit = 10) => {
         const resultado = asistencias[0].data;
         const total = asistencias[0].metadata.length > 0 ? asistencias[0].metadata[0].total : 0;
 
-        // Separar entradas y salidas
-        const entradas = [];
-        const salidas = [];
+        // Procesar el resultado para emparejar entradas con salidas
+        const asistenciasEmparejadas = resultado.map(usuario => {
+            const { asistencias } = usuario;
+            const emparejadas = [];
 
-        resultado.forEach(asistencia => {
-            if (asistencia.tipo_acceso === 'Entrada') {
-                entradas.push(asistencia);
-            } else if (asistencia.tipo_acceso === 'Salida') {
-                salidas.push(asistencia);
-            }
-        });
+            let entradaActual = null;
 
-        // Emparejar entradas con salidas
-        const asistenciasEmparejadas = [];
-        let salidaIndex = 0;
-
-        entradas.forEach(entrada => {
-            let salida = null;
-
-            // Buscar la primera salida que sea posterior a la entrada actual
-            while (salidaIndex < salidas.length) {
-                if (salidas[salidaIndex].fecha_hora > entrada.fecha_hora) {
-                    salida = salidas[salidaIndex];
-                    salidaIndex++;
-                    break;
+            asistencias.forEach(asistencia => {
+                if (asistencia.tipo_acceso === 'Entrada') {
+                    if (entradaActual) {
+                        emparejadas.push({ entrada: entradaActual, salida: null });
+                    }
+                    entradaActual = asistencia;
+                } else if (asistencia.tipo_acceso === 'Salida' && entradaActual) {
+                    emparejadas.push({ entrada: entradaActual, salida: asistencia });
+                    entradaActual = null;
                 }
-                salidaIndex++;
+            });
+
+            if (entradaActual) {
+                emparejadas.push({ entrada: entradaActual, salida: null });
             }
 
-            // Emparejar la entrada con la salida o dejar la salida como null si no se encontró
-            asistenciasEmparejadas.push({ entrada, salida });
+            return emparejadas;
         });
 
-        return { asistencias: asistenciasEmparejadas, total: asistenciasEmparejadas.length };
+        // Aplanar el array de arrays para que el total de asistencias sea preciso
+        const asistenciasAplanadas = asistenciasEmparejadas.flat();
+
+        return { asistencias: asistenciasAplanadas, total: asistenciasAplanadas.length };
     } catch (error) {
         console.error(`Error al mostrar las asistencias para usuario_id ${usuario_id}:`, error.message);
         throw new Error(`Error al mostrar las asistencias para usuario_id ${usuario_id}: ${error.message}`);
