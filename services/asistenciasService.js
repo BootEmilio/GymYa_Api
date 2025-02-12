@@ -230,7 +230,7 @@ const verAsistenciasUser = async (usuario_id, page = 1, limit = 10) => {
             },
             {
                 $sort: {
-                    fecha_hora: -1 // Ordenar cronológicamente las asistencias
+                    fecha_hora: 1 // Ordenar cronológicamente las asistencias de más antiguo a más reciente
                 }
             },
             {
@@ -259,36 +259,40 @@ const verAsistenciasUser = async (usuario_id, page = 1, limit = 10) => {
         const resultado = asistencias[0].data;
         const total = asistencias[0].metadata.length > 0 ? asistencias[0].metadata[0].total : 0;
 
-        // Procesar el resultado para emparejar entradas con salidas
-        const asistenciasEmparejadas = resultado.map(usuario => {
-            const { asistencias } = usuario;
-            const emparejadas = [];
+        // Separar entradas y salidas
+        const entradas = [];
+        const salidas = [];
 
-            let entradaActual = null;
-
-            asistencias.forEach(asistencia => {
-                if (asistencia.tipo_acceso === 'Entrada') {
-                    if (entradaActual) {
-                        emparejadas.push({ entrada: entradaActual, salida: null });
-                    }
-                    entradaActual = asistencia;
-                } else if (asistencia.tipo_acceso === 'Salida' && entradaActual) {
-                    emparejadas.push({ entrada: entradaActual, salida: asistencia });
-                    entradaActual = null;
-                }
-            });
-
-            if (entradaActual) {
-                emparejadas.push({ entrada: entradaActual, salida: null });
+        resultado.forEach(asistencia => {
+            if (asistencia.tipo_acceso === 'Entrada') {
+                entradas.push(asistencia);
+            } else if (asistencia.tipo_acceso === 'Salida') {
+                salidas.push(asistencia);
             }
-
-            return emparejadas;
         });
 
-        // Aplanar el array de arrays para que el total de asistencias sea preciso
-        const asistenciasAplanadas = asistenciasEmparejadas.flat();
+        // Emparejar entradas con salidas
+        const asistenciasEmparejadas = [];
+        let salidaIndex = 0;
 
-        return { asistencias: asistenciasAplanadas, total: asistenciasAplanadas.length };
+        entradas.forEach(entrada => {
+            let salida = null;
+
+            // Buscar la primera salida que sea posterior a la entrada actual
+            while (salidaIndex < salidas.length) {
+                if (salidas[salidaIndex].fecha_hora > entrada.fecha_hora) {
+                    salida = salidas[salidaIndex];
+                    salidaIndex++;
+                    break;
+                }
+                salidaIndex++;
+            }
+
+            // Emparejar la entrada con la salida o dejar la salida como null si no se encontró
+            asistenciasEmparejadas.push({ entrada, salida });
+        });
+
+        return { asistencias: asistenciasEmparejadas, total: asistenciasEmparejadas.length };
     } catch (error) {
         console.error(`Error al mostrar las asistencias para usuario_id ${usuario_id}:`, error.message);
         throw new Error(`Error al mostrar las asistencias para usuario_id ${usuario_id}: ${error.message}`);
