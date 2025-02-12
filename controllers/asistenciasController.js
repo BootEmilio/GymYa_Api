@@ -43,4 +43,29 @@ const verAsistencias = async (req, res) => {
     }
 };
 
-module.exports = { registrarAsistencia,verAsistencias };
+//Controlador para que el usuario vea todas sus asitencias agrupadas
+const verAsistenciasUser = async (req, res) => {
+    try {
+        const usuario_id = req.user._id; // Obtener el usuario_id desde el token de autenticación
+        const { page = 1, limit = 10 } = req.query; // Parámetros opcionales de paginación
+
+        // Llamada al servicio para obtener las asistencias del usuario
+        const { asistencias, total } = await asistenciasService.verAsistenciasUser(usuario_id, parseInt(page), parseInt(limit));
+
+        // Devolver la respuesta con los datos paginados
+        res.status(200).json({
+            asistencias,
+            total,
+            page: parseInt(page),
+            limit: parseInt(limit),
+            totalPages: Math.ceil(total / limit) // Calcular número de páginas
+        });
+    } catch (error) {
+        console.error('Error en obtener las asistencias del usuario:', error);
+        res.status(500).json({
+            error: 'Ocurrió un error al obtener las asistencias del usuario.'
+        });
+    }
+};
+
+module.exports = { registrarAsistencia, verAsistencias, verAsistenciasUser };

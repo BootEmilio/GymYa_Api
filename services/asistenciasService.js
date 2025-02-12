@@ -214,11 +214,102 @@ const verAsistencia = async () => { //Comentario para ver pq no me hace commit e
 };
 
 //Servicio para que el usuario vea sus asistencias (paginadas y poder cambiar los días a ver)
-const verAsistenciasUser = async () => {
-    try{
+const verAsistenciasUser = async (usuario_id, page = 1, limit = 10) => {
+    try {
+        // Verificar si usuario_id es un ObjectId válido
+        if (!mongoose.Types.ObjectId.isValid(usuario_id)) {
+            throw new Error('El usuario_id proporcionado no es válido');
+        }
 
-    }catch(error){
+        // Realizar la consulta agregando el filtro por usuario_id
+        const asistencias = await Asistencia.aggregate([
+            {
+                $match: {
+                    usuario_id: new mongoose.Types.ObjectId(usuario_id) // Filtrar por usuario_id
+                }
+            },
+            {
+                $lookup: {
+                    from: 'usuarios', // Colección de usuario
+                    localField: 'usuario_id', // Campo en asistencias
+                    foreignField: '_id', // Campo en colección de usuarios
+                    as: 'usuario'
+                }
+            },
+            { $unwind: '$usuario' }, // Descomprimir el array de usuarios
+            {
+                $group: {
+                    _id: {
+                        usuario_id: '$usuario_id',
+                        nombre_completo: '$usuario.nombre_completo'
+                    },
+                    asistencias: {
+                        $push: {
+                            asistencia_id: '$_id',
+                            fecha_hora: '$fecha_hora',
+                            tipo_acceso: '$tipo_acceso'
+                        }
+                    }
+                }
+            },
+            {
+                $sort: {
+                    'asistencias.fecha_hora': 1 // Ordenar cronológicamente las asistencias
+                }
+            },
+            {
+                $facet: {
+                    metadata: [{ $count: "total" }],
+                    data: [
+                        { $skip: (page - 1) * limit },
+                        { $limit: parseInt(limit) }
+                    ] // Paginación
+                }
+            }
+        ]);
 
+        const resultado = asistencias[0].data;
+        const total = asistencias[0].metadata.length > 0 ? asistencias[0].metadata[0].total : 0;
+
+        // Procesar el resultado para emparejar entradas con salidas
+        const asistenciasEmparejadas = resultado.map(usuario => {
+            const { _id, asistencias } = usuario;
+            const emparejadas = [];
+
+            let entradaActual = null;
+
+            asistencias.forEach(asistencia => {
+                if (asistencia.tipo_acceso === 'Entrada') {
+                    // Si ya hay una entrada en curso, emparejarla con la siguiente salida
+                    if (entradaActual) {
+                        emparejadas.push({ entrada: entradaActual, salida: null });
+                    }
+                    // Establecer la nueva entrada actual
+                    entradaActual = asistencia;
+                } else if (asistencia.tipo_acceso === 'Salida' && entradaActual) {
+                    // Si hay una entrada en curso, emparejarla con esta salida
+                    emparejadas.push({ entrada: entradaActual, salida: asistencia });
+                    // Resetear la entrada actual
+                    entradaActual = null;
+                }
+            });
+
+            // Si quedó alguna entrada sin emparejar, la añadimos con salida null
+            if (entradaActual) {
+                emparejadas.push({ entrada: entradaActual, salida: null });
+            }
+
+            return {
+                usuario_id: _id.usuario_id,
+                nombre_completo: _id.nombre_completo,
+                asistencias: emparejadas
+            };
+        });
+
+        return { asistencias: asistenciasEmparejadas, total };
+    } catch (error) {
+        console.error(`Error al mostrar las asistencias para usuario_id ${usuario_id}:`, error);
+        throw new Error('Error al mostrar las asistencias');
     }
 };
 

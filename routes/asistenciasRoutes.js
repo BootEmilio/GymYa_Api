@@ -7,6 +7,8 @@ const router = express.Router();
 router.post('/nuevaAsistencia', token, asistenciasController.registrarAsistencia);
 //Ruta para ver las entradas y salidas del gimnasio
 router.get('/asistencias', token, asistenciasController.verAsistencias);
+//Ruta para ver las entradas y salidas de un usuario
+router.get('/asistenciasUser', token, asistenciasController.verAsistenciasUser);
 // Ruta para registrar una nueva asistencia
 //router.post('/asistencias', token, asistenciasController.createAsistencia);
 
