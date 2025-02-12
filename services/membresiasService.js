@@ -244,8 +244,21 @@ const aplazarMembresia = async(membresia_id, plan_id) => {
         //Condición para el cambio de plan_id
         if (plan_id !== membresia.plan_id.toString()) {
             //Si la fecha_fin original es mayor a la fecha actual, no cambiar el plan_id hasta que la fecha original haya pasado
-            if (fecha_fin_original <= fecha_actual) {
-                membresia.plan_id = plan_id; // Cambiar el plan_id si ya pasó la fecha_fin original
+            if (fecha_fin_original > fecha_actual) {
+                //Programar un cambio de plan_id cuando llegue la fecha_fin_original
+                const tiempoRestante = fecha_fin_original.getTime() - fecha_actual.getTime();
+
+                setTimeout(async () => {
+                    //Cambiar el plan_id cuadno llegue la fecha original
+                    membresia.plan_id = plan_id;
+                    await membresia.save();
+                    console.log(`El plan de la membresía ${membresia_id} ha sido actualizado a ${plan_id}`);
+                }, tiempoRestante);
+
+                console.log(`El plan se actualizará automáticamente el ${fecha_fin_original}`);
+            } else{
+                //Si la fecha_fin original ya pasó, cambiar el plan_id de inmediato
+                membresia.plan_id = plan_id;
             }
         }
 
