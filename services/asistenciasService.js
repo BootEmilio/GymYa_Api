@@ -230,19 +230,7 @@ const verAsistenciasUser = async (usuario_id, page = 1, limit = 10) => {
             },
             {
                 $sort: {
-                    fecha_hora: -1 // Ordenar cronológicamente las asistencias
-                }
-            },
-            {
-                $group: {
-                    _id: null, // No necesitamos agrupar por usuario, solo contar asistencias
-                    asistencias: {
-                        $push: {
-                            asistencia_id: '$_id',
-                            fecha_hora: '$fecha_hora',
-                            tipo_acceso: '$tipo_acceso'
-                        }
-                    }
+                    fecha_hora: -1 // Ordenar de más reciente a más antiguo
                 }
             },
             {
@@ -259,11 +247,10 @@ const verAsistenciasUser = async (usuario_id, page = 1, limit = 10) => {
         const resultado = asistencias[0].data;
         const total = asistencias[0].metadata.length > 0 ? asistencias[0].metadata[0].total : 0;
 
-        // Separar entradas y salidas y ordenarlas nuevamente si es necesario
+        // Separar entradas y salidas
         const entradas = [];
         const salidas = [];
 
-        // Separar las entradas y salidas del resultado
         resultado.forEach(asistencia => {
             if (asistencia.tipo_acceso === 'Entrada') {
                 entradas.push(asistencia);
@@ -272,7 +259,7 @@ const verAsistenciasUser = async (usuario_id, page = 1, limit = 10) => {
             }
         });
 
-        // ahora emparejamos en orden correcto, es decir, para cada entrada, buscamos la salida más cercana posterior.
+        // Emparejar entradas con salidas
         const asistenciasEmparejadas = [];
         let salidaIndex = 0;
 
@@ -293,7 +280,6 @@ const verAsistenciasUser = async (usuario_id, page = 1, limit = 10) => {
             asistenciasEmparejadas.push({ entrada, salida });
         });
 
-        // Devolver el resultado correctamente emparejado y ordenado
         return { asistencias: asistenciasEmparejadas, total: asistenciasEmparejadas.length };
     } catch (error) {
         console.error(`Error al mostrar las asistencias para usuario_id ${usuario_id}:`, error.message);
