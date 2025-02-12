@@ -16,9 +16,14 @@ const loggerMiddleware = require('./middlewares/loggerMiddleware');
 const app = express();
 connectDB();
 
-app.use(cors({
-  origin: ['https://bootemilio.github.io', 'https://gymya-web.onrender.com/'],
-}));
+const corsOptions = {
+  origin: 'https://gymya-web.onrender.com', // Permitir solo tu frontend
+  methods: 'GET,POST,PUT,DELETE', // Métodos permitidos
+  allowedHeaders: 'Content-Type,Authorization', // Headers permitidos
+};
+
+// Aplicar CORS a todas las rutas
+app.use(cors(corsOptions));
 
 app.use(express.json());
 
