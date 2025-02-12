@@ -239,10 +239,6 @@ const verAsistenciasUser = async (usuario_id, page = 1, limit = 10) => {
             { $unwind: '$usuario' }, // Descomprimir el array de usuarios
             {
                 $group: {
-                    _id: {
-                        usuario_id: '$usuario_id',
-                        nombre_completo: '$usuario.nombre_completo'
-                    },
                     asistencias: {
                         $push: {
                             asistencia_id: '$_id',
@@ -273,7 +269,7 @@ const verAsistenciasUser = async (usuario_id, page = 1, limit = 10) => {
 
         // Procesar el resultado para emparejar entradas con salidas
         const asistenciasEmparejadas = resultado.map(usuario => {
-            const { _id, asistencias } = usuario;
+            const { asistencias } = usuario;
             const emparejadas = [];
 
             let entradaActual = null;
@@ -300,8 +296,6 @@ const verAsistenciasUser = async (usuario_id, page = 1, limit = 10) => {
             }
 
             return {
-                usuario_id: _id.usuario_id,
-                nombre_completo: _id.nombre_completo,
                 asistencias: emparejadas
             };
         });
