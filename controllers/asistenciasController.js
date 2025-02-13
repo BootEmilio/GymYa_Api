@@ -48,7 +48,7 @@ const verAsistencia = async (req, res) => {
     const { usuario_id } = req.user.id; // Obtener el usuario_id de los parámetros de la URL
 
     try {
-        const ultimaEntrada = await asistenciasService.verAsistencias(usuario_id);
+        const ultimaEntrada = await asistenciasService.verAsistencia(usuario_id);
 
         if (!ultimaEntrada) {
             return res.status(404).json({
