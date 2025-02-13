@@ -131,7 +131,7 @@ const verAsistencias = async (gym_id, fecha = null, search = '', page = 1, limit
             {
                 $group: {
                     _id: {
-                        //usuario_id: '$usuario_id',
+                        usuario_id: '$usuario_id',
                         nombre_completo: '$usuario.nombre_completo'
                     },
                     asistencias: {
@@ -221,37 +221,14 @@ const verAsistenciasUser = async (usuario_id, page = 1, limit = 10) => {
             throw new Error(`El usuario_id proporcionado no es válido: ${usuario_id}`);
         }
 
-        // Realizar la consulta agregando el filtro por usuario_id
-        const asistencias = await Asistencia.aggregate([
-            {
-                $match: {
-                    usuario_id: new mongoose.Types.ObjectId(usuario_id) // Filtrar por usuario_id
-                }
-            },
-            {
-                $sort: {
-                    fecha_hora: -1 // Ordenar de más reciente a más antiguo
-                }
-            },
-            {
-                $facet: {
-                    metadata: [{ $count: "total" }],
-                    data: [
-                        { $skip: (page - 1) * limit },
-                        { $limit: parseInt(limit) }
-                    ] // Paginación
-                }
-            }
-        ]);
+        // Obtener todas las asistencias sin paginación
+        const asistencias = await Asistencia.find({ usuario_id: new mongoose.Types.ObjectId(usuario_id) }).sort({ fecha_hora: -1 });
 
-        const resultado = asistencias[0].data;
-        const total = asistencias[0].metadata.length > 0 ? asistencias[0].metadata[0].total : 0;
-
-        // Separar entradas y salidas
+        // Separar las entradas y salidas
         const entradas = [];
         const salidas = [];
 
-        resultado.forEach(asistencia => {
+        asistencias.forEach(asistencia => {
             if (asistencia.tipo_acceso === 'Entrada') {
                 entradas.push(asistencia);
             } else if (asistencia.tipo_acceso === 'Salida') {
@@ -280,7 +257,18 @@ const verAsistenciasUser = async (usuario_id, page = 1, limit = 10) => {
             asistenciasEmparejadas.push({ entrada, salida });
         });
 
-        return { asistencias: asistenciasEmparejadas, total: asistenciasEmparejadas.length };
+        // Paginar después de emparejar
+        const total = asistenciasEmparejadas.length;
+        const paginatedAsistencias = asistenciasEmparejadas.slice((page - 1) * limit, page * limit);
+
+        // Devolver los datos paginados
+        return {
+            asistencias: paginatedAsistencias,
+            total: total,
+            page: parseInt(page),
+            limit: parseInt(limit),
+            totalPages: Math.ceil(total / limit)
+        };
     } catch (error) {
         console.error(`Error al mostrar las asistencias para usuario_id ${usuario_id}:`, error.message);
         throw new Error(`Error al mostrar las asistencias para usuario_id ${usuario_id}: ${error.message}`);
