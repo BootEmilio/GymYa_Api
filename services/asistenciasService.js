@@ -221,7 +221,7 @@ const verAsistenciasUser = async (usuario_id, page = 1, limit = 10) => {
             throw new Error(`El usuario_id proporcionado no es válido: ${usuario_id}`);
         }
 
-        // Realizar la agregación en MongoDB para emparejar entradas y salidas
+        // Realizar la agregación en MongoDB para obtener las entradas y salidas en orden descendente
         const asistencias = await Asistencia.aggregate([
             {
                 $match: {
@@ -230,7 +230,7 @@ const verAsistenciasUser = async (usuario_id, page = 1, limit = 10) => {
             },
             {
                 $sort: {
-                    fecha_hora: 1 // Ordenar cronológicamente de más antiguo a más reciente para facilitar el emparejamiento
+                    fecha_hora: -1 // Ordenar cronológicamente de más reciente a más antiguo
                 }
             },
             {
@@ -262,7 +262,7 @@ const verAsistenciasUser = async (usuario_id, page = 1, limit = 10) => {
 
         const { entradas, salidas } = asistencias[0];
 
-        // Emparejar entradas y salidas dentro de la aplicación
+        // Emparejar entradas y salidas dentro de la aplicación (del más reciente al más antiguo)
         const asistenciasEmparejadas = [];
         let salidaIndex = 0;
 
@@ -270,7 +270,8 @@ const verAsistenciasUser = async (usuario_id, page = 1, limit = 10) => {
             let salida = null;
 
             while (salidaIndex < salidas.length) {
-                if (salidas[salidaIndex].fecha_hora > entrada.fecha_hora) {
+                // Ahora buscamos la primera salida más cercana a la entrada (más reciente)
+                if (salidas[salidaIndex].fecha_hora < entrada.fecha_hora) { // Cambiado a "<" para encontrar salidas anteriores
                     salida = salidas[salidaIndex];
                     salidaIndex++;
                     break;
@@ -281,7 +282,7 @@ const verAsistenciasUser = async (usuario_id, page = 1, limit = 10) => {
             asistenciasEmparejadas.push({ entrada, salida });
         });
 
-        // Paginación después del emparejamiento
+        // Paginar después del emparejamiento
         const total = asistenciasEmparejadas.length;
         const paginatedAsistencias = asistenciasEmparejadas.slice((page - 1) * limit, page * limit);
 
