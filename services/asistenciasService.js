@@ -221,57 +221,31 @@ const verAsistenciasUser = async (usuario_id, page = 1, limit = 10) => {
             throw new Error(`El usuario_id proporcionado no es válido: ${usuario_id}`);
         }
 
-        // Realizar la agregación en MongoDB para obtener las entradas y salidas en orden descendente
-        const asistencias = await Asistencia.aggregate([
-            {
-                $match: {
-                    usuario_id: new mongoose.Types.ObjectId(usuario_id)
-                }
-            },
-            {
-                $sort: {
-                    fecha_hora: -1 // Ordenar cronológicamente de más reciente a más antiguo
-                }
-            },
-            {
-                $group: {
-                    _id: null,
-                    entradas: {
-                        $push: {
-                            $cond: [{ $eq: ['$tipo_acceso', 'Entrada'] }, '$$ROOT', null]
-                        }
-                    },
-                    salidas: {
-                        $push: {
-                            $cond: [{ $eq: ['$tipo_acceso', 'Salida'] }, '$$ROOT', null]
-                        }
-                    }
-                }
-            },
-            {
-                $project: {
-                    entradas: { $filter: { input: '$entradas', as: 'item', cond: { $ne: ['$$item', null] } } },
-                    salidas: { $filter: { input: '$salidas', as: 'item', cond: { $ne: ['$$item', null] } } }
-                }
+        // Obtener todas las asistencias sin paginación
+        const asistencias = await Asistencia.find({ usuario_id: new mongoose.Types.ObjectId(usuario_id) }).sort({ fecha_hora: -1 });
+
+        // Separar las entradas y salidas
+        const entradas = [];
+        const salidas = [];
+
+        asistencias.forEach(asistencia => {
+            if (asistencia.tipo_acceso === 'Entrada') {
+                entradas.push(asistencia);
+            } else if (asistencia.tipo_acceso === 'Salida') {
+                salidas.push(asistencia);
             }
-        ]);
+        });
 
-        if (asistencias.length === 0) {
-            return { asistencias: [], total: 0, page: parseInt(page), limit: parseInt(limit), totalPages: 0 };
-        }
-
-        const { entradas, salidas } = asistencias[0];
-
-        // Emparejar entradas y salidas dentro de la aplicación (del más reciente al más antiguo)
+        // Emparejar entradas con salidas
         const asistenciasEmparejadas = [];
         let salidaIndex = 0;
 
         entradas.forEach(entrada => {
             let salida = null;
 
+            // Buscar la primera salida que sea posterior a la entrada actual
             while (salidaIndex < salidas.length) {
-                // Ahora buscamos la primera salida más cercana a la entrada (más reciente)
-                if (salidas[salidaIndex].fecha_hora < entrada.fecha_hora) { // Cambiado a "<" para encontrar salidas anteriores
+                if (salidas[salidaIndex].fecha_hora > entrada.fecha_hora) {
                     salida = salidas[salidaIndex];
                     salidaIndex++;
                     break;
@@ -279,13 +253,15 @@ const verAsistenciasUser = async (usuario_id, page = 1, limit = 10) => {
                 salidaIndex++;
             }
 
+            // Emparejar la entrada con la salida o dejar la salida como null si no se encontró
             asistenciasEmparejadas.push({ entrada, salida });
         });
 
-        // Paginar después del emparejamiento
+        // Paginar después de emparejar
         const total = asistenciasEmparejadas.length;
         const paginatedAsistencias = asistenciasEmparejadas.slice((page - 1) * limit, page * limit);
 
+        // Devolver los datos paginados
         return {
             asistencias: paginatedAsistencias,
             total: total,
