@@ -214,7 +214,7 @@ const verAsistencia = async () => { //Comentario para ver pq no me hace commit e
 };
 
 //Servicio para que el usuario vea sus asistencias (paginadas y poder cambiar los días a ver)
-const verAsistenciasUser = async (usuario_id, page = 1, limit = 10) => {
+const verAsistenciasUser = async (usuario_id, page = 1, limit = 5) => {
     try {
         // Verificar si usuario_id es un ObjectId válido
         if (!mongoose.Types.ObjectId.isValid(usuario_id)) {

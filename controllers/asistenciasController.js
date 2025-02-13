@@ -47,7 +47,7 @@ const verAsistencias = async (req, res) => {
 const verAsistenciasUser = async (req, res) => {
     try {
         const usuario_id = req.user.id; // Obtener el usuario_id desde el token de autenticación
-        const { page = 1, limit = 10 } = req.query; // Parámetros opcionales de paginación
+        const { page = 1, limit = 5 } = req.query; // Parámetros opcionales de paginación
 
         // Llamada al servicio para obtener las asistencias del usuario
         const { asistencias, total } = await asistenciasService.verAsistenciasUser(usuario_id, parseInt(page), parseInt(limit));
