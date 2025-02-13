@@ -43,6 +43,34 @@ const verAsistencias = async (req, res) => {
     }
 };
 
+//Controlador para ver última asistencia
+const verAsistencia = async (req, res) => {
+    const { usuario_id } = req.params; // Obtener el usuario_id de los parámetros de la URL
+
+    try {
+        const ultimaEntrada = await asistenciasService.verAsistencias(usuario_id);
+
+        if (!ultimaEntrada) {
+            return res.status(404).json({
+                success: false,
+                message: "No se encontró ninguna asistencia de tipo 'Entrada' para el usuario proporcionado."
+            });
+        }
+
+        // Si se encuentra la última entrada, devolverla
+        res.status(200).json({
+            success: true,
+            data: ultimaEntrada
+        });
+    } catch (error) {
+        console.error("Error en el controlador getUltimaEntrada:", error.message);
+        res.status(500).json({
+            success: false,
+            message: `Error al obtener la última entrada: ${error.message}`
+        });
+    }
+}
+
 //Controlador para que el usuario vea todas sus asitencias agrupadas
 const verAsistenciasUser = async (req, res) => {
     try {
@@ -68,4 +96,4 @@ const verAsistenciasUser = async (req, res) => {
     }
 };
 
-module.exports = { registrarAsistencia, verAsistencias, verAsistenciasUser };
+module.exports = { registrarAsistencia, verAsistencias, verAsistencia, verAsistenciasUser };

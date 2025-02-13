@@ -205,11 +205,29 @@ const verAsistencias = async (gym_id, fecha = null, search = '', page = 1, limit
 };
 
 //Servicio para que el usuario su última asistencia
-const verAsistencia = async () => { //Comentario para ver pq no me hace commit en render
-    try{
+const verAsistencia = async (usuario_id) => { 
+    try {
+        // Verificar si usuario_id es un ObjectId válido
+        if (!mongoose.Types.ObjectId.isValid(usuario_id)) {
+            throw new Error(`El usuario_id proporcionado no es válido: ${usuario_id}`);
+        }
 
-    }catch(error){
+        // Obtener la última asistencia de tipo "Entrada"
+        const ultimaEntrada = await Asistencia.findOne({ 
+            usuario_id: new mongoose.Types.ObjectId(usuario_id), 
+            tipo: "Entrada" 
+        }).sort({ fecha_hora: -1 }); // Ordenar por fecha_hora en orden descendente
 
+        // Si no se encuentra ninguna asistencia de tipo "Entrada", devolver null
+        if (!ultimaEntrada) {
+            return null;
+        }
+
+        // Devolver la última asistencia de tipo "Entrada"
+        return ultimaEntrada;
+    } catch (error) {
+        console.error(`Error al obtener la última entrada para usuario_id ${usuario_id}:`, error.message);
+        throw new Error(`Error al obtener la última entrada para usuario_id ${usuario_id}: ${error.message}`);
     }
 };
 
