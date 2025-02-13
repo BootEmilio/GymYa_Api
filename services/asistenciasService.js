@@ -222,44 +222,12 @@ const verAsistenciasUser = async (usuario_id, page = 1, limit = 5) => {
         }
 
         // Obtener todas las asistencias sin paginación
-        const asistencias = await Asistencia.find({ usuario_id: new mongoose.Types.ObjectId(usuario_id) }).sort({ fecha_hora: -1 });
+        const asistencias = await Asistencia.find({ usuario_id: new mongoose.Types.ObjectId(usuario_id) })
+            .sort({ fecha_hora: -1 });
 
-        // Separar las entradas y salidas
-        const entradas = [];
-        const salidas = [];
-
-        asistencias.forEach(asistencia => {
-            if (asistencia.tipo_acceso === 'Entrada') {
-                entradas.push(asistencia);
-            } else if (asistencia.tipo_acceso === 'Salida') {
-                salidas.push(asistencia);
-            }
-        });
-
-        // Emparejar entradas con salidas
-        const asistenciasEmparejadas = [];
-        let salidaIndex = 0;
-
-        entradas.forEach(entrada => {
-            let salida = null;
-
-            // Buscar la primera salida que sea posterior a la entrada actual
-            while (salidaIndex < salidas.length) {
-                if (salidas[salidaIndex].fecha_hora > entrada.fecha_hora) {
-                    salida = salidas[salidaIndex];
-                    salidaIndex++;
-                    break;
-                }
-                salidaIndex++;
-            }
-
-            // Emparejar la entrada con la salida o dejar la salida como null si no se encontró
-            asistenciasEmparejadas.push({ entrada, salida });
-        });
-
-        // Paginar después de emparejar
-        const total = asistenciasEmparejadas.length;
-        const paginatedAsistencias = asistenciasEmparejadas.slice((page - 1) * limit, page * limit);
+        // Paginar directamente las asistencias, sin emparejarlas
+        const total = asistencias.length;
+        const paginatedAsistencias = asistencias.slice((page - 1) * limit, page * limit);
 
         // Devolver los datos paginados
         return {
