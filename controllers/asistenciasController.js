@@ -45,7 +45,7 @@ const verAsistencias = async (req, res) => {
 
 //Controlador para ver última asistencia
 const verAsistencia = async (req, res) => {
-    const { usuario_id } = req.params; // Obtener el usuario_id de los parámetros de la URL
+    const { usuario_id } = req.user.id; // Obtener el usuario_id de los parámetros de la URL
 
     try {
         const ultimaEntrada = await asistenciasService.verAsistencias(usuario_id);
