@@ -247,10 +247,10 @@ const verAsistenciasUser = async (usuario_id, page = 1, limit = 10) => {
             while (salidaIndex < salidas.length) {
                 if (salidas[salidaIndex].fecha_hora > entrada.fecha_hora) {
                     salida = salidas[salidaIndex];
-                    salidaIndex++;
+                    salidaIndex++; // Solo avanzar el índice cuando se encuentra una salida válida
                     break;
                 }
-                salidaIndex++;
+                // No avanzamos salidaIndex aquí hasta encontrar la primera salida válida
             }
 
             // Emparejar la entrada con la salida o dejar la salida como null si no se encontró
