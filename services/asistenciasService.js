@@ -215,7 +215,7 @@ const verAsistencia = async (usuario_id) => {
         // Obtener la última asistencia de tipo "Entrada"
         const ultimaEntrada = await Asistencia.findOne({ 
             usuario_id: new mongoose.Types.ObjectId(usuario_id), 
-            tipo: "Entrada" 
+            tipo_acceso: "Entrada" 
         }).sort({ fecha_hora: -1 }); // Ordenar por fecha_hora en orden descendente
 
         // Si no se encuentra ninguna asistencia de tipo "Entrada", devolver null
