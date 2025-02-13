@@ -5,7 +5,7 @@ const mongoose = require('mongoose')
 //const Plan = require('../models/planes');
 
 //Servicio para extraer datos del código QR y registrar así una asistencia (entrada/salida)
-const registrarAsistencia = async (membresia_id, fecha_fin) => {
+const registrarAsistencia = async (membresia_id) => {
     try{
         //Buscamos el usuario_id de la membresía
         const membresia = await Membresia.findById(membresia_id);
@@ -13,8 +13,9 @@ const registrarAsistencia = async (membresia_id, fecha_fin) => {
             throw new Error('La membresía no existe');
         }
 
+        fechaFin = membresia.fecha_fin;
         // Verificamos que la fecha_fin dentro del QR es mayor a la fecha actual
-        if(fecha_fin < new Date()) {
+        if(fechaFin < new Date()) {
             throw new Error('Su membresía esta expirada, no tiene acceso al gimnasio');
         }
 
