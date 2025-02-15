@@ -4,7 +4,7 @@ const entrenadoresService = require('../services/entrenadoresService');
 const agregarEntrenador = async(req, res) => {
     try{
         const {nombre_completo, especialidad, horario, imagen } = req.body;
-        const {gym_id} = req.user.gym_id; //Obtenemos el gym_id del token del administrador
+        const gym_id = req.user.gym_id; //Obtenemos el gym_id del token del administrador
 
         //Validar que todos los datos son proporcionados
         if(!nombre_completo || !especialidad || !horario){
