@@ -7,7 +7,7 @@ const agregarEntrenador = async(req, res) => {
         const {gym_id} = req.user.gym_id; //Obtenemos el gym_id del token del administrador
 
         //Validar que todos los datos son proporcionados
-        if(!gym_id || !nombre_completo || !especialidad || !horario){
+        if(!nombre_completo || !especialidad || !horario){
             return res.status(400).json({ error: 'Todos los campos son obligatorios' });
         }
 
