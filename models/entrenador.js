@@ -6,8 +6,8 @@ const EntrenadorSchema = new mongoose.Schema({
     especialidad: { type: String, required: true },
     horario: { type: String }, //Horario de los entrenadores dentro del gimnasio
     independiente: { type: Boolean, required: true, default: false }, //Validaremos que el entrenador sea independiente o no
-    telefono: { type: String },
-    email: { type: String },
+    telefono: { type: String, unique: true },
+    email: { type: String, unique: true },
     imagen: { type: String, required: true }
 });
 

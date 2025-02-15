@@ -3,8 +3,10 @@ const connectDB = require('./db');
 const cors = require('cors');
 const swaggerUI = require("swagger-ui-express");
 const specs = require("./swagger/swagger");
+//Ruta para los registros
+const registrosRoutes = require('./routes/registrosRoutes');
 //Ruta de los logins
-const loginsRoute = require('./routes/loginsRoutes');
+const loginsRoutes = require('./routes/loginsRoutes');
 // Rutas de administradores
 const adminRoutes = require('./routes/adminRoutes');
 const gymRoutes = require('./routes/gymRoutes');
@@ -35,13 +37,14 @@ app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 app.use(loggerMiddleware);
 
 //Ruta para los registros
-//Registro de administradores y entrenadores independientes
+app.use('/api', registrosRoutes);//Registro de administradores y entrenadores independientes
 
 //Ruta para los logins
-app.use('/api', loginsRoute); //Login de los administradores, usuarios y entrenadores
+app.use('/api', loginsRoutes); //Login de los administradores, usuarios y entrenadores
+
+app.use(authMiddleware); //De aquí en adelante las rutas necesitan del token
 
 //Rutas para administradores
-app.use('/api', adminRoutes); // Registro para administradores
 app.use('/api/admin', gymRoutes); // Solo editar gimnasio
 app.use('/api/admin', planesRoutes); // Agregar, ver, editar y "eliminar" planes de membresía
 app.use('/api', entrenadoresRoutes); //Agregar entrenador
@@ -53,7 +56,6 @@ app.use('/api', asistenciasRoutes); // Registrar entradas y salidas, consultarla
 app.use('/api', adminUsersRoutes);
 app.use('/api', adminPaymentsRoutes);
 
-app.use(authMiddleware);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
