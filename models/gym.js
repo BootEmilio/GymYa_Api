@@ -8,4 +8,4 @@ const GymSchema = new mongoose.Schema({
     planes_membresias: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Plan' }],
 }, { collection: 'gimnasios' }); // Nombre de la colección en MongoDB
 
-module.exports = mongoose.model('Gym', GymSchema);
+module.exports = mongoose.model('Gimnasio', GymSchema);

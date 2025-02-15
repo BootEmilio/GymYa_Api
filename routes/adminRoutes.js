@@ -1,5 +1,5 @@
 const express = require('express');
-const AuthAdminController  = require('../controllers/adminAuthController');
+const adminController  = require('../controllers/adminController');
 const router = express.Router();
 //const token = require('../middlewares/authMiddleware');
 
@@ -47,9 +47,7 @@ const router = express.Router();
  *         description: Credenciales inválidas
  */
 //ruta para agregar el primer administrador
-router.post('/registro', AuthAdminController.registro);
-//ruta para logear administrador
-router.post('/login', AuthAdminController.loginAdmin);
+router.post('/registro', adminController.registro);
 /*
 //ruta para agregar otro administrador
 router.post('/addAdmin', token, AuthAdminController.crearAdministrador);

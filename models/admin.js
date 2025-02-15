@@ -9,4 +9,4 @@ const AdminSchema = new mongoose.Schema({
     telefono: { type: String, required: true }
 }, { collection: 'administradores' }); // Nombre de la colección en MongoDB
 
-module.exports = mongoose.model('Admin', AdminSchema); // Nombre del modelo
+module.exports = mongoose.model('Administrador', AdminSchema); // Nombre del modelo

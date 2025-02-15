@@ -1,4 +1,4 @@
-const AuthAdminService = require('../services/adminAuthService');
+const AuthAdminService = require('../services/adminService');
 
 //Controlador para registrar primer administrador
 const registro = async (req, res) => {
