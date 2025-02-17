@@ -5,7 +5,7 @@ const crearPlanes = async (req, res) => {
     try{
         const { nombre, descripcion, costo, duracion_meses, duracion_semanas, duracion_dias, gymIds = [] } = req.body;
         const adminGymIds = req.user.gym_id; // Array de gym_id del administrador
-        const gymIdURL = req.params;
+        const gymIdURL = req.params.gymId;
 
         // Agregar el gymId de la URL al array de gymIds si no está ya presente
         if (!gymIds.includes(gymIdURL)) {
