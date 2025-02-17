@@ -1,5 +1,6 @@
 const entrenadoresService = require('../services/entrenadoresService');
 const Entrenador = require('../models/entrenador');
+const bcrypt = require('bcryptjs');
 
 //Controlador para que un administrador agregue a un entrenador
 const agregarEntrenador = async(req, res) => {

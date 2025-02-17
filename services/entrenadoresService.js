@@ -1,5 +1,5 @@
 const Entrenador = require('../models/entrenador');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const secretKey = process.env.JWT_SECRET;
