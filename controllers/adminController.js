@@ -1,6 +1,6 @@
 const adminService = require('../services/adminService');
 const Admin = require('../models/admin');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 //Controlador para registrar primer administrador
 const registro = async (req, res) => {

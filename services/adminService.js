@@ -1,7 +1,7 @@
 //Aquí se van a encontrar todos los services para crear y editar a los administradores
 const Gym = require('../models/gym');
 const Admin = require('../models/admin');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
