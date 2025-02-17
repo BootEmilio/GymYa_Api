@@ -4,7 +4,7 @@ const token = require('../middlewares/authMiddleware');
 const router = express.Router();
 
 //Ruta para crear gimnasio
-router.create('/gym', token, gymController.crearGimnasio);
+router.post('/gym', token, gymController.crearGimnasio);
 //Ruta para ver gimnasios
 router.get('/gym', token, gymController.verGimnasios)
 // Ruta para editar un gimnasio
