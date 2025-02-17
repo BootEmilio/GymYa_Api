@@ -5,7 +5,7 @@ const token = require('../middlewares/authMiddleware');
 const router = express.Router();
 
 // Ruta para crear un plan de membresía
-router.post('/planes', token, planesController.crearPlanes);
+router.post('/:gymId/planes', token, planesController.crearPlanes);
 
 // Ruta para mostrar planes de membresía
 router.get('/:gymId/planes', token, planesController.mostrarPlanes);

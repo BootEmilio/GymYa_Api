@@ -3,11 +3,17 @@ const planesService = require('../services/planesService')
 //Controlador para agregar planes de membrbesía
 const crearPlanes = async (req, res) => {
     try{
-        const { nombre, descripcion, costo, duracion_meses, duracion_semanas, duracion_dias, gymIds } = req.body;
+        const { nombre, descripcion, costo, duracion_meses, duracion_semanas, duracion_dias, gymIds = [] } = req.body;
         const adminGymIds = req.user.gym_id; // Array de gym_id del administrador
+        const gymIdURL = req.params;
+
+        // Agregar el gymId de la URL al array de gymIds si no está ya presente
+        if (!gymIds.includes(gymIdURL)) {
+            gymIds.push(gymIdURL);
+        }
 
         // Validar que se proporcionen gymIds
-        if (!gymIds || !Array.isArray(gymIds) || gymIds.length === 0) {
+        if (gymIds.length === 0) {
             return res.status(400).json({ error: 'Debe proporcionar al menos un gimnasio válido.' });
         }
 
