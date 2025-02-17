@@ -1,20 +1,14 @@
-const planesService = require('../services/planesService')
+const planesService = require('../services/colaboracionesService')
 
-//Controlador para agregar planes de membrbesía
-const crearPlanes = async (req, res) => {
+//Controlador para agregar colaboraciones
+const crearColaboraciones = async (req, res) => {
     try{
         const { nombre, descripcion, costo, duracion_meses, duracion_semanas, duracion_dias, gymIds } = req.body;
-        const adminGymIds = req.user.gym_id; // Array de gym_id del administrador
+        const entrenadorId = req.user.id; // _id del entrenador
 
-        // Validar que se proporcionen gymIds
-        if (!gymIds || !Array.isArray(gymIds) || gymIds.length === 0) {
-            return res.status(400).json({ error: 'Debe proporcionar al menos un gimnasio válido.' });
-        }
-
-        // Verificar que todos los gymIds proporcionados estén en el array de gym_id del administrador
-        const gymIdsInvalidos = gymIds.filter(gymId => !adminGymIds.includes(gymId));
-        if (gymIdsInvalidos.length > 0) {
-            return res.status(403).json({ error: 'No tienes permisos para agregar planes en algunos de los gimnasios seleccionados.' });
+        // Validar que al menos un gym_id o un entrenador_id esté presente
+        if (!gymIds || gymIds.length === 0) {
+            throw new Error('Debe proporcionar al menos un gimnasio.');
         }
 
         // Validar que al menos una duración sea proporcionada
@@ -34,26 +28,20 @@ const crearPlanes = async (req, res) => {
             return res.status(400).json({ error: 'El costo debe de estar definido y no puede ser negativo.' });
         }
 
-        const nuevoPlan = await planesService.crearPlanes(gymIds, nombre, descripcion, costo, duracion_meses, duracion_semanas, duracion_dias);
+        const nuevoPlan = await planesService.crearPlanes(gymIds, entrenadorId, nombre, descripcion, costo, duracion_meses, duracion_semanas, duracion_dias);
         res.status(201).json(nuevoPlan);
     }catch (error) {
-        res.status(500).json({error: 'Error al crear nuevo plan de membresía'});
+        res.status(500).json({error: 'Error al crear nueva colaboración'});
     }
 };
 
 //Controlador para mostrar planes de membresía
-const mostrarPlanes = async (req, res) => {
+const mostrarColaboraciones = async (req, res) => {
     try {
-        const { gymId } = req.params; // Obtener el gymId desde los parámetros de la ruta
-        const adminGymIds = req.user.gym_id; // Array de gym_id del administrador
-
-        // Validar que el gymId esté en el array de gym_id del administrador
-        if (!adminGymIds.includes(gymId)) {
-            return res.status(403).json({ error: 'No tienes permisos para ver los planes de este gimnasio' });
-        }
+        const entrenadorId = req.user.id; // Id del entrenador para ver sus colaboraciones
 
         // Llamar al servicio para obtener los planes
-        const planes = await planesService.mostrarPlanes(gymId);
+        const planes = await planesService.mostrarPlanes(entrenadorId);
 
         res.status(200).json(planes);
     } catch (error) {

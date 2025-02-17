@@ -8,6 +8,7 @@ const EntrenadorSchema = new mongoose.Schema({
     independiente: { type: Boolean, required: true, default: false }, //Validaremos que el entrenador sea independiente o no
     telefono: { type: String, unique: true },
     email: { type: String, unique: true },
+    password: { type: String },
     imagen: { type: String, required: true }
 });
 

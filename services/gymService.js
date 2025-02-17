@@ -1,39 +1,58 @@
 //Aquí se encuentran los services para el manejo de gimnasios
 const Gym = require('../models/gym');
+const Admin = require('../models/admin');
 require('dotenv').config();
 
-
-/*
 //Servicio para agregar un gimnasio
-const crearGimnasio = async (nombre, direccion, telefono, fechaRegistro) => {
+const crearGimnasio = async (nombre, direccion, telefono, horario, adminId) => {
     try {
-      const result = await db.query(
-        'INSERT INTO gimnasios(nombre, direccion, telefono, fecha_registro) VALUES($1,$2,$3,$4) RETURNING *',
-        [nombre, direccion, telefono, fechaRegistro]
+      //Crear nuevo gimnasio
+      const nuevoGym = await Gym.create({
+        nombre,
+        direccion,
+        telefono,
+        horario
+      });
+
+      //Obtener el _id del nuevo gimnasio
+      const gymId = nuevoGym._id;
+
+      //Actualizar el array de gym_id
+      await Admin.findByIdAndUpdate(
+        adminId,
+        { $push: { gym_id: gymId } },
+        { new: true }
       );
-      return result.rows[0];
+
+      return nuevoGym;
     } catch (error){
-      console.error('Erros al crear un gimnasio nuevo:', error);
+      console.error('Error al crear el gimnasio:', error);
       throw new Error('Error al crear el gimnasio');
     }
 };
-*/
+
+//Servicio para ver gimnasios
+const verGimnasios = async (adminId) => {
+  try {
+      // Buscar el administrador por su ID y obtener su array gym_id
+      const admin = await Admin.findById(adminId).select('gym_id');
+      if (!admin) {
+          throw new Error('Administrador no encontrado');
+      }
+
+      // Obtener los gimnasios correspondientes a los gym_id
+      const gimnasios = await Gym.find({ _id: { $in: admin.gym_id } });
+
+      return gimnasios;
+  } catch (error) {
+      console.error('Error en el servicio de obtenerGimnasiosDeAdmin:', error);
+      throw new Error('Error al obtener los gimnasios del administrador');
+  }
+};
 
 // Servicio para editar datos del gimnasio
-const editarGimnasio = async (id, nombre, direccion, telefono) => {
+const editarGimnasio = async (id, updateFields) => {
     try {
-        // Construimos un objeto con los campos que fueron proporcionados
-        const updateFields = {};
-
-        if (nombre) updateFields.nombre = nombre;
-        if (direccion) updateFields.direccion = direccion;
-        if (telefono) updateFields.telefono = telefono;
-
-        // Si no se proporcionaron campos, lanzamos un error
-        if (Object.keys(updateFields).length === 0) {
-            throw new Error('No se han proporcionado datos para actualizar.');
-        }
-
         // Actualizamos el gimnasio usando su ID
         const gimnasioActualizado = await Gym.findByIdAndUpdate(
             id,  // ID del gimnasio que se va a actualizar
@@ -53,4 +72,4 @@ const editarGimnasio = async (id, nombre, direccion, telefono) => {
     }
 };
 
-module.exports = { editarGimnasio };
+module.exports = { crearGimnasio, verGimnasios, editarGimnasio };

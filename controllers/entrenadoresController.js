@@ -22,9 +22,9 @@ const agregarEntrenador = async(req, res) => {
 //Registro de entrenador independiente
 const registro = async(req,res) => {
     try{
-        const {nombre_completo, especialidad, telefono, email, imagen} = req.body;
+        const {nombre_completo, especialidad, telefono, email, password, imagen} = req.body;
 
-        if(!nombre_completo || !especialidad || !telefono || !email){
+        if(!nombre_completo || !especialidad || !telefono || !email || !password){
             return res.status(400).json({ error: 'Todos los campos son obligatorios' });
         }
 
@@ -40,11 +40,46 @@ const registro = async(req,res) => {
             return res.status(400).json({ error: 'El email ya está registrado' });
         }
 
-        const nuevoEntrenador = await entrenadoresService.registro(nombre_completo, especialidad, telefono, email, imagen);
+        const nuevoEntrenador = await entrenadoresService.registro(nombre_completo, especialidad, telefono, email, password, imagen);
         res.status(201).json(nuevoEntrenador);
     }catch(error){
         res.status(500).json({error: 'Error al agregar al entrenador'});
     }
 };
 
-module.exports = { agregarEntrenador, registro };
+//Controlador para que un entrenador haga login
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    //Validar que se pasen los datos
+    if (!username || !password) {
+      return res.status(400).json({ message: 'Username y contraseña son requeridos' });
+    }
+
+    // Buscar el administrador por username
+    const entrenador = await Entrenador.findOne({ email });  
+    if (!entrenador) {
+      throw new Error('Administrador no encontrado');
+    }    
+     
+    // Comparar la contraseña usando bcrypt
+    const isPasswordValid = await bcrypt.compare(password, entrenador.password);
+    if (!isPasswordValid) {
+      throw new Error('Contraseña incorrecta');
+    }
+
+    const authResult = await entrenadoresService.login(entrenador);
+
+    res.status(200).json({
+      message: 'Login exitoso',
+      token: authResult.token,
+      entrenador: authResult.entrenador,
+    });
+  } catch (error) {
+    console.error('Error en el proceso de login del entrenador:', error);
+    res.status(500).json({ message: 'Error interno del servidor' });
+  }
+};
+
+module.exports = { agregarEntrenador, registro, login };

@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 
 const PlanSchema = new mongoose.Schema({
-    gym_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Gym', required: true },
+    gym_id: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Gym' }],
+    entrenador_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Entrenador' }, //Aquí se pondrá el _id del entrenador dueño de la colaboración
     nombre: { type: String, required: true },
     descripcion: { type: String, required: true },
     costo: {type: Number, required: true},

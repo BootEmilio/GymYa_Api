@@ -3,12 +3,11 @@ const gymController = require('../controllers/gymController');
 const token = require('../middlewares/authMiddleware');
 const router = express.Router();
 
+//Ruta para crear gimnasio
+router.create('/gym', token, gymController.crearGimnasio);
+//Ruta para ver gimnasios
+router.get('/gym', token, gymController.verGimnasios)
 // Ruta para editar un gimnasio
-router.put('/gym', token, gymController.editarGimnasio);
-
-/*
-// Ruta para crear un gimnasio 
-router.post('/addGym', token, gymController.crearGimnasio); //Revisar lógica de este
-*/
+router.put('/:gymId/editar', token, gymController.editarGimnasio);
 
 module.exports = router;

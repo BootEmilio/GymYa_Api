@@ -2,10 +2,11 @@ const Plan = require('../models/planes');
 require('dotenv').config();
 
 // Servicio para agregar un tipo de plan de membresía
-const crearPlanes = async (gymIds, nombre, descripcion, costo, duracion_meses, duracion_semanas, duracion_dias) => {
+const crearColaboraciones = async (gymIds, entrenadorId, nombre, descripcion, costo, duracion_meses, duracion_semanas, duracion_dias) => {
     try {
         const nuevoPlan = new Plan({
             gym_id: gymIds,
+            entrenadorId,
             nombre,
             descripcion,
             costo,
@@ -28,40 +29,40 @@ const crearPlanes = async (gymIds, nombre, descripcion, costo, duracion_meses, d
         const result = await nuevoPlan.save();
         return result;
     } catch (error) {
-        console.error('Error al crear membresía:', error);
-        throw new Error('Error al crear la membresía');
+        console.error('Error al crear colaboración:', error);
+        throw new Error('Error al crear crear colaboración');
     }
 };
 
 // Servicio para mostrar los planes de membresía activos
-const mostrarPlanes = async (gymId) => {
+const mostrarColaboraciones = async (entrenadorId) => {
     try {
         // Filtrar por gym_id y solo planes que estén activos (activa: true)
-        const planes = await Plan.find({ gym_id: gymId, activa: true })
+        const planes = await Plan.find({ entrenador_id: entrenadorId, activa: true })
             .select('nombre descripcion costo duracion_meses duracion_semanas duracion_dias') // Solo seleccionar los campos necesarios
             .sort({ costo: 1 }); // Ordenar por costo de menor a mayor
         return planes;
     } catch (error) {
-        console.error('Error al mostrar los planes de membresía:', error);
-        throw new Error('Error al mostrar los planes de membresía');
+        console.error('Error al mostrar las colaboraciones', error);
+        throw new Error('Error al mostrar las colaboraciones');
     }
 };
 
 // Servicio para editar un plan existente de membresía
-const editarPlanes = async (planId, gymId, updateFields, unsetFields) => {
+const editarColaboracion = async (planId, entrenadorId, updateFields, unsetFields) => {
     try {
         // Buscar el plan por su id y gym_id, y actualizarlo
         const planActualizado = await Plan.findOneAndUpdate(
-            { _id: planId, gym_id: gymId }, // Filtro para asegurar que el plan pertenezca al gimnasio
+            { _id: planId, entrenador_id: entrenadorId }, // Filtro para asegurar que la colaboración le pertenece al entrenador
             { 
                 $set: updateFields, // Campos a actualizar
                 $unset: unsetFields // Campos a eliminar
             },
-            { new: true } // Retorna el plan actualizado
+            { new: true } // Retorna la colaboracion actualizado
         );
 
         if (!planActualizado) {
-            throw new Error('Plan no encontrado o no pertenece al gimnasio');
+            throw new Error('Colaboración no encontrada o no pertenece al entrenador');
         }
 
         return planActualizado;
@@ -72,11 +73,11 @@ const editarPlanes = async (planId, gymId, updateFields, unsetFields) => {
 };
 
 // Servicio para "eliminar" planes de membresía (desactivarlo)
-const eliminarPlan = async (id, gymId) => {
+const eliminarColaboracion = async (id, entrenadorId) => {
     try {
         // "Eliminar" el plan estableciendo activa a false
         const planEliminado = await Plan.findOneAndUpdate(
-            { _id: id, gym_id: gymId },
+            { _id: id, entrenador_id: entrenadorId },
             { $set: { activa: false } }, // Cambiar el estado a inactivo
             { new: true }
         );
@@ -88,4 +89,4 @@ const eliminarPlan = async (id, gymId) => {
     }
 };
 
-module.exports = { crearPlanes, mostrarPlanes, editarPlanes, eliminarPlan };
+module.exports = { crearColaboraciones, mostrarColaboraciones, editarColaboracion, eliminarColaboracion };
