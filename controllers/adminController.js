@@ -51,13 +51,13 @@ const loginAdmin = async (req, res) => {
     // Buscar el administrador por username
     const admin = await Admin.findOne({ username });  
     if (!admin) {
-      throw new Error('Administrador no encontrado');
-    }    
+      throw res.status(400).json({ message: 'Administrador no encontrado'});
+    }
      
     // Comparar la contraseña usando bcrypt
     const isPasswordValid = await bcrypt.compare(password, admin.password);
     if (!isPasswordValid) {
-      throw new Error('Contraseña incorrecta');
+      throw res.status(400).json({ message: 'Contraseña incorrecta'});
     }
 
     const authResult = await adminService.authenticateAdmin(admin);

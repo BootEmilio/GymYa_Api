@@ -14,6 +14,6 @@ router.get('/:gymId/planes', token, planesController.mostrarPlanes);
 router.put('/:gymId/planes/:planId', token, planesController.editarPlanes);
 
 // Ruta para "eliminar" un plan de membresía (marcar como inactivo)
-router.put('/:gym_id/planes/:id/eliminar', token, planesController.eliminarPlan);
+router.put('/:gymId/planes/:planid/eliminar', token, planesController.eliminarPlan);
 
 module.exports = router;
