@@ -100,12 +100,20 @@ const getMembresias = async (gymId, status, page = 1, limit = 10, search = '') =
             searchCondition = { $or: searchConditions };
         }
 
+        // Obtener los planes que contienen el gymId en su array de gym_ids
+        const planes = await Plan.find({ gym_ids: { $in: [new mongoose.Types.ObjectId(gymId)] } }).select('_id');
+        const planIds = planes.map(plan => plan._id); // Extraer los plan_id
+
+        if (planIds.length === 0) {
+            return { membresias: [], total: 0 }; // Si no hay planes, devolver vacío
+        }
+
         // Agregación en MongoDB con la condición dinámica
         const membresias = await Membresia.aggregate([
             {
                 $match: {
                     fecha_fin: dateCondition, // Condición dinámica según el estado
-                    gym_id: new mongoose.Types.ObjectId(gymId) // Asegurar que gymId es un ObjectId
+                    plan_id: { $in: planIds } // Filtrar por plan_id en los planes del gimnasio
                 }
             },
             {
