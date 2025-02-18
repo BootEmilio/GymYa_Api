@@ -75,6 +75,7 @@ const getMembresias = async (gymId, status, page = 1, limit = 10, search = '') =
             throw new Error('El gymId proporcionado no es válido');
         }
 
+        // Establecer la condición de fecha según el estado (activas o expiradas)
         let dateCondition;
         if (status === 'activas') {
             dateCondition = { $gt: new Date() }; // Membresías activas
@@ -84,12 +85,12 @@ const getMembresias = async (gymId, status, page = 1, limit = 10, search = '') =
             throw new Error('El estado proporcionado no es válido. Use "activas" o "expiradas".');
         }
 
-        // Crear condición de búsqueda
+        // Crear la condición de búsqueda (para nombre o username del usuario)
         let searchCondition = {};
         if (search) {
             const searchConditions = [
                 { 'usuario.nombre_completo': { $regex: search, $options: 'i' } },
-                { 'usuario.username': { $regex: search, $options: 'i' } }
+                { 'usuario.email': { $regex: search, $options: 'i' } }
             ];
 
             // Solo agregar la búsqueda por _id si search es un ObjectId válido
@@ -101,7 +102,7 @@ const getMembresias = async (gymId, status, page = 1, limit = 10, search = '') =
         }
 
         // Obtener los planes que contienen el gymId en su array de gym_ids
-        const planes = await plan.find({ gym_id: { $in: [new mongoose.Types.ObjectId(gymId)] } }).select('_id');
+        const planes = await Plan.find({ gym_id: { $in: [new mongoose.Types.ObjectId(gymId)] } }).select('_id');
         const planIds = planes.map(plan => plan._id); // Extraer los plan_id
 
         if (planIds.length === 0) {
@@ -135,7 +136,7 @@ const getMembresias = async (gymId, status, page = 1, limit = 10, search = '') =
             },
             { $unwind: '$plan' }, // Descomprimir el array de planes
             {
-                $match: searchCondition // Aplicar la condición de búsqueda
+                $match: searchCondition // Aplicar la condición de búsqueda si se proporcionó
             },
             {
                 $project: {
@@ -166,7 +167,7 @@ const getMembresias = async (gymId, status, page = 1, limit = 10, search = '') =
         return { membresias: membresias[0].data, total };
     } catch (error) {
         console.error(`Error al mostrar las membresías ${status} para gymId: ${gymId}:`, error);
-        throw new Error(`Error al mostrar las membresías ${status}`);
+        throw new Error(`Error al mostrar las membresías ${status}: ${error.message}`);
     }
 };
 
