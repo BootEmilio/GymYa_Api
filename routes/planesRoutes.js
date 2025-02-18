@@ -1,7 +1,6 @@
 const express = require('express');
 const planesController = require('../controllers/planesController');
 const token = require('../middlewares/authMiddleware');
-
 const router = express.Router();
 
 // Ruta para crear un plan de membresía

@@ -1,17 +1,23 @@
 const membresiasService = require('../services/membresiasService');
+const User = require('../models/usuarios');
 
 //Controlador para registrar usuarios con sus membresias
 const registroUsuario = async (req, res) => {
   try{
-    const {plan_id, username, password, nombre_completo, email, telefono} = req.body;
-    const gym_id = req.user.gym_id; //Usamos el gym_id del token
+    const {plan_id, nombre_completo, email, password, telefono, imagen} = req.body;
 
     // Validar que todos los campos estén presentes
-    if (!plan_id || !username || !password || !nombre_completo || !email || !telefono) {
+    if (!plan_id || !nombre_completo || !email || !password) {
       return res.status(400).json({ error: 'Todos los campos son obligatorios' });
     }
 
-    const usuarioNuevo = await membresiasService.registroUsuario(gym_id, plan_id, username, password, nombre_completo, email, telefono);
+    // Verificar si el email ya existe
+    const emailExistente = await User.findOne({ email });
+    if (emailExistente) {
+      return res.status(400).json({ error: 'El email ya está registrado' });
+    }
+
+    const usuarioNuevo = await membresiasService.registroUsuario(plan_id, nombre_completo, email, password, telefono, imagen);
     res.status(201).json(usuarioNuevo);
   }catch (error) {
     res.status(500).json({error: 'Error al registrar el usuario junto a su membresía'});
@@ -22,8 +28,15 @@ const registroUsuario = async (req, res) => {
 const getMembresias = async (req, res) => {
   try {
       const gym_id = req.user.gym_id; // Usamos el gym_id del token
-      const { status } = req.params; // Usamos el status de la URL
+      const { gymId, status } = req.params; // Usamos el gymId y el status de la URL
       const { page = 1, limit = 10, search } = req.query; // Parámetros de paginación y búsqueda
+
+      const adminGymIds = req.user.gym_id; // Array de gym_id del administrador
+
+      // Verificar si el gymId está en el array de gym_id del administrador
+      if (!adminGymIds.includes(gymId)) {
+        return res.status(403).json({ error: 'No tienes permisos para editar este gimnasio' });
+      }
 
       // Validar si el status es "activas" o "expiradas"
       if (status !== 'activas' && status !== 'expiradas') {
@@ -31,7 +44,7 @@ const getMembresias = async (req, res) => {
       }
 
       // Llamar al servicio para obtener las membresías
-      const { membresias, total } = await membresiasService.getMembresias(gym_id, status, page, limit, search);
+      const { membresias, total } = await membresiasService.getMembresias(gymId, status, page, limit, search);
 
       // Devolver los resultados como respuesta
       res.status(200).json({

@@ -3,10 +3,8 @@ const membresiasController = require('../controllers/membresiasController');
 const token = require('../middlewares/authMiddleware');
 const router = express.Router();
 
-// Ruta para registrar usuarios junto a sus membresías
-router.post('/membresias', token, membresiasController.registroUsuario);
 // Ruta para obtener las membresías activas o expiradas
-router.get('/membresias/:status', token, membresiasController.getMembresias);
+router.get('/:gymId/membresias/:status', token, membresiasController.getMembresias);
 // Ruta para obtener las membresía del usuario
 router.get('/membresia', token, membresiasController.getMembresia);
 // Ruta para aplazar las membresías existentes

@@ -2,38 +2,22 @@ const mongoose = require('mongoose');
 const Membresia = require('../models/membresias');
 const user = require('../models/usuarios');
 const plan = require('../models/planes');
+const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
 //Servicio para crear un nuevo usuario con su membresia
-const registroUsuario = async(gym_id, plan_id, username, password, nombre_completo, email, telefono) => {
+const registroUsuario = async(plan_id, nombre_completo, email, password, telefono, imagen) => {
     try{
-        //Crear el usuario
-        const nuevoUsuario = await user.create({
-            gym_id,
-            username,
-            password,
-            nombre_completo,
-            email,
-            telefono
-        });
-        const usuario_id = nuevoUsuario._id;
-
-        //Obtenemos el plan de membresía que se ha escogido
-        const planSeleccionado = await plan.findById(plan_id);
-        if(!planSeleccionado){
-          throw new Error('El plan seleccionado no existe');
-        }
-
         //Obtenemos la fecha de hoy
         const fecha_inicio = new Date();
 
         // Calculamos la fecha de finalización en función de la duración del plan
         const fecha_fin = new Date(fecha_inicio);
-
-
+        
+        
         // Sumar meses, semanas y días según lo definido en el plan
         if (planSeleccionado.duracion_meses) {
-            fecha_fin.setMonth(fecha_fin.getMonth() + planSeleccionado.duracion_meses);
+                fecha_fin.setMonth(fecha_fin.getMonth() + planSeleccionado.duracion_meses);
         }
         if (planSeleccionado.duracion_semanas) {
             fecha_fin.setDate(fecha_fin.getDate() + (planSeleccionado.duracion_semanas * 7)); // Sumar semanas
@@ -41,14 +25,38 @@ const registroUsuario = async(gym_id, plan_id, username, password, nombre_comple
         if (planSeleccionado.duracion_dias) {
             fecha_fin.setDate(fecha_fin.getDate() + planSeleccionado.duracion_dias); // Sumar días
         }
-
+        
         //Crear la nueva membresía
         const nuevaMembresia = await Membresia.create({
-          usuario_id,
-          gym_id,
-          plan_id,
-          fecha_inicio,
-          fecha_fin
+            plan_id,
+            fecha_inicio,
+            fecha_fin
+        });
+
+        //Obtenemos el _id de la nueva membresía
+        const membresia_id = [nuevaMembresia._id];
+
+        // Hash de la contraseña
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        //Agregamos una imagen por defecto del entrenador
+        if(!imagen){
+            imagen = 'user.jpg';
+        }
+
+        //Agregamos una imagen por defecto del entrenador
+        if(!telefono){
+            telefono = null;
+        }
+
+        //Crear el usuario
+        const nuevoUsuario = await user.create({
+            membresia_id,
+            nombre_completo,
+            email,
+            password: hashedPassword,
+            telefono,
+            imagen
         });
 
         return { success: true, message: 'Registro de usuario exitoso', usuario: nuevoUsuario, membresia: nuevaMembresia };
@@ -127,7 +135,7 @@ const getMembresias = async (gymId, status, page = 1, limit = 10, search = '') =
                     fecha_fin: 1,
                     usuario_id: '$usuario._id',
                     nombre_completo: '$usuario.nombre_completo',
-                    username: '$usuario.username',
+                    email: '$usuario.email',
                     nombre_plan: '$plan.nombre',
                     _id: 0
                 }
