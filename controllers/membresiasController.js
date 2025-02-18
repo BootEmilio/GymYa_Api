@@ -27,7 +27,6 @@ const registroUsuario = async (req, res) => {
 //Controlador para ver membresias activas y expiradas
 const getMembresias = async (req, res) => {
   try {
-      const gym_id = req.user.gym_id; // Usamos el gym_id del token
       const { gymId, status } = req.params; // Usamos el gymId y el status de la URL
       const { page = 1, limit = 10, search } = req.query; // Parámetros de paginación y búsqueda
 
