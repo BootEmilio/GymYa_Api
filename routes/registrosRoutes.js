@@ -6,8 +6,6 @@ const router = express.Router();
 
 //ruta para agregar el primer administrador
 router.post('/admin/registro', adminController.registro);
-// Ruta para registrar usuarios junto a sus membresías
-router.post('/user/registro', token, membresiasController.registroUsuario);
 //ruta para agregar el primer administrador
 router.post('/entrenador/registro', entrenadorController.registro);
 
