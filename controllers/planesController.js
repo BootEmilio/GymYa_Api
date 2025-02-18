@@ -165,7 +165,7 @@ const eliminarPlan = async (req, res) => {
         const eliminado = await planesService.eliminarPlan(planId, gymId);
 
         // Devolver el plan desactivado
-        return res.status(200).json({ message: 'Plan de membresía eliminado correctamente', plan: eliminado });
+        return res.status(200).json({ message: 'Plan de membresía eliminado correctamente'});
     } catch (error) {
         res.status(500).json({ error: 'Error al eliminar el plan de membresía' });
     }
