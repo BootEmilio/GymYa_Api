@@ -101,7 +101,7 @@ const getMembresias = async (gymId, status, page = 1, limit = 10, search = '') =
         }
 
         // Obtener los planes que contienen el gymId en su array de gym_ids
-        const planes = await Plan.find({ gym_ids: { $in: [new mongoose.Types.ObjectId(gymId)] } }).select('_id');
+        const planes = await plan.find({ gym_ids: { $in: [new mongoose.Types.ObjectId(gymId)] } }).select('_id');
         const planIds = planes.map(plan => plan._id); // Extraer los plan_id
 
         if (planIds.length === 0) {
