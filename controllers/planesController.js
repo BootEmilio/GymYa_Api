@@ -157,6 +157,11 @@ const eliminarPlan = async (req, res) => {
         const { planId, gymId } = req.params; // Obtenemos los _id del plan y del gimnasio desde la URL
         const adminGymIds = req.user.gym_id; // Array de gym_id del administrador
 
+        // Validar que se pasen todos los parametros
+        if(!planId || !gymId) {
+            return res.status(400).json({ error: 'Todos los datos son necesarios' });
+        }
+
         // Validar que el gymId esté en el array de gym_id del administrador
         if (!adminGymIds.includes(gymId)) {
             return res.status(403).json({ error: 'No tienes permisos para editar planes en este gimnasio' });
