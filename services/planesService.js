@@ -76,11 +76,12 @@ const eliminarPlan = async (planId, gymId) => {
     try {
         // "Eliminar" el plan estableciendo activa a false
         const planEliminado = await Plan.findOneAndUpdate(
-            { _id: planId, gym_id: gymId },
+            { _id: planId, gym_id: gymId, activa: true }, // Buscar solo planes activos
             { $set: { activa: false } }, // Cambiar el estado a inactivo
             { new: true }
         );
 
+        // Devolver el plan eliminado o null si no se encontró
         return planEliminado;
     } catch (error) {
         console.error('Error al eliminar el plan:', error);

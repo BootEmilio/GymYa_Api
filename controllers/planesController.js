@@ -157,17 +157,17 @@ const eliminarPlan = async (req, res) => {
         const { planId, gymId } = req.params; // Obtenemos los _id del plan y del gimnasio desde la URL
         const adminGymIds = req.user.gym_id; // Array de gym_id del administrador
 
-        // Validar que se pasen todos los parametros
-        if(!planId || !gymId) {
-            return res.status(400).json({ error: 'Todos los datos son necesarios' });
-        }
-
         // Validar que el gymId esté en el array de gym_id del administrador
         if (!adminGymIds.includes(gymId)) {
             return res.status(403).json({ error: 'No tienes permisos para editar planes en este gimnasio' });
         }
 
         const eliminado = await planesService.eliminarPlan(planId, gymId);
+
+        // Si no se encontró el plan
+        if (!eliminado) {
+            return res.status(404).json({ error: 'Plan de membresía no encontrado o ya eliminado' });
+        }
 
         // Devolver el plan desactivado
         return res.status(200).json({ message: 'Plan de membresía eliminado correctamente', plan: eliminado });
