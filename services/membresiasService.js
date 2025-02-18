@@ -13,7 +13,8 @@ const registroUsuario = async(plan_id, nombre_completo, email, password, telefon
 
         // Calculamos la fecha de finalización en función de la duración del plan
         const fecha_fin = new Date(fecha_inicio);
-        
+
+        const planSeleccionado = await plan.findById(plan_id);
         
         // Sumar meses, semanas y días según lo definido en el plan
         if (planSeleccionado.duracion_meses) {
