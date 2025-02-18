@@ -11,21 +11,12 @@ const authenticateUser = async (username, password) => {
     // Buscar el usuario por username
     const usuario = await user.findOne({ username });
 
-    if (!usuario) {
-      throw new Error('Usuario no encontrado');
-    }
-
-    // Verificar si el usuario existe y la contraseña es correcta
-    if (password !== usuario.password) {
-      throw new Error('Contraseña incorrecta');
-    }
-
     const token = jwt.sign(
       {
         id: usuario._id,
         username: usuario.username,
         role: 'user',
-        gym_id: usuario.gym_id
+        membresia_id: usuario.membresia_id
       },
       secretKey,
       { expiresIn: tokenExpiration }
