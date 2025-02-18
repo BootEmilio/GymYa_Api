@@ -1,13 +1,28 @@
+const user = require('../models/usuarios');
 const userAuthService = require('../services/userService');
+const bcrypt = require('bcryptjs');
 
 const loginUser = async (req, res) => {
-  const { username, password } = req.body;
-
-  if (!username || !password) {
-    return res.status(400).json({ message: 'Username y contraseña son requeridos' });
-  }
   try {
-    const authResult = await userAuthService.authenticateUser(username, password);
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ message: 'email y contraseña son requeridos' });
+    }
+
+    // Buscar el administrador por username
+    const usuario = await user.findOne({ email });  
+    if (!usuario) {
+      throw res.status(400).json({ message: 'Correo electronico no encontrado no encontrado'});
+    }
+
+    // Comparar la contraseña usando bcrypt
+    const isPasswordValid = await bcrypt.compare(password, usuario.password);
+    if (!isPasswordValid) {
+      throw res.status(400).json({ message: 'Contraseña incorrecta'});
+    }
+
+    const authResult = await userAuthService.authenticateUser(email, password);
 
     if (!authResult) {
       return res.status(401).json({ message: 'Credenciales inválidas' });
