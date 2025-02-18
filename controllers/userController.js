@@ -10,7 +10,7 @@ const loginUser = async (req, res) => {
       return res.status(400).json({ message: 'email y contraseña son requeridos' });
     }
 
-    // Buscar el administrador por username
+    // Buscar el usuario por email
     const usuario = await user.findOne({ email });  
     if (!usuario) {
       throw res.status(400).json({ message: 'Correo electronico no encontrado no encontrado'});
@@ -22,7 +22,7 @@ const loginUser = async (req, res) => {
       throw res.status(400).json({ message: 'Contraseña incorrecta'});
     }
 
-    const authResult = await userAuthService.authenticateUser(email, password);
+    const authResult = await userAuthService.authenticateUser(usuario);
 
     if (!authResult) {
       return res.status(401).json({ message: 'Credenciales inválidas' });

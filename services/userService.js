@@ -6,16 +6,8 @@ const secretKey = process.env.JWT_SECRET;
 const tokenExpiration = process.env.JWT_EXPIRATION || '2h';
 
 // Servicio para hacer login como usuario
-const authenticateUser = async (email, password) => {
+const authenticateUser = async (usuario) => {
   try {
-    // Buscar el usuario por username
-    const usuario = await user.findOne({ email });
-
-    // Verificar si el usuario existe y la contraseña es correcta
-    if (password !== usuario.password) {
-      throw new Error('Contraseña incorrecta');
-    }
-
     const token = jwt.sign(
       {
         id: usuario._id,
