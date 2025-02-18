@@ -1,4 +1,4 @@
-const user   = require('../models/usuarios');
+const user = require('../models/usuarios');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
@@ -19,7 +19,7 @@ const authenticateUser = async (email, password) => {
     const token = jwt.sign(
       {
         id: usuario._id,
-        username: usuario.username,
+        email: usuario.email,
         role: 'user',
         membresia_id: usuario.membresia_id
       },
