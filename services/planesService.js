@@ -71,15 +71,19 @@ const editarPlanes = async (planId, gymId, updateFields, unsetFields) => {
     }
 };
 
-// Servicio para "eliminar" planes de membresía (desactivarlo)
 const eliminarPlan = async (planId, gymId) => {
     try {
         // Actualizar el plan para marcarlo como inactivo
         const planEliminado = await Plan.findOneAndUpdate(
-            { _id: planId, gym_id: gymId }, // Encontrar por _id y gym_id
-            { $set: { activa: false } },    // Cambiar el estado a inactivo
+            { _id: planId, gym_id: { $in: [gymId] } }, // Usar $in para verificar si el gymId está en el array de gym_id
+            { $set: { activa: false } },               // Cambiar el estado a inactivo
             { new: true }
         );
+
+        // Verificar si se encontró y eliminó el plan
+        if (!planEliminado) {
+            return null; // Retornar null si no se encontró el plan
+        }
 
         // Devolver el plan eliminado
         return planEliminado;
