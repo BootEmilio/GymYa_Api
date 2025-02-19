@@ -24,7 +24,7 @@ const registroUsuario = async (req, res) => {
   }
 };
 
-//Controlador para ver membresias activas y expiradas
+//Controlador para ver membresias activas y expiradas de un gimnasio
 const getMembresias = async (req, res) => {
   try {
       const { gymId, status } = req.params; // Usamos el gymId y el status de la URL
@@ -59,10 +59,11 @@ const getMembresias = async (req, res) => {
   }
 };
 
-//Controlador para ver membresias activas y expiradas
-const getMembresia = async (req, res) => {
+//Controlador para ver membresias activas y expiradas del usuario
+const getMembresiasUser = async (req, res) => {
   try {
-    const { id: usuario_id } = req.user || {}; //Obtenemos el _id del token del usuario
+    const {membresiaId} = req.params; //Obtenemos el id de la membresía por medio de la URL
+    const userMembresiaIds = req.user.membresia_id; //El array de 
     if(!usuario_id){
         return res.status(400).json({ error: 'No se encontró el usuario en la solicitud.' });
     }
@@ -101,4 +102,4 @@ const aplazarMembresia = async (req, res) => {
   }
 }; 
 
-module.exports = { registroUsuario, getMembresias,  getMembresia, aplazarMembresia };
+module.exports = { registroUsuario, getMembresias,  getMembresiasUser, aplazarMembresia };

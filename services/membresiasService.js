@@ -67,14 +67,9 @@ const registroUsuario = async(plan_id, nombre_completo, email, password, telefon
     }
 };
 
-//Servicio para obtener las membresías activas o inactivas de un gimnasio
+//Servicio para mosotrar las membresías activas o expiradas de un gimnasio
 const getMembresias = async (gymId, status, page = 1, limit = 10, search = '') => {
     try {
-        // Verificar si gymId es un ObjectId válido
-        if (!mongoose.Types.ObjectId.isValid(gymId)) {
-            throw new Error('El gymId proporcionado no es válido');
-        }
-
         // Establecer la condición de fecha según el estado (activas o expiradas)
         let dateCondition;
         if (status === 'activas') {
@@ -85,12 +80,12 @@ const getMembresias = async (gymId, status, page = 1, limit = 10, search = '') =
             throw new Error('El estado proporcionado no es válido. Use "activas" o "expiradas".');
         }
 
-        // Crear la condición de búsqueda (para nombre o username del usuario)
+        // Crear la condición de búsqueda (para nombre o email del usuario)
         let searchCondition = {};
         if (search) {
             const searchConditions = [
-                { 'usuario.nombre_completo': { $regex: search, $options: 'i' } },
-                { 'usuario.email': { $regex: search, $options: 'i' } }
+                { 'nombre_completo': { $regex: search, $options: 'i' } },
+                { 'email': { $regex: search, $options: 'i' } }
             ];
 
             // Solo agregar la búsqueda por _id si search es un ObjectId válido
@@ -101,51 +96,43 @@ const getMembresias = async (gymId, status, page = 1, limit = 10, search = '') =
             searchCondition = { $or: searchConditions };
         }
 
-        // Obtener los planes que contienen el gymId en su array de gym_ids
-        const planes = await plan.find({ gym_id: { $in: [new mongoose.Types.ObjectId(gymId)] } }).select('_id');
-        const planIds = planes.map(plan => plan._id); // Extraer los plan_id
-
-        if (planIds.length === 0) {
-            return { membresias: [], total: 0 }; // Si no hay planes, devolver vacío
-        }
-
-        // Agregación en MongoDB con la condición dinámica
-        const membresias = await Membresia.aggregate([
+        // Agregación en MongoDB desde Usuario
+        const membresias = await user.aggregate([
             {
-                $match: {
-                    fecha_fin: dateCondition, // Condición dinámica según el estado
-                    plan_id: { $in: planIds } // Filtrar por plan_id en los planes del gimnasio
-                }
+                $match: searchCondition // Aplicar la condición de búsqueda si se proporcionó
             },
             {
                 $lookup: {
-                    from: 'usuarios', // Colección usuarios
-                    localField: 'usuario_id', // Campo en membresias
-                    foreignField: '_id', // Campo en usuarios
-                    as: 'usuario'
+                    from: 'membresias', // Colección membresias
+                    localField: 'membresia_id', // Campo en usuarios
+                    foreignField: '_id', // Campo en membresias
+                    as: 'membresias'
                 }
             },
-            { $unwind: '$usuario' }, // Descomprimir el array de usuarios
+            { $unwind: '$membresias' }, // Descomprimir el array de membresías
             {
                 $lookup: {
                     from: 'planes', // Colección planes
-                    localField: 'plan_id', // Campo en membresias
+                    localField: 'membresias.plan_id', // Campo en membresias
                     foreignField: '_id', // Campo en planes
                     as: 'plan'
                 }
             },
             { $unwind: '$plan' }, // Descomprimir el array de planes
             {
-                $match: searchCondition // Aplicar la condición de búsqueda si se proporcionó
+                $match: {
+                    'plan.gym_id': new mongoose.Types.ObjectId(gymId), // Filtrar por gym_id
+                    'membresias.fecha_fin': dateCondition // Condición dinámica según el estado
+                }
             },
             {
                 $project: {
-                    membresia_id: '$_id', // Seleccionamos los campos deseados
-                    fecha_inicio: 1,
-                    fecha_fin: 1,
-                    usuario_id: '$usuario._id',
-                    nombre_completo: '$usuario.nombre_completo',
-                    email: '$usuario.email',
+                    membresia_id: '$membresias._id', // Seleccionamos los campos deseados
+                    fecha_inicio: '$membresias.fecha_inicio',
+                    fecha_fin: '$membresias.fecha_fin',
+                    usuario_id: '$_id',
+                    nombre_completo: '$nombre_completo',
+                    email: '$email',
                     nombre_plan: '$plan.nombre',
                     _id: 0
                 }
