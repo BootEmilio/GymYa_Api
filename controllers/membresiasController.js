@@ -77,6 +77,22 @@ const getMembresiasUser = async (req, res) => {
   }
 };
 
+//Controlador para ver una membresía del usuario
+const getMembresia = async (req, res) => {
+  try {
+    const { membresiaId } = req.params; // Obtenemos el _id de la membresía por parte de la URL
+
+      // Llamar al servicio para obtener la membresía
+      const membresia = await membresiasService.getMembresia(membresiaId);
+
+      // Devolver los resultados como respuesta
+      res.status(200).json(membresia);
+  } catch (error) { 
+      console.error('Error en obtener Membresia:', error);
+      res.status(500).json({ error: 'Ocurrió un error al obtener la membresía.' });
+  }
+};
+
 //controlador para aplazar las membresías existentes
 const aplazarMembresia = async (req, res) => {
   try{
@@ -101,4 +117,4 @@ const aplazarMembresia = async (req, res) => {
   }
 }; 
 
-module.exports = { registroUsuario, getMembresias,  getMembresiasUser, aplazarMembresia };
+module.exports = { registroUsuario, getMembresias,  getMembresiasUser, getMembresia, aplazarMembresia };

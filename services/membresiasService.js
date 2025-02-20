@@ -215,6 +215,24 @@ const getMembresiasUser = async (usuario_id) => {
     }
 };
 
+const getMembresia = async (membresiaId) => {
+    try {
+        // Buscar la membresía por su _id
+        const membresia = await Membresia.findById(membresiaId);
+
+        // Verificar si no se encontró la membresía
+        if (!membresia) {
+            return { error: 'No se ha encontrado la membresía con ese ID.' };
+        }
+
+        // Retornar los datos de la membresía
+        return membresia;
+    } catch (error) {
+        console.error('Error al obtener la membresía:', error);
+        throw new Error('Error al obtener la membresía');
+    }
+};
+
 //Servicio para aplazar fecha_fin
 const aplazarMembresia = async(membresia_id, plan_id) => {
     try{
@@ -286,4 +304,4 @@ const aplazarMembresia = async(membresia_id, plan_id) => {
     }
 };
 
-module.exports = { registroUsuario, getMembresias, getMembresiasUser, aplazarMembresia };
+module.exports = { registroUsuario, getMembresias, getMembresiasUser, getMembresia, aplazarMembresia };
