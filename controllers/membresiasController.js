@@ -59,19 +59,18 @@ const getMembresias = async (req, res) => {
   }
 };
 
-//Controlador para ver membresias activas y expiradas del usuario
+//Controlador para ver membresias activas y expiradas de un usuario
 const getMembresiasUser = async (req, res) => {
   try {
-    const {membresiaId} = req.params; //Obtenemos el id de la membresía por medio de la URL
-    const userMembresiaIds = req.user.membresia_id; //El array de 
-    if(!usuario_id){
-        return res.status(400).json({ error: 'No se encontró el usuario en la solicitud.' });
+    const userId = req.user.id; //Obtenemos el id del usuario por medio de su token
+    if(!userId){
+        return res.status(400).json({ error: 'No se encontró el usuario.' });
     }
       // Llamar al servicio para obtener las membresía
-      const membresia = await membresiasService.getMembresia(usuario_id);
+      const membresias = await membresiasService.getMembresiasUser(userId);
 
       // Devolver los resultados como respuesta
-      res.status(200).json(membresia);
+      res.status(200).json(membresias);
   } catch (error) { 
       console.error('Error en obtener Membresia:', error);
       res.status(500).json({ error: 'Ocurrió un error al obtener la membresía.' });

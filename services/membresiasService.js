@@ -161,39 +161,43 @@ const getMembresias = async (gymId, status, page = 1, limit = 10, search = '') =
     }
 };
 
-//Servicio para mostrar la membresía del usuario
-const getMembresia = async (usuario_id) =>{
-    try{
+//Servicio para mostrar las membresías del usuario
+const getMembresiasUser = async (usuario_id) => {
+    try {
+        // Obtener el usuario por su ID para extraer su array de membresias_id
+        const usuario = await user.findById(usuario_id).populate('membresia_id');
+
+        // Obtener las membresías relacionadas con el usuario
+        const membresias_ids = usuario.membresia_id.map(m => m._id);
+
+        // Realizamos la agregación
         const resultado = await Membresia.aggregate([
-            { $match: { usuario_id: new mongoose.Types.ObjectId(usuario_id) } },
-            {
-                $lookup: {
-                    from: 'usuarios', // Colección usuarios
-                    localField: 'usuario_id', // Campo en membresias
-                    foreignField: '_id', // Campo en usuarios
-                    as: 'usuario'
-                }
-            },
-            { $unwind: '$usuario' },
+            { $match: { _id: { $in: membresias_ids } } }, // Buscar todas las membresías en el array del usuario
             {
                 $lookup: {
                     from: 'planes', // Colección planes
-                    localField: 'plan_id', // Campo en membresias
+                    localField: 'plan_id', // Campo en membresías
                     foreignField: '_id', // Campo en planes
                     as: 'plan'
                 }
             },
             { $unwind: '$plan' }, // Descomprimir el array de planes
             {
+                $lookup: {
+                    from: 'gimnasios', // Colección gimnasios
+                    localField: 'gym_id', // Campo en membresías
+                    foreignField: '_id', // Campo en gimnasios
+                    as: 'gimnasios' // Array de gimnasios
+                }
+            },
+            {
                 $project: {
-                    membresia_id: '$_id', // Seleccionamos los campos deseados
+                    membresia_id: '$_id', // Seleccionar los campos deseados
                     fecha_inicio: 1,
                     fecha_fin: 1,
-                    usuario_id: '$usuario._id',
-                    nombre_completo: '$usuario.nombre_completo',
-                    username: '$usuario.username',
                     plan_id: '$plan._id',
                     nombre_plan: '$plan.nombre',
+                    gimnasios: '$gimnasios.nombre', // Obtener solo los nombres de los gimnasios
                     _id: 0
                 }
             }
@@ -201,12 +205,13 @@ const getMembresia = async (usuario_id) =>{
 
         // Verificar si no se encontraron membresías
         if (resultado.length === 0) {
-            return { error: 'No se ha encontrado ninguna membresía con ese usuario_id' };
+            return { error: 'No se ha encontrado ninguna membresía para este usuario.' };
         }
 
         return resultado;
-    }catch(error){
-        throw new Error('Error al obtener la membresía del usuario');
+    } catch (error) {
+        console.error('Error al obtener las membresías del usuario:', error);
+        throw new Error('Error al obtener las membresías del usuario');
     }
 };
 
@@ -281,4 +286,4 @@ const aplazarMembresia = async(membresia_id, plan_id) => {
     }
 };
 
-module.exports = { registroUsuario, getMembresias, getMembresia, aplazarMembresia };
+module.exports = { registroUsuario, getMembresias, getMembresiasUser, aplazarMembresia };
