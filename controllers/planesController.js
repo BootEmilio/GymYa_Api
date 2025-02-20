@@ -71,19 +71,30 @@ const mostrarPlanes = async (req, res) => {
     }
 };
 
-//Controlador para que un usuario vea los planes de membresía disponibles
+// Controlador para que un usuario vea los planes de membresía disponibles
 const mostrarPlanesUser = async (req, res) => {
-    try{
-        const {membresiaId} = req.params; //obtenemos el _id por la URL
+    try {
+        const { membresiaId } = req.params; // Obtener el _id de la URL
 
-        //Llamar al servicio para obtener los planes de membresía
+        // Validar que el membresiaId exista en la URL
+        if (!membresiaId) {
+            return res.status(400).json({ error: 'Falta el ID de la membresía en los parámetros' });
+        }
+
+        // Llamar al servicio para obtener los planes de membresía
         const planes = await planesService.mostrarPlanesUser(membresiaId);
 
+        if (!planes || planes.length === 0) {
+            return res.status(404).json({ error: 'No se encontraron planes de membresía disponibles' });
+        }
+
+        // Enviar los planes obtenidos
         res.status(200).json(planes);
-    }catch (error){
-        res.status(500).json({error: 'Error al mostrar planes de membresía'});
+    } catch (error) {
+        console.error('Error al mostrar planes de membresía:', error);
+        res.status(500).json({ error: 'Error interno al mostrar planes de membresía' });
     }
-}
+};
 
 //Controlador para editar planes de membresía
 const editarPlanes = async (req, res) => {
