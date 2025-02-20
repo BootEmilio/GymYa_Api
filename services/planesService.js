@@ -47,6 +47,47 @@ const mostrarPlanes = async (gymId) => {
     }
 };
 
+//Servicio para que un usuario vea los planes de membresía disponibles
+const mostrarPlanesUser = async (membresiaId) => {
+    try {
+        // Buscar la membresía por su ID para obtener el plan_id
+        const membresia = await Membresia.findById(membresiaId).populate('plan_id');
+
+        // Obtener los gym_id referenciados en el plan de la membresía
+        const gymIds = membresia.plan_id.gym_id;
+
+        // Buscar todos los planes de membresía que estén disponibles en los mismos gimnasios referenciados
+        const planesDisponibles = await Plan.aggregate([
+            { $match: { gym_id: { $in: gymIds } } }, // Filtrar los planes que tienen gimnasios en gym_id
+            {
+                $lookup: {
+                    from: 'gimnasios', // Colección de gimnasios
+                    localField: 'gym_id', // Campo gym_id en los planes
+                    foreignField: '_id', // Campo _id en la colección gimnasios
+                    as: 'gimnasios', // Asociar gimnasios a los planes
+                }
+            },
+            {
+                $project: {
+                    nombre: 1, // Mostrar el nombre del plan
+                    precio: 1, // Mostrar el precio del plan
+                    gimnasios: '$gimnasios.nombre', // Mostrar los nombres de los gimnasios
+                }
+            }
+        ]);
+
+        // Verificar si no se encontraron planes
+        if (planesDisponibles.length === 0) {
+            return { error: 'No se encontraron planes de membresía disponibles en estos gimnasios' };
+        }
+
+        return planesDisponibles;
+    } catch (error) {
+        console.error('Error al mostrar los planes de membresía:', error);
+        throw new Error('Error al mostrar los planes de membresía');
+    }
+};
+
 // Servicio para editar un plan existente de membresía
 const editarPlanes = async (planId, gymId, updateFields, unsetFields) => {
     try {
@@ -93,4 +134,4 @@ const eliminarPlan = async (planId, gymId) => {
     }
 };
 
-module.exports = { crearPlanes, mostrarPlanes, editarPlanes, eliminarPlan };
+module.exports = { crearPlanes, mostrarPlanes, mostrarPlanesUser, editarPlanes, eliminarPlan };

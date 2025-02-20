@@ -71,6 +71,20 @@ const mostrarPlanes = async (req, res) => {
     }
 };
 
+//Controlador para que un usuario vea los planes de membresía disponibles
+const mostrarPlanesUser = async (req, res) => {
+    try{
+        const {membresiaId} = req.params; //obtenemos el _id por la URL
+
+        //Llamar al servicio para obtener los planes de membresía
+        const planes = await planesService.mostrarPlanesUser(membresiaId);
+
+        res.status(200).json(planes);
+    }catch (error){
+        res.status(500).json({error: 'Error al mostrar planes de membresía'});
+    }
+}
+
 //Controlador para editar planes de membresía
 const editarPlanes = async (req, res) => {
     try {
@@ -176,4 +190,4 @@ const eliminarPlan = async (req, res) => {
     }
 };
 
-module.exports = { crearPlanes, mostrarPlanes, editarPlanes, eliminarPlan };
+module.exports = { crearPlanes, mostrarPlanes, mostrarPlanesUser, editarPlanes, eliminarPlan };
