@@ -1,5 +1,7 @@
 const membresiasService = require('../services/membresiasService');
 const User = require('../models/usuarios');
+const Membresia = require('../models/membresias');
+const plan = require('../models/planes');
 
 //Controlador para registrar usuarios con sus membresias
 const registroUsuario = async (req, res) => {
@@ -98,6 +100,18 @@ const aplazarMembresia = async (req, res) => {
   try{
     const { membresia_id } = req.params; // Obtenemos el id de la membresía en el URL
     const { plan_id } = req.body; // Obtenemos el id del plan por medio del body
+
+    //Buscamos la membresia por su _id
+    const membresiaExiste = await Membresia.findById(membresia_id);
+    if(!membresiaExiste){
+        throw new Error('La membresía no existe');
+    }
+
+    //Obtener el plan seleccionado
+    const planSeleccionado = await plan.findById(plan_id);
+    if(!planSeleccionado){
+        throw new Error('El plan seleccionado no existe');
+    }
 
     // Llamar al servicio para obtener aplazar las membresias
     const membresia = await membresiasService.aplazarMembresia(membresia_id, plan_id);

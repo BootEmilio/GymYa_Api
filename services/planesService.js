@@ -71,7 +71,11 @@ const mostrarPlanesUser = async (membresiaId) => {
             {
                 $project: {
                     nombre: 1, // Mostrar el nombre del plan
+                    descripcion: 1,
                     precio: 1, // Mostrar el precio del plan
+                    duracion_dias: 1,
+                    duracion_semanas: 1,
+                    duracion_meses: 1,
                     gimnasios: '$gimnasios.nombre', // Mostrar los nombres de los gimnasios
                 }
             }

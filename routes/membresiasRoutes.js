@@ -12,5 +12,5 @@ router.get('/membresias', token, membresiasController.getMembresiasUser);
 // Ruta para obtener una membresía del usuario
 router.get('/:membresiaId', token, membresiasController.getMembresia);
 // Ruta para aplazar las membresías existentes
-router.put('/membresias/:membresia_id', token, membresiasController.aplazarMembresia);
+router.put('/:membresia_id/aplazar', token, membresiasController.aplazarMembresia);
 module.exports = router;
