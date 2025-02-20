@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const UsuarioSchema = new mongoose.Schema({
-    membresia_id: [{ type: mongoose.Schema.Types.ObjectId, ref: 'membresia', required: true }],
+    membresia_id: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Membresia', required: true }],
     nombre_completo: { type: String, required: true },
     email: { type: String, required: true },
     password: { type: String, required: true },
