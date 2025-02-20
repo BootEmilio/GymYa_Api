@@ -1,4 +1,5 @@
 const Plan = require('../models/planes');
+const Membresia = require('../models/membresias');
 require('dotenv').config();
 
 // Servicio para agregar un tipo de plan de membresía
