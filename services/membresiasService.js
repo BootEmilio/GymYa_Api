@@ -26,9 +26,12 @@ const registroUsuario = async(plan_id, nombre_completo, email, password, telefon
         if (planSeleccionado.duracion_dias) {
             fecha_fin.setDate(fecha_fin.getDate() + planSeleccionado.duracion_dias); // Sumar días
         }
+
+        const gym_id = planSeleccionado.gym_id;
         
         //Crear la nueva membresía
         const nuevaMembresia = await Membresia.create({
+            gym_id,
             plan_id,
             fecha_inicio,
             fecha_fin
