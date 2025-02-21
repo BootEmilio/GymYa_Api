@@ -88,11 +88,17 @@ const verAsistencia = async (req, res) => {
 //Controlador para que el usuario vea todas sus asitencias agrupadas
 const verAsistenciasUser = async (req, res) => {
     try {
-        const usuario_id = req.user.id; // Obtener el usuario_id desde el token de autenticación
-        const { page = 1, limit = 5 } = req.query; // Parámetros opcionales de paginación
+        const { membresiaId } = req.params; // Obtener el _id de la membresía por medio de
+        const { page = 1, limit = 8 } = req.query; // Parámetros opcionales de paginación
+
+        //Buscamos el _id de la membresía
+        const membresia = await Membresia.findById(membresia_id);
+        if(!membresia) {
+            res.status(400).json({  error: 'La membresía no existe'});
+        }
 
         // Llamada al servicio para obtener las asistencias del usuario
-        const { asistencias, total } = await asistenciasService.verAsistenciasUser(usuario_id, parseInt(page), parseInt(limit));
+        const { asistencias, total } = await asistenciasService.verAsistenciasUser(membresiaId, parseInt(page), parseInt(limit));
 
         // Devolver la respuesta con los datos paginados
         res.status(200).json({

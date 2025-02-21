@@ -195,7 +195,7 @@ const verAsistencias = async (gym_id, fecha = null, search = '', page = 1, limit
 };
 
 //Servicio para que el usuario su última asistencia
-const verAsistencia = async (usuario_id) => { 
+const verAsistencia = async (membresiaId) => { 
     try {
         // Verificar si usuario_id es un ObjectId válido
         if (!mongoose.Types.ObjectId.isValid(usuario_id)) {
@@ -204,7 +204,7 @@ const verAsistencia = async (usuario_id) => {
 
         // Obtener la última asistencia de tipo "Entrada"
         const ultimaEntrada = await Asistencia.findOne({ 
-            usuario_id: new mongoose.Types.ObjectId(usuario_id), 
+            membresia_id: new mongoose.Types.ObjectId(membresiaId), 
             tipo_acceso: "Entrada" 
         }).sort({ fecha_hora: -1 }); // Ordenar por fecha_hora en orden descendente
 
@@ -222,15 +222,10 @@ const verAsistencia = async (usuario_id) => {
 };
 
 //Servicio para que el usuario vea sus asistencias (paginadas y poder cambiar los días a ver)
-const verAsistenciasUser = async (usuario_id, page = 1, limit = 5) => {
+const verAsistenciasUser = async (membresiaId, page = 1, limit = 5) => {
     try {
-        // Verificar si usuario_id es un ObjectId válido
-        if (!mongoose.Types.ObjectId.isValid(usuario_id)) {
-            throw new Error(`El usuario_id proporcionado no es válido: ${usuario_id}`);
-        }
-
         // Obtener todas las asistencias sin paginación
-        const asistencias = await Asistencia.find({ usuario_id: new mongoose.Types.ObjectId(usuario_id) })
+        const asistencias = await Asistencia.find({ membresia_id: new mongoose.Types.ObjectId(membresiaId) })
             .sort({ fecha_hora: -1 });
 
         // Paginar directamente las asistencias, sin emparejarlas
