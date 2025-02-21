@@ -23,9 +23,9 @@ const agregarEntrenador = async(req, res) => {
 //Registro de entrenador independiente
 const registro = async(req,res) => {
     try{
-        const {nombre_completo, especialidad, telefono, email, password, imagen} = req.body;
+        const {nombre_completo, especialidad, email, password, imagen} = req.body;
 
-        if(!nombre_completo || !especialidad || !telefono || !email || !password){
+        if(!nombre_completo || !especialidad || !email || !password){
             return res.status(400).json({ error: 'Todos los campos son obligatorios' });
         }
 
