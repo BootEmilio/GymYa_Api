@@ -41,7 +41,7 @@ const registro = async(req,res) => {
             return res.status(400).json({ error: 'El email ya está registrado' });
         }
 
-        const nuevoEntrenador = await entrenadoresService.registro(nombre_completo, especialidad, telefono, email, password, imagen);
+        const nuevoEntrenador = await entrenadoresService.registro(nombre_completo, especialidad, email, password, imagen);
         res.status(201).json(nuevoEntrenador);
     }catch(error){
         res.status(500).json({error: 'Error al agregar al entrenador'});

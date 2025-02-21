@@ -29,7 +29,7 @@ const agregarEntrenador = async(gym_id, nombre_completo, especialidad, horario, 
 };
 
 //Servicio para que un entrenador independiente se registre
-const registro = async(nombre_completo, especialidad, telefono, email, password, imagen) => {
+const registro = async(nombre_completo, especialidad, email, password, imagen) => {
     try{
         //Agregamos una imagen por defecto del entrenador
         if(!imagen){
@@ -43,7 +43,6 @@ const registro = async(nombre_completo, especialidad, telefono, email, password,
            nombre_completo,
            especialidad,
            independiente: true,
-           telefono,
            email,
            password: hashedPassword,
            imagen
