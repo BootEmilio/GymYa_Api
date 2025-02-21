@@ -18,10 +18,10 @@ const registrarAsistencia = async (gymId, membresiaId, fecha_hora) => {
 
         //Creamos la asistencia
         const nuevaAsistencia = await Asistencia.create({
-            membresiaId,
-            gymId,
-            tipo_acceso,
-            fecha_hora
+            membresia_id: membresiaId,
+            gym_id: gymId,
+            tipo_acceso: tipo_acceso,
+            fecha_hora: fecha_hora
         })
 
         //Si es una entrada, programamos la salida después de x tiempo (ahora es un minuto)
@@ -42,10 +42,10 @@ const registrarAsistencia = async (gymId, membresiaId, fecha_hora) => {
                     // Usar la fecha de entrada y sumarle el tiempo adicional (3 horas)
                     const fechaSalidaAutomatica = new Date(nuevaAsistencia.fecha_hora.getTime() + AUTO_LOGOUT_TIME);
                     await Asistencia.create({
-                        membresiaId,
-                        gymId,
+                        membresia_id: membresiaId,
+                        gym_id: gymId,
                         tipo_acceso: 'Salida',
-                        fechaSalidaAutomatica // Fecha actual, cuando se registra la salida automática
+                        fecha_hora: fechaSalidaAutomatica // Fecha actual, cuando se registra la salida automática
                     });
 
                     console.log('Salida automática registrada para el usuario:', membresia.usuario_id);
