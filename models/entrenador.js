@@ -10,6 +10,6 @@ const EntrenadorSchema = new mongoose.Schema({
     email: { type: String, unique: true },
     password: { type: String },
     imagen: { type: String, required: true }
-});
+}, { collection: 'entrenadores' });
 
 module.exports = mongoose.model('Entrenador', EntrenadorSchema);
