@@ -1,28 +1,13 @@
 const Asistencia = require('../models/asistencias');
-const Membresia = require('../models/membresias');
 const mongoose = require('mongoose')
-//const User = require('../models/usuarios');
-//const Plan = require('../models/planes');
 
 //Servicio para extraer datos del código QR y registrar así una asistencia (entrada/salida)
-const registrarAsistencia = async (membresia_id) => {
+const registrarAsistencia = async (gymId, membresiaId, fecha_hora) => {
     try{
-        //Buscamos el usuario_id de la membresía
-        const membresia = await Membresia.findById(membresia_id);
-        if(!membresia) {
-            throw new Error('La membresía no existe');
-        }
-
-        fechaFin = membresia.fecha_fin;
-        // Verificamos que la fecha_fin dentro del QR es mayor a la fecha actual
-        if(fechaFin < new Date()) {
-            throw new Error('Su membresía esta expirada, no tiene acceso al gimnasio');
-        }
-
-        //Buscamos su último registro de asistencia del usuario dentro del gimnasio
+        //Buscamos el último registro de asistencia de la membresía dentro del gimnasio
         const ultimaAsistencia = await Asistencia.findOne({
-            usuario_id: membresia.usuario_id,
-            gym_id: membresia.gym_id
+            membresia_id: membresiaId,
+            gym_id: gymId
         }).sort({ fecha_hora: -1 }); //Ordenar por las más recientes
 
         let tipo_acceso = 'Entrada'; //Valor por defecto
@@ -33,30 +18,34 @@ const registrarAsistencia = async (membresia_id) => {
 
         //Creamos la asistencia
         const nuevaAsistencia = await Asistencia.create({
-            usuario_id: membresia.usuario_id,
-            gym_id: membresia.gym_id,
+            membresiaId,
+            gymId,
             tipo_acceso,
-            fecha_hora: new Date()
+            fecha_hora
         })
 
         //Si es una entrada, programamos la salida después de x tiempo (ahora es un minuto)
         if(tipo_acceso === 'Entrada') {
+            const AUTO_LOGOUT_TIME = 3 * 60 * 60 * 1000; // 3 horas en milisegundos (3 * 60 * 60 * 1000)
+
             setTimeout(async () => {
                 // Verificar si ya se registró una salida manualmente en este tiempo
                 const salidaRegistrada = await Asistencia.findOne({
-                    usuario_id: membresia.usuario_id,
-                    gym_id: membresia.gym_id,
+                    membresia_id: membresiaId,
+                    gym_id: gymId,
                     tipo_acceso: 'Salida',
                     fecha_hora: { $gte: nuevaAsistencia.fecha_hora } // Buscar salidas después de esta entrada
                 });
 
                 // Si no se registró una salida, crearla automáticamente
                 if (!salidaRegistrada) {
+                    // Usar la fecha de entrada y sumarle el tiempo adicional (3 horas)
+                    const fechaSalidaAutomatica = new Date(nuevaAsistencia.fecha_hora.getTime() + AUTO_LOGOUT_TIME);
                     await Asistencia.create({
-                        usuario_id: membresia.usuario_id,
-                        gym_id: membresia.gym_id,
+                        membresiaId,
+                        gymId,
                         tipo_acceso: 'Salida',
-                        fecha_hora: new Date() // Fecha actual, cuando se registra la salida automática
+                        fechaSalidaAutomatica // Fecha actual, cuando se registra la salida automática
                     });
 
                     console.log('Salida automática registrada para el usuario:', membresia.usuario_id);

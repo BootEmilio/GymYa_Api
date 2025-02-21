@@ -1,16 +1,30 @@
 const asistenciasService = require('../services/asistenciasService');
+const Membresia = require('../models/membresias');
 
 //Controlador para que el registre las entradas y salidas (por ahora por medio de peticiones, cambiar para registro de QR)
 const registrarAsistencia = async (req, res) => {
     try{
-        const { membresia_id } = req.body; //Obtener los datos de la petición
+        const { gymId } = req.params; // Obtenemos los datos de la URL
+        const { membresia_id, fecha_hora } = req.body; //Obtener los datos de la petición
 
         //Validar que se pasaron todos los datos
-        if(!membresia_id) {
+        if(!membresia_id || !fecha_hora) {
             return res.status(400).json({ error: 'Todos los campos son obligatorios' });
         }
 
-        const nuevaAsistencia = await asistenciasService.registrarAsistencia(membresia_id);
+        //Buscamos el _id de la membresía
+        const membresia = await Membresia.findById(membresia_id);
+        if(!membresia) {
+            res.status(400).json({  error: 'La membresía no existe'});
+        }
+
+        const fechaFin = membresia.fecha_fin;
+        // Verificamos que la fecha_fin dentro del QR es mayor a la fecha actual
+        if(fechaFin < new Date()) {
+            res.status(400).json({ error: 'Su membresía esta expirada, no tiene acceso al gimnasio'});
+        }
+
+        const nuevaAsistencia = await asistenciasService.registrarAsistencia(gymId, membresia_id, fecha_hora);
 
         res.status(201).json(nuevaAsistencia);
     }catch(error){

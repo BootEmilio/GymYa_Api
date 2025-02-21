@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
 
 const AsistenciaSchema = new mongoose.Schema({
-    usuario_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario', required: true },
-    gym_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Gym', required: true },
+    membresia_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Membresias', required: true },
+    gym_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Gimnasios', required: true },
     tipo_acceso: { type: String, required: true },
-    fecha_hora: { type: Date, default: Date.now}
+    fecha_hora: { type: Date, required: true}
 });
 
 module.exports = mongoose.model('Asistencia', AsistenciaSchema);

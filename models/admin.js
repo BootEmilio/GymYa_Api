@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const AdminSchema = new mongoose.Schema({
-    gym_id: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Gym', required: true }],
+    gym_id: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Gimnasio', required: true }],
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     nombre_completo: { type: String, required: true },
