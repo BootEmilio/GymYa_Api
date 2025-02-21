@@ -29,12 +29,6 @@ const registro = async(req,res) => {
             return res.status(400).json({ error: 'Todos los campos son obligatorios' });
         }
 
-        // Verificar si el teléfono ya existe
-        const telefonoExistente = await Entrenador.findOne({ telefono });
-        if (telefonoExistente) {
-            return res.status(400).json({ error: 'El teléfono ya está registrado' });
-        }
-
         // Verificar si el email ya existe
         const emailExistente = await Entrenador.findOne({ email });
         if (emailExistente) {
