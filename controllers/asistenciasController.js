@@ -92,7 +92,7 @@ const verAsistenciasUser = async (req, res) => {
         const { page = 1, limit = 8 } = req.query; // Parámetros opcionales de paginación
 
         //Buscamos el _id de la membresía
-        const membresia = await Membresia.findById(membresia_id);
+        const membresia = await Membresia.findById(membresiaId);
         if(!membresia) {
             res.status(400).json({  error: 'La membresía no existe'});
         }
