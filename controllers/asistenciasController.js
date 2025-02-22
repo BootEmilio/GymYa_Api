@@ -35,7 +35,7 @@ const registrarAsistencia = async (req, res) => {
 //Controlador para que el admin vea las asistencias del día u otra fecha
 const verAsistencias = async (req, res) => {
     try {
-        const gym_id = req.user.gym_id; // Obtener el gym_id desde el token del usuario
+        const gym_id = req.params; // Obtener el gym_id desde la url
         const { fecha, search, page = 1, limit = 10 } = req.query; // Parámetros opcionales
 
         // Llamada al servicio para obtener las asistencias paginadas
@@ -60,9 +60,15 @@ const verAsistencias = async (req, res) => {
 //Controlador para ver última asistencia
 const verAsistencia = async (req, res) => {
     try {
-        const { id: usuario_id } = req.user || {}; //Obtenemos el _id del token del usuario
+        const { membresiaId } = req.params; //Obtenemos el _id de la URL
 
-        const ultimaEntrada = await asistenciasService.verAsistencia(usuario_id);
+        //Buscamos el _id de la membresía
+        const membresia = await Membresia.findById(membresiaId);
+        if(!membresia) {
+            res.status(400).json({  error: 'La membresía no existe'});
+        }
+
+        const ultimaEntrada = await asistenciasService.verAsistencia(membresiaId);
 
         if (!ultimaEntrada) {
             return res.status(404).json({

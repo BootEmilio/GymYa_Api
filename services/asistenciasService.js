@@ -194,14 +194,9 @@ const verAsistencias = async (gym_id, fecha = null, search = '', page = 1, limit
     }
 };
 
-//Servicio para que el usuario su última asistencia
+//Servicio para que el usuario vea su última asistencia
 const verAsistencia = async (membresiaId) => { 
     try {
-        // Verificar si usuario_id es un ObjectId válido
-        if (!mongoose.Types.ObjectId.isValid(usuario_id)) {
-            throw new Error(`El usuario_id proporcionado no es válido: ${usuario_id}`);
-        }
-
         // Obtener la última asistencia de tipo "Entrada"
         const ultimaEntrada = await Asistencia.findOne({ 
             membresia_id: new mongoose.Types.ObjectId(membresiaId), 
