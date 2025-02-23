@@ -215,18 +215,23 @@ const getMembresiasUser = async (usuario_id) => {
     }
 };
 
+//Servicio para que el usuario tenga su membresía
 const getMembresia = async (membresiaId) => {
     try {
         // Buscar la membresía por su _id
         const membresia = await Membresia.findById(membresiaId);
 
-        // Verificar si no se encontró la membresía
-        if (!membresia) {
-            return { error: 'No se ha encontrado la membresía con ese ID.' };
-        }
+        // Buscar el plan asociado a la membresía
+        const plan = await Plan.findById(membresia.plan_id);
+
+        // Crear un objeto con los datos de la membresía y el nombre del plan
+        const respuesta = {
+            ...membresia.toObject(), // Convertir el documento de Mongoose a un objeto plano
+            nombrePlan: plan.nombre // Agregar el nombre del plan
+        };
 
         // Retornar los datos de la membresía
-        return membresia;
+        return respuesta;
     } catch (error) {
         console.error('Error al obtener la membresía:', error);
         throw new Error('Error al obtener la membresía');
