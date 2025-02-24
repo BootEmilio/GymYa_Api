@@ -18,6 +18,11 @@ const registrarAsistencia = async (req, res) => {
             res.status(400).json({  error: 'La membresía no existe'});
         }
 
+        // Verificar que el gymId esté en el array gym_id de la membresía
+        if (!membresia.gym_id.includes(gymId)) {
+            return res.status(400).json({ error: 'El gimnasio no está asociado a esta membresía, no tiene acceso' });
+        }
+
         const fechaFin = membresia.fecha_fin;
         // Verificamos que la fecha_fin dentro del QR es mayor a la fecha actual
         if(fechaFin < new Date()) {
