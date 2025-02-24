@@ -221,7 +221,7 @@ const getMembresia = async (membresiaId) => {
         // Realizar una agregación para obtener la membresía con el nombre del plan
         const membresia = await Membresia.aggregate([
             // Filtra la membresía por su _id
-            { $match: { _id: mongoose.Types.ObjectId(membresiaId) } },
+            { $match: { _id: new mongoose.Types.ObjectId(membresiaId) } },
 
             // Realiza un "join" con la colección de Planes usando el campo plan_id
             {
