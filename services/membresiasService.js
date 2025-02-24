@@ -218,20 +218,42 @@ const getMembresiasUser = async (usuario_id) => {
 //Servicio para que el usuario tenga su membresía
 const getMembresia = async (membresiaId) => {
     try {
-        // Buscar la membresía por su _id
-        const membresia = await Membresia.findById(membresiaId);
+        // Realizar una agregación para obtener la membresía con el nombre del plan
+        const membresia = await Membresia.aggregate([
+            // Filtra la membresía por su _id
+            { $match: { _id: mongoose.Types.ObjectId(membresiaId) } },
 
-        // Buscar el plan asociado a la membresía
-        const plan = await Plan.findById(membresia.plan_id);
+            // Realiza un "join" con la colección de Planes usando el campo plan_id
+            {
+                $lookup: {
+                    from: 'planes', // Nombre de la colección de Planes
+                    localField: 'plan_id', // Campo en la colección Membresia
+                    foreignField: '_id', // Campo en la colección Plan
+                    as: 'plan' // Nombre del campo donde se almacenará el resultado del join
+                }
+            },
 
-        // Crear un objeto con los datos de la membresía y el nombre del plan
-        const respuesta = {
-            ...membresia.toObject(), // Convertir el documento de Mongoose a un objeto plano
-            nombrePlan: plan.nombre // Agregar el nombre del plan
-        };
+            // Descomponer el array "plan" (resultado del $lookup) en un objeto
+            { $unwind: '$plan' },
 
-        // Retornar los datos de la membresía
-        return respuesta;
+            // Proyectar los campos que deseas devolver
+            {
+                $project: {
+                    _id: 1, // Incluir el _id de la membresía
+                    fecha_inicio: 1, // Incluir la fecha de inicio de la membresía
+                    fecha_fin: 1, // Incluir la fecha de fin de la membresía
+                    nombrePlan: '$plan.nombre' // Incluir el nombre del plan
+                }
+            }
+        ]);
+
+        // Verificar si no se encontró la membresía
+        if (membresia.length === 0) {
+            return { error: 'No se ha encontrado la membresía con ese ID.' };
+        }
+
+        // Retornar los datos de la membresía con el nombre del plan
+        return membresia[0];
     } catch (error) {
         console.error('Error al obtener la membresía:', error);
         throw new Error('Error al obtener la membresía');
