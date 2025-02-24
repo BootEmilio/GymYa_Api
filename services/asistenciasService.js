@@ -217,7 +217,7 @@ const verAsistencia = async (membresiaId) => {
             {
                 $lookup: {
                     from: 'gimnasios', // Nombre de la colección de Gimnasios
-                    localField: 'gimnasio_id', // Campo en la colección Asistencia
+                    localField: 'gym_id', // Campo en la colección Asistencia
                     foreignField: '_id', // Campo en la colección Gimnasio
                     as: 'gimnasio' // Nombre del campo donde se almacenará el resultado del join
                 }
