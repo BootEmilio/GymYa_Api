@@ -98,11 +98,11 @@ const getMembresia = async (req, res) => {
 //controlador para aplazar las membresías existentes
 const aplazarMembresia = async (req, res) => {
   try{
-    const { membresia_id } = req.params; // Obtenemos el _id de la membresía en el URL
+    const { membresiaId } = req.params; // Obtenemos el _id de la membresía en el URL
     const { plan_id } = req.body; // Obtenemos el id del plan por medio del body
 
     //Buscamos la membresia por su _id
-    const membresiaExiste = await Membresia.findById(membresia_id);
+    const membresiaExiste = await Membresia.findById(membresiaId);
     if(!membresiaExiste){
       return res.status(400).json({error: 'La membresía no existe'});
     }
@@ -114,7 +114,7 @@ const aplazarMembresia = async (req, res) => {
     }
 
     // Llamar al servicio para obtener aplazar las membresias
-    const membresia = await membresiasService.aplazarMembresia(membresia_id, plan_id);
+    const membresia = await membresiasService.aplazarMembresia(membresiaId, plan_id);
 
     // Devolver la membresía actualizada como respuesta, incluyendo la nueva fecha_fin
     res.status(200).json({
