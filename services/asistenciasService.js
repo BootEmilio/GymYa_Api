@@ -195,24 +195,58 @@ const verAsistencias = async (gym_id, fecha = null, search = '', page = 1, limit
 };
 
 //Servicio para que el usuario vea su última asistencia
-const verAsistencia = async (membresiaId) => { 
+const verAsistencia = async (membresiaId) => {
     try {
-        // Obtener la última asistencia de tipo "Entrada"
-        const ultimaEntrada = await Asistencia.findOne({ 
-            membresia_id: new mongoose.Types.ObjectId(membresiaId), 
-            tipo_acceso: "Entrada" 
-        }).sort({ fecha_hora: -1 }); // Ordenar por fecha_hora en orden descendente
+        // Realizar una agregación para obtener la última asistencia con el nombre del gimnasio
+        const ultimaEntrada = await Asistencia.aggregate([
+            // Filtra las asistencias por membresia_id y tipo_acceso = "Entrada"
+            {
+                $match: {
+                    membresia_id: new mongoose.Types.ObjectId(membresiaId),
+                    tipo_acceso: "Entrada"
+                }
+            },
 
-        // Si no se encuentra ninguna asistencia de tipo "Entrada", devolver null
-        if (!ultimaEntrada) {
+            // Ordenar por fecha_hora en orden descendente (la más reciente primero)
+            { $sort: { fecha_hora: -1 } },
+
+            // Limitar a 1 resultado (la última entrada)
+            { $limit: 1 },
+
+            // Realizar un "join" con la colección de Gimnasios usando el campo gimnasio_id
+            {
+                $lookup: {
+                    from: 'gimnasios', // Nombre de la colección de Gimnasios
+                    localField: 'gimnasio_id', // Campo en la colección Asistencia
+                    foreignField: '_id', // Campo en la colección Gimnasio
+                    as: 'gimnasio' // Nombre del campo donde se almacenará el resultado del join
+                }
+            },
+
+            // Descomponer el array "gimnasio" (resultado del $lookup) en un objeto
+            { $unwind: '$gimnasio' },
+
+            // Proyectar los campos que deseas devolver
+            {
+                $project: {
+                    _id: 1, // Incluir el _id de la asistencia
+                    fecha_hora: 1, // Incluir la fecha y hora de la asistencia
+                    tipo_acceso: 1, // Incluir el tipo de acceso
+                    gimnasioNombre: '$gimnasio.nombre' // Incluir el nombre del gimnasio
+                }
+            }
+        ]);
+
+        // Verificar si no se encontró ninguna asistencia
+        if (ultimaEntrada.length === 0) {
             return null;
         }
 
-        // Devolver la última asistencia de tipo "Entrada"
-        return ultimaEntrada;
+        // Retornar la última asistencia con el nombre del gimnasio
+        return ultimaEntrada[0];
     } catch (error) {
-        console.error(`Error al obtener la última entrada para usuario_id ${usuario_id}:`, error.message);
-        throw new Error(`Error al obtener la última entrada para usuario_id ${usuario_id}: ${error.message}`);
+        console.error(`Error al obtener la última entrada para membresia_id ${membresiaId}:`, error.message);
+        throw new Error(`Error al obtener la última entrada para membresia_id ${membresiaId}: ${error.message}`);
     }
 };
 
