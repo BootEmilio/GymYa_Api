@@ -1,5 +1,6 @@
 const Plan = require('../models/planes');
 const Membresia = require('../models/membresias');
+const mongoose = require('mongoose')
 require('dotenv').config();
 
 // Servicio para agregar un tipo de plan de membresía
@@ -96,7 +97,7 @@ const mostrarPlanIndividual = async (planId) => {
     try {
         // Buscar el plan de membresía por su ID
         const plan = await Plan.aggregate([
-            { $match: { _id: mongoose.Types.ObjectId(planId) } }, // Filtrar por el ID del plan
+            { $match: { _id: new mongoose.Types.ObjectId(planId) } }, // Filtrar por el ID del plan
             {
                 $lookup: {
                     from: 'gimnasios', // Colección de gimnasios
