@@ -104,13 +104,13 @@ const aplazarMembresia = async (req, res) => {
     //Buscamos la membresia por su _id
     const membresiaExiste = await Membresia.findById(membresia_id);
     if(!membresiaExiste){
-        throw new Error('La membresía no existe');
+      return res.status(400).json({error: 'La membresía no existe'});
     }
 
     //Obtener el plan seleccionado
     const planSeleccionado = await plan.findById(plan_id);
     if(!planSeleccionado){
-        throw new Error('El plan seleccionado no existe');
+      return res.status(400).json({error: 'El plan seleccionado no existe'});
     }
 
     // Llamar al servicio para obtener aplazar las membresias

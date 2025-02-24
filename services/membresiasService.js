@@ -263,6 +263,12 @@ const getMembresia = async (membresiaId) => {
 //Servicio para aplazar fecha_fin
 const aplazarMembresia = async(membresia_id, plan_id) => {
     try{
+        //Obtenemos la membresía 
+        const membresia = await Membresia.findById(membresia_id);
+
+        //Obtenemos el plna de membresía
+        const planSeleccionado = await plan.findById(plan_id);
+        
         //Obtenemos las fechas
         const fecha_fin_original = membresia.fecha_fin; //La fecha fin original
         const fecha_actual = new Date(); //fecha actual
