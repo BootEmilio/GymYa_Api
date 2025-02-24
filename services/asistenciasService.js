@@ -251,13 +251,45 @@ const verAsistencia = async (membresiaId) => {
 };
 
 //Servicio para que el usuario vea sus asistencias (paginadas y poder cambiar los días a ver)
-const verAsistenciasUser = async (membresiaId, page = 1, limit = 5) => {
+const verAsistenciasUser = async (membresiaId, page = 1, limit = 8) => {
     try {
-        // Obtener todas las asistencias sin paginación
-        const asistencias = await Asistencia.find({ membresia_id: new mongoose.Types.ObjectId(membresiaId) })
-            .sort({ fecha_hora: -1 });
+        // Realizar una agregación para obtener las asistencias con el nombre del gimnasio
+        const asistencias = await Asistencia.aggregate([
+            // Filtra las asistencias por membresia_id
+            {
+                $match: {
+                    membresia_id: new mongoose.Types.ObjectId(membresiaId),
+                },
+            },
 
-        // Paginar directamente las asistencias, sin emparejarlas
+            // Ordenar por fecha_hora en orden descendente (la más reciente primero)
+            { $sort: { fecha_hora: -1 } },
+
+            // Realizar un "join" con la colección de Gimnasios usando el campo gimnasio_id
+            {
+                $lookup: {
+                    from: 'gimnasios', // Nombre de la colección de Gimnasios
+                    localField: 'gym_id', // Campo en la colección Asistencia
+                    foreignField: '_id', // Campo en la colección Gimnasio
+                    as: 'gimnasio', // Nombre del campo donde se almacenará el resultado del join
+                },
+            },
+
+            // Descomponer el array "gimnasio" (resultado del $lookup) en un objeto
+            { $unwind: '$gimnasio' },
+
+            // Proyectar los campos que deseas devolver
+            {
+                $project: {
+                    _id: 1, // Incluir el _id de la asistencia
+                    fecha_hora: 1, // Incluir la fecha y hora de la asistencia
+                    tipo_acceso: 1, // Incluir el tipo de acceso
+                    gimnasioNombre: '$gimnasio.nombre', // Incluir el nombre del gimnasio
+                },
+            },
+        ]);
+
+        // Paginar las asistencias
         const total = asistencias.length;
         const paginatedAsistencias = asistencias.slice((page - 1) * limit, page * limit);
 
@@ -267,11 +299,11 @@ const verAsistenciasUser = async (membresiaId, page = 1, limit = 5) => {
             total: total,
             page: parseInt(page),
             limit: parseInt(limit),
-            totalPages: Math.ceil(total / limit)
+            totalPages: Math.ceil(total / limit),
         };
     } catch (error) {
-        console.error(`Error al mostrar las asistencias para usuario_id ${usuario_id}:`, error.message);
-        throw new Error(`Error al mostrar las asistencias para usuario_id ${usuario_id}: ${error.message}`);
+        console.error(`Error al mostrar las asistencias para membresia_id ${membresiaId}:`, error.message);
+        throw new Error(`Error al mostrar las asistencias para membresia_id ${membresiaId}: ${error.message}`);
     }
 };
 
