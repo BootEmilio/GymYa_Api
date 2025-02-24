@@ -96,6 +96,27 @@ const mostrarPlanesUser = async (req, res) => {
     }
 };
 
+// Controlador para mostrar un solo plan de membresía
+const mostrarPlanIndividual = async (req, res) => {
+    try {
+        const { planId } = req.params; // Extraer el planId desde los parámetros de la URL
+
+        // Llamar a la función que obtiene el plan de membresía individual
+        const plan = await planesService.mostrarPlanIndividual(planId);
+
+        // Verificar si ocurrió un error (como que no exista el plan)
+        if (plan.error) {
+            return res.status(404).json({ error: plan.error });
+        }
+
+        // Devolver el plan encontrado
+        return res.status(200).json(plan);
+    } catch (error) {
+        console.error('Error en el controlador al obtener el plan de membresía:', error);
+        return res.status(500).json({ error: 'Error al obtener el plan de membresía' });
+    }
+};
+
 //Controlador para editar planes de membresía
 const editarPlanes = async (req, res) => {
     try {
@@ -201,4 +222,4 @@ const eliminarPlan = async (req, res) => {
     }
 };
 
-module.exports = { crearPlanes, mostrarPlanes, mostrarPlanesUser, editarPlanes, eliminarPlan };
+module.exports = { crearPlanes, mostrarPlanes, mostrarPlanesUser, mostrarPlanIndividual, editarPlanes, eliminarPlan };

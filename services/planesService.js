@@ -17,11 +17,9 @@ const crearPlanes = async (gymIds, nombre, descripcion, costo, duracion_meses, d
         if (duracion_meses !== undefined) {
             nuevoPlan.duracion_meses = duracion_meses;
         }
-
         if (duracion_semanas !== undefined) {
             nuevoPlan.duracion_semanas = duracion_semanas;
         }
-
         if (duracion_dias !== undefined) {
             nuevoPlan.duracion_dias = duracion_dias;
         }
@@ -93,6 +91,46 @@ const mostrarPlanesUser = async (membresiaId) => {
     }
 };
 
+// Servicio para ver solo un plan de membresía
+const mostrarPlanIndividual = async (planId) => {
+    try {
+        // Buscar el plan de membresía por su ID
+        const plan = await Plan.aggregate([
+            { $match: { _id: mongoose.Types.ObjectId(planId) } }, // Filtrar por el ID del plan
+            {
+                $lookup: {
+                    from: 'gimnasios', // Colección de gimnasios
+                    localField: 'gym_id', // Campo gym_id en los planes
+                    foreignField: '_id', // Campo _id en la colección gimnasios
+                    as: 'gimnasios', // Asociar gimnasios al plan
+                }
+            },
+            {
+                $project: {
+                    nombre: 1, // Mostrar el nombre del plan
+                    descripcion: 1,
+                    costo: 1, // Mostrar el precio del plan
+                    duracion_dias: 1,
+                    duracion_semanas: 1,
+                    duracion_meses: 1,
+                    gimnasios: '$gimnasios.nombre', // Mostrar los nombres de los gimnasios
+                }
+            }
+        ]);
+
+        // Verificar si el plan fue encontrado
+        if (!plan || plan.length === 0) {
+            return { error: 'No se encontró el plan de membresía' };
+        }
+
+        // Devolver el plan encontrado
+        return plan[0]; // Solo retornamos el primer (y único) resultado
+    } catch (error) {
+        console.error('Error al mostrar el plan de membresía:', error);
+        throw new Error('Error al mostrar el plan de membresía');
+    }
+};
+
 // Servicio para editar un plan existente de membresía
 const editarPlanes = async (planId, gymId, updateFields, unsetFields) => {
     try {
@@ -139,4 +177,4 @@ const eliminarPlan = async (planId, gymId) => {
     }
 };
 
-module.exports = { crearPlanes, mostrarPlanes, mostrarPlanesUser, editarPlanes, eliminarPlan };
+module.exports = { crearPlanes, mostrarPlanes, mostrarPlanesUser, mostrarPlanIndividual, editarPlanes, eliminarPlan };
