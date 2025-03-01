@@ -6,7 +6,7 @@ const plan = require('../models/planes');
 //Controlador para registrar usuarios con sus membresias
 const registroUsuario = async (req, res) => {
   try{
-    const {plan_id, nombre_completo, email, password, telefono, imagen} = req.body;
+    const {plan_id, nombre_completo, email, password, telefono} = req.body;
 
     // Validar que todos los campos estén presentes
     if (!plan_id || !nombre_completo || !email || !password) {
@@ -19,7 +19,7 @@ const registroUsuario = async (req, res) => {
       return res.status(400).json({ error: 'El email ya está registrado' });
     }
 
-    const usuarioNuevo = await membresiasService.registroUsuario(plan_id, nombre_completo, email, password, telefono, imagen);
+    const usuarioNuevo = await membresiasService.registroUsuario(plan_id, nombre_completo, email, password, telefono);
     res.status(201).json(usuarioNuevo);
   }catch (error) {
     res.status(500).json({error: 'Error al registrar el usuario junto a su membresía'});

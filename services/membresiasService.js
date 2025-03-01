@@ -6,7 +6,7 @@ const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
 //Servicio para crear un nuevo usuario con su membresia
-const registroUsuario = async(plan_id, nombre_completo, email, password, telefono, imagen) => {
+const registroUsuario = async(plan_id, nombre_completo, email, password, telefono) => {
     try{
         //Obtenemos la fecha de hoy
         const fecha_inicio = new Date();
@@ -43,12 +43,7 @@ const registroUsuario = async(plan_id, nombre_completo, email, password, telefon
         // Hash de la contraseña
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        //Agregamos una imagen por defecto del entrenador
-        if(!imagen){
-            imagen = 'user.jpg';
-        }
-
-        //Agregamos una imagen por defecto del entrenador
+        //Agregamos nulo al telefono
         if(!telefono){
             telefono = null;
         }
