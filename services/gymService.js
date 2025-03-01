@@ -4,14 +4,15 @@ const Admin = require('../models/admin');
 require('dotenv').config();
 
 //Servicio para agregar un gimnasio
-const crearGimnasio = async (nombre, direccion, telefono, horario, adminId) => {
+const crearGimnasio = async (nombre, direccion, telefono, horario, adminId, imagenUrl) => {
     try {
       //Crear nuevo gimnasio
       const nuevoGym = await Gym.create({
         nombre,
         direccion,
         telefono,
-        horario
+        horario,
+        imagenUrl
       });
 
       //Obtener el _id del nuevo gimnasio

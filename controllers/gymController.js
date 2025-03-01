@@ -1,4 +1,6 @@
 const gymService = require('../services/gymService');
+const cloudinary = require('./cloudinary-config');
+const fs = require('fs'); // para manejar el borrado de archivos temporales
 
 //Controlador para agregar gimnasios
 const crearGimnasio = async (req, res) => {
@@ -11,7 +13,21 @@ const crearGimnasio = async (req, res) => {
             return res.status(400).json({ error: 'Todos los campos son obligatorios' });
         }
 
-        const nuevoGimnasio = await gymService.crearGimnasio(nombre, direccion, telefono, horario, adminId);
+        // Validar si hay un archivo de imagen en la petición
+        if (!req.file) {
+            return res.status(400).json({ error: 'La imagen es obligatoria' });
+        }
+
+        // Subir imagen a Cloudinary
+        const result = await cloudinary.uploader.upload(req.file.path);
+
+        // Guardar la URL de la imagen
+        const imagenUrl = result.secure_url;
+
+        const nuevoGimnasio = await gymService.crearGimnasio(nombre, direccion, telefono, horario, adminId, imagenUrl);
+
+        // Eliminar el archivo temporal subido
+        fs.unlinkSync(req.file.path);
 
         res.status(201).json(nuevoGimnasio);
     }catch (error) {
