@@ -131,6 +131,7 @@ const getMembresias = async (gymId, status, page = 1, limit = 10, search = '') =
                     usuario_id: '$_id',
                     nombre_completo: '$nombre_completo',
                     email: '$email',
+                    imagen: '$imagen',
                     nombre_plan: '$plan.nombre',
                     _id: 0
                 }
