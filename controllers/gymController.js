@@ -1,5 +1,5 @@
 const gymService = require('../services/gymService');
-const cloudinary = require('./cloudinary-config');
+const cloudinary = require('../cloudinary-config');
 const fs = require('fs'); // para manejar el borrado de archivos temporales
 
 //Controlador para agregar gimnasios
