@@ -10,6 +10,6 @@ router.post('/gym', token, upload.single('imagen'), gymController.crearGimnasio)
 //Ruta para ver gimnasios
 router.get('/gym', token, gymController.verGimnasios)
 // Ruta para editar un gimnasio
-router.put('/:gymId/editar', token, gymController.editarGimnasio);
+router.put('/:gymId/editar', upload.single('imagen'), token, gymController.editarGimnasio);
 
 module.exports = router;
