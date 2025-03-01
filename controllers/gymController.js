@@ -82,14 +82,14 @@ const editarGimnasio = async (req, res) => {
 
         // Verificar si hay una imagen nueva en la solicitud
         if(req.file) {
-            const imagenActualUrl = gimnasioActual.imagenUrl; // Obtener la imagen actual
+            const imagenActualUrl = gimnasioActual.imagen; // Obtener la imagen actual
 
             // Subir la nueva imagen a Cloudinary
             const result = await cloudinary.uploader.upload(req.file.path);
             const nuevaImagenUrl = result.secure_url;
 
             // Guardar la URL de la nueva imagen en los campos de actualización
-            updateFields.imagenUrl = nuevaImagenUrl;
+            updateFields.imagen = nuevaImagenUrl;
 
             // Eliminar la imagen anterior de Cloudinary (si existe)
             if (imagenActualUrl) {
