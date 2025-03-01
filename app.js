@@ -27,6 +27,9 @@ const corsOptions = {
   allowedHeaders: 'Content-Type,Authorization', // Headers permitidos
 };
 
+// Permitir que Express sirva archivos estáticos desde la carpeta "uploads"
+app.use('/uploads', express.static('uploads'));
+
 // Aplicar CORS a todas las rutas
 app.use(cors(corsOptions));
 

@@ -60,7 +60,7 @@ const registroUsuario = async(plan_id, nombre_completo, email, password, telefon
             email,
             password: hashedPassword,
             telefono,
-            imagen
+            imagen: '/uploads/default-user.png'
         });
 
         return { success: true, message: 'Registro de usuario exitoso', usuario: nuevoUsuario, membresia: nuevaMembresia };
