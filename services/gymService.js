@@ -12,7 +12,7 @@ const crearGimnasio = async (nombre, direccion, telefono, horario, adminId, imag
         direccion,
         telefono,
         horario,
-        imagen= imagenUrl
+        imagen: imagenUrl
       });
 
       //Obtener el _id del nuevo gimnasio
