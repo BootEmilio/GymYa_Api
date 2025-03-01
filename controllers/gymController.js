@@ -1,6 +1,7 @@
 const gymService = require('../services/gymService');
 const cloudinary = require('../cloudinary-config');
 const fs = require('fs'); // para manejar el borrado de archivos temporales
+const Gym = require('../models/gym')
 
 //Controlador para agregar gimnasios
 const crearGimnasio = async (req, res) => {
@@ -61,6 +62,12 @@ const editarGimnasio = async (req, res) => {
         const {gymId} = req.params; //Se obtiene por medio de la ruta
         const adminGymIds = req.user.gym_id; // Array de gym_id del administrador
 
+        // Buscar el gimnasio en la base de datos usando Mongoose
+        const gimnasioActual = await Gym.findById(gymId);
+        if (!gimnasioActual) {
+            return res.status(404).json({ error: 'Gimnasio no encontrado' });
+        }
+
         // Verificar si el gymId está en el array de gym_id del administrador
         if (!adminGymIds.includes(gymId)) {
             return res.status(403).json({ error: 'No tienes permisos para editar este gimnasio' });
@@ -72,6 +79,27 @@ const editarGimnasio = async (req, res) => {
         if (direccion) updateFields.direccion = direccion;
         if (telefono) updateFields.telefono = telefono;
         if (horario) updateFields.horario = horario;
+
+        // Verificar si hay una imagen nueva en la solicitud
+        if(req.file) {
+            const imagenActualUrl = gimnasioActual.imagenUrl; // Obtener la imagen actual
+
+            // Subir la nueva imagen a Cloudinary
+            const result = await cloudinary.uploader.upload(req.file.path);
+            const nuevaImagenUrl = result.secure_url;
+
+            // Guardar la URL de la nueva imagen en los campos de actualización
+            updateFields.imagenUrl = nuevaImagenUrl;
+
+            // Eliminar la imagen anterior de Cloudinary (si existe)
+            if (imagenActualUrl) {
+                const imagenId = imagenActualUrl.split('/').pop().split('.')[0]; // Extraer el ID de la imagen
+                await cloudinary.uploader.destroy(imagenId);
+            }
+
+            // Eliminar el archivo temporal subido
+            fs.unlinkSync(req.file.path);
+        }
 
         // Si no se proporcionaron campos, lanzamos un error
         if (Object.keys(updateFields).length === 0) {
