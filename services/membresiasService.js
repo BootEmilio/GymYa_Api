@@ -55,7 +55,7 @@ const registroUsuario = async(plan_id, nombre_completo, email, password, telefon
             email,
             password: hashedPassword,
             telefono,
-            imagen: '/uploads/default-user.png'
+            imagen: 'https://api-gymya-api.onrender.com/uploads/default-user.png'
         });
 
         return { success: true, message: 'Registro de usuario exitoso', usuario: nuevoUsuario, membresia: nuevaMembresia };
