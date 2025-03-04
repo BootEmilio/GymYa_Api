@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const secretKey = process.env.JWT_SECRET;
-const tokenExpiration = process.env.JWT_EXPIRATION || '2h';
+const tokenExpiration = process.env.JWT_EXPIRATION || '72h';
 
 //Servicio para agregar el primer administrador
 const registro = async (username, password, nombre_completo, email, telefono) => {

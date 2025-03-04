@@ -108,6 +108,21 @@ const verAsistencias = async (gym_id, fecha, search = '', page = 1, limit = 10) 
             {
                 $match: searchCondition // Aplicar la condición de búsqueda
             },
+            {
+                $group: {
+                    _id: {
+                        usuario_id: '$usuario._id',
+                        nombre_completo: '$usuario.nombre_completo'
+                    },
+                    asistencias: {
+                        $push: {
+                            asistencia_id: '$_id',
+                            fecha_hora: '$fecha_hora',
+                            tipo_acceso: '$tipo_acceso'
+                        }
+                    }
+                }
+            },
             { 
                 $skip: (page - 1) * limit 
             }, 
@@ -126,8 +141,10 @@ const verAsistencias = async (gym_id, fecha, search = '', page = 1, limit = 10) 
             const { _id, asistencias } = usuario;
             const emparejadas = [];
 
-            // Verificar que asistencias no sea undefined
-            if (asistencias && Array.isArray(asistencias)) {
+            let entradaActual = null;
+
+            // Verificar que asistencias no sea undefined ni vacío
+            if (asistencias && asistencias.length > 0) {
                 asistencias.forEach(asistencia => {
                     if (asistencia.tipo_acceso === 'Entrada') {
                         if (entradaActual) {
