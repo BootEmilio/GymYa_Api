@@ -114,7 +114,7 @@ const aplazarMembresia = async (req, res) => {
     }
 
     // Llamar al servicio para obtener aplazar las membresias
-    const membresia = await membresiasService.aplazarMembresia(membresiaId, plan_id);
+    const { membresia, pago } = await membresiasService.aplazarMembresia(membresiaId, plan_id);
 
     // Devolver la membresía actualizada como respuesta, incluyendo la nueva fecha_fin
     res.status(200).json({
@@ -124,11 +124,19 @@ const aplazarMembresia = async (req, res) => {
         gym_id: membresia.gym_id,
         plan_id: membresia.plan_id,
         fecha_fin: membresia.fecha_fin, // Nueva fecha_fin
+      },
+      pago: {
+        _id: pago._id,
+        membresia_id: pago.membresia_id,
+        gym_id: pago.gym_id,
+        fecha_hora: pago.fecha_hora,
+        concepto: pago.concepto,
+        monto: pago.monto,
       }
     });
   }catch (error){
     res.status(500).json({ error: 'Ocurrió un error al aplazar la fecha fin de la membresía.' });
   }
-}; 
+};
 
 module.exports = { registroUsuario, getMembresias,  getMembresiasUser, getMembresia, aplazarMembresia };

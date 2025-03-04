@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Membresia = require('../models/membresias');
 const user = require('../models/usuarios');
 const plan = require('../models/planes');
+const Pago = require('../models/pagos');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
@@ -58,7 +59,21 @@ const registroUsuario = async(plan_id, nombre_completo, email, password, telefon
             imagen: 'https://api-gymya-api.onrender.com/uploads/default-user.png'
         });
 
-        return { success: true, message: 'Registro de usuario exitoso', usuario: nuevoUsuario, membresia: nuevaMembresia };
+        //Crear el pago
+        const nuevoPago = await Pago.create({
+            membresia_id: nuevaMembresia._id,
+            gym_id: planSeleccionado.gym_id,
+            fecha_hora: fecha_inicio,
+            concepto: planSeleccionado.nombrePlan,
+            monto: planSeleccionado.costo
+        });
+
+        return { success: true, 
+            message: 'Registro de usuario exitoso', 
+            usuario: nuevoUsuario, 
+            membresia: nuevaMembresia, 
+            pago: nuevoPago 
+        };
     } catch(error){
       console.error('Erros al registrar al usuario:', error);
       throw new Error('Error al registrar al usuario');
@@ -331,7 +346,16 @@ const aplazarMembresia = async(membresia_id, plan_id) => {
         membresia.fecha_fin = nueva_fecha_fin;
         await membresia.save();
 
-        return membresia; // Retornar la membresía actualizada
+        // Crear un nuevo pago por el aplazamiento de la membresía
+        const nuevoPago = await Pago.create({
+            membresia_id: membresia._id,
+            gym_id: membresia.gym_id,
+            fecha_hora: fecha_actual, // Fecha y hora actual para el nuevo pago
+            concepto: planSeleccionado.nombrePlan,
+            monto: planSeleccionado.costo
+        });
+
+        return {membresia, pago: nuevoPago}; // Retornar la membresía actualizada
     }catch (error){
         console.error('Error al aplazar la membresía:', error);
         throw new Error('Error al aplazar la membresía');
