@@ -71,7 +71,6 @@ const verAsistencias = async (gym_id, fecha, search = '', page = 1, limit = 10) 
                 { 'usuario.username': { $regex: search, $options: 'i' } }
             ];
 
-            // Solo agregar la búsqueda por _id si search es un ObjectId válido
             if (mongoose.Types.ObjectId.isValid(search)) {
                 searchConditions.push({ '_id': new mongoose.Types.ObjectId(search) });
             }
@@ -82,17 +81,23 @@ const verAsistencias = async (gym_id, fecha, search = '', page = 1, limit = 10) 
         // Obtener el rango de fechas (inicio y fin del día actual)
         let fechaInicio, fechaFin;
 
-        // Si no se pasa una fecha específica, se filtra por el día actual
         if (!fecha) {
             const hoy = new Date();
             fechaInicio = new Date(hoy.setHours(0, 0, 0, 0)); // Inicio del día
             fechaFin = new Date(hoy.setHours(23, 59, 59, 999)); // Fin del día
         } else {
-            // Si se proporciona una fecha, filtrar por ese día
             const fechaConsulta = new Date(fecha);
             fechaInicio = new Date(fechaConsulta.setHours(0, 0, 0, 0)); // Inicio del día consultado
             fechaFin = new Date(fechaConsulta.setHours(23, 59, 59, 999)); // Fin del día consultado
         }
+
+        // Probar la consulta sin el lookup y el unwind para depurar
+        const asistenciasSinLookup = await Asistencia.find({
+            gym_id: new mongoose.Types.ObjectId(gym_id),
+            fecha_hora: { $gte: fechaInicio, $lte: fechaFin }
+        });
+
+        console.log('Asistencias encontradas sin lookup:', asistenciasSinLookup);
 
         const asistencias = await Asistencia.aggregate([
             {
@@ -103,7 +108,7 @@ const verAsistencias = async (gym_id, fecha, search = '', page = 1, limit = 10) 
             },
             {
                 $lookup: {
-                    from: 'usuarios', // Colección de usuario
+                    from: 'usuarios', // Colección de usuarios
                     localField: 'usuario_id', // Campo en asistencias
                     foreignField: '_id', // Campo en colección de usuarios
                     as: 'usuario'
@@ -156,21 +161,16 @@ const verAsistencias = async (gym_id, fecha, search = '', page = 1, limit = 10) 
 
             asistencias.forEach(asistencia => {
                 if (asistencia.tipo_acceso === 'Entrada') {
-                    // Si ya hay una entrada en curso, emparejarla con la siguiente salida
                     if (entradaActual) {
                         emparejadas.push({ entrada: entradaActual, salida: null });
                     }
-                    // Establecer la nueva entrada actual
                     entradaActual = asistencia;
                 } else if (asistencia.tipo_acceso === 'Salida' && entradaActual) {
-                    // Si hay una entrada en curso, emparejarla con esta salida
                     emparejadas.push({ entrada: entradaActual, salida: asistencia });
-                    // Resetear la entrada actual
                     entradaActual = null;
                 }
             });
 
-            // Si quedó alguna entrada sin emparejar, la añadimos con salida null
             if (entradaActual) {
                 emparejadas.push({ entrada: entradaActual, salida: null });
             }
@@ -188,6 +188,7 @@ const verAsistencias = async (gym_id, fecha, search = '', page = 1, limit = 10) 
         throw new Error(`Error al mostrar las asistencias del día ${fecha}`);
     }
 };
+
 
 //Servicio para que el usuario vea su última asistencia
 const verAsistencia = async (membresiaId) => {
