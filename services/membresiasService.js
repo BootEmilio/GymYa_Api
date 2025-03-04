@@ -80,6 +80,66 @@ const registroUsuario = async(plan_id, nombre_completo, email, password, telefon
     }
 };
 
+//Servicio para crear una nueva membresía de un usuario que ya este registrado
+const crearMembresia = async (plan_id, email) => {
+    try{
+        //Buscamos el plan de membresía
+        const planSeleccionado = await plan.findById(plan_id);
+
+        //Obtenemos la fecha de hoy
+        const fecha_inicio = new Date();
+
+        // Calculamos la fecha de finalización en función de la duración del plan
+        const fecha_fin = new Date(fecha_inicio);
+
+        // Sumar meses, semanas y días según lo definido en el plan
+        if (planSeleccionado.duracion_meses) {
+            fecha_fin.setMonth(fecha_fin.getMonth() + planSeleccionado.duracion_meses);
+        }
+        if (planSeleccionado.duracion_semanas) {
+            fecha_fin.setDate(fecha_fin.getDate() + (planSeleccionado.duracion_semanas * 7)); // Sumar semanas
+        }
+        if (planSeleccionado.duracion_dias) {
+            fecha_fin.setDate(fecha_fin.getDate() + planSeleccionado.duracion_dias); // Sumar días
+        }
+
+        //Creamos la nueva membresia
+        const nuevaMembresia = await Membresia.create({
+            gym_id: planSeleccionado.gym_id,
+            plan_id: planSeleccionado._id,
+            fecha_inicio: fecha_inicio,
+            fecha_fin: fecha_fin
+        })
+
+        //Actualizamos al usuario para agregar al array la nueva membresia
+        const usuario = await user.findOneAndUpdate(
+            { email }, // Buscar el usuario por email
+            { $push: { membresia_id: nuevaMembresia._id } }, // Agregar la nueva membresía al array
+            { new: true } // Retornar el usuario actualizado
+        );
+
+        //Crear el pago
+        const nuevoPago = await Pago.create({
+            membresia_id: nuevaMembresia._id,
+            gym_id: planSeleccionado.gym_id,
+            fecha_hora: fecha_inicio,
+            concepto: planSeleccionado.nombre,
+            monto: planSeleccionado.costo
+        });
+
+        return {
+            success: true, 
+            message: 'Nueva membresía creada',
+            membresia: nuevaMembresia,
+            usuario: usuario,
+            pago: nuevoPago
+        };
+    }catch (error){
+        console.error('Error al crear una nueva membresía:', error);
+        throw new Error('Error al crear una nueva membresía');
+    }
+};
+
 //Servicio para mosotrar las membresías activas o expiradas de un gimnasio
 const getMembresias = async (gymId, status, page = 1, limit = 10, search = '') => {
     try {
@@ -362,4 +422,4 @@ const aplazarMembresia = async(membresia_id, plan_id) => {
     }
 };
 
-module.exports = { registroUsuario, getMembresias, getMembresiasUser, getMembresia, aplazarMembresia };
+module.exports = { registroUsuario, crearMembresia, getMembresias, getMembresiasUser, getMembresia, aplazarMembresia };

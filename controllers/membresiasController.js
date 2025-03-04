@@ -19,8 +19,43 @@ const registroUsuario = async (req, res) => {
       return res.status(400).json({ error: 'El email ya está registrado' });
     }
 
+    //Obtener el plan seleccionado
+    const planSeleccionado = await plan.findById(plan_id);
+    if(!planSeleccionado){
+      return res.status(400).json({error: 'El plan seleccionado no existe'});
+    }
+
     const usuarioNuevo = await membresiasService.registroUsuario(plan_id, nombre_completo, email, password, telefono);
     res.status(201).json(usuarioNuevo);
+  }catch (error) {
+    res.status(500).json({error: 'Error al registrar el usuario junto a su membresía'});
+  }
+};
+
+//Controlador para crear membresía de un usaurio que ya tiene una cuenta
+const crearMembresia = async (req, res) => {
+  try{
+    const {plan_id, email} = req.body;
+
+    // Validar que todos los campos estén presentes
+    if (!plan_id || !email ) {
+      return res.status(400).json({ error: 'Todos los campos son obligatorios' });
+    }
+
+    // Verificar si el email ya existe
+    const emailExistente = await User.findOne({ email });
+    if (!emailExistente) {
+      return res.status(400).json({ error: 'El email no esta registrado' });
+    }
+
+    //Obtener el plan seleccionado
+    const planSeleccionado = await plan.findById(plan_id);
+    if(!planSeleccionado){
+      return res.status(400).json({error: 'El plan seleccionado no existe'});
+    }
+
+    const membresiaNueva = await membresiasService.crearMembresia(plan_id, email);
+    res.status(201).json(membresiaNueva);
   }catch (error) {
     res.status(500).json({error: 'Error al registrar el usuario junto a su membresía'});
   }
@@ -139,4 +174,4 @@ const aplazarMembresia = async (req, res) => {
   }
 };
 
-module.exports = { registroUsuario, getMembresias,  getMembresiasUser, getMembresia, aplazarMembresia };
+module.exports = { registroUsuario, crearMembresia, getMembresias,  getMembresiasUser, getMembresia, aplazarMembresia };
