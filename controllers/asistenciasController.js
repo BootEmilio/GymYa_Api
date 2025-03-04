@@ -41,7 +41,7 @@ const registrarAsistencia = async (req, res) => {
 //Controlador para que el admin vea las asistencias del día u otra fecha
 const verAsistencias = async (req, res) => {
     try {
-        const gymId = req.params; // Obtener el gym_id desde la url
+        const {gymId} = req.params; // Obtener el gym_id desde la url
         const { fecha, search, page = 1, limit = 10 } = req.query; // Parámetros opcionales
 
         const gimnasio = await Gym.findById(gymId);
