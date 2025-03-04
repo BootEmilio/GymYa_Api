@@ -211,10 +211,10 @@ const getMembresiasUser = async (usuario_id) => {
     }
 };
 
-//Servicio para que el usuario tenga su membresía
+//Servicio para que el usuario tenga su membresía o que el admin vea solo un usuario
 const getMembresia = async (membresiaId) => {
     try {
-        // Realizar una agregación para obtener la membresía con el nombre del plan
+        // Realizar una agregación para obtener la membresía con el nombre del plan y datos del usuario
         const membresia = await Membresia.aggregate([
             // Filtra la membresía por su _id
             { $match: { _id: new mongoose.Types.ObjectId(membresiaId) } },
@@ -232,13 +232,30 @@ const getMembresia = async (membresiaId) => {
             // Descomponer el array "plan" (resultado del $lookup) en un objeto
             { $unwind: '$plan' },
 
+            // Realiza un "join" con la colección de Usuarios usando el campo membresia_id
+            {
+                $lookup: {
+                    from: 'usuarios', // Nombre de la colección de Usuarios
+                    localField: '_id', // Campo en la colección Membresia
+                    foreignField: 'membresia_id', // Campo en la colección Usuario
+                    as: 'usuario' // Nombre del campo donde se almacenará el resultado del join
+                }
+            },
+
+            // Descomponer el array "usuario" (resultado del $lookup) en un objeto
+            { $unwind: '$usuario' },
+
             // Proyectar los campos que deseas devolver
             {
                 $project: {
                     _id: 1, // Incluir el _id de la membresía
                     fecha_inicio: 1, // Incluir la fecha de inicio de la membresía
                     fecha_fin: 1, // Incluir la fecha de fin de la membresía
-                    nombrePlan: '$plan.nombre' // Incluir el nombre del plan
+                    nombrePlan: '$plan.nombre', // Incluir el nombre del plan
+                    nombreCompelto: '$usuario.nombre_completo', // Incluir el nombre del usuario
+                    email: '$usuario.email', // Incluir el email del usuario
+                    telefono: '$usuario.telefono', // Incluir el télefono del usuario
+                    imagen: '$usuario.imagen' // Incluir la imagen del usuario
                 }
             }
         ]);
@@ -248,7 +265,7 @@ const getMembresia = async (membresiaId) => {
             return { error: 'No se ha encontrado la membresía con ese ID.' };
         }
 
-        // Retornar los datos de la membresía con el nombre del plan
+        // Retornar los datos de la membresía con el nombre del plan y datos del usuario
         return membresia[0];
     } catch (error) {
         console.error('Error al obtener la membresía:', error);
