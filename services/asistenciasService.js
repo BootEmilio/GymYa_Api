@@ -76,13 +76,30 @@ const verAsistencias = async (gym_id, fecha, search = '', page = 1, limit = 10) 
             fechaFin = new Date(fechaConsulta.setHours(23, 59, 59, 999)); // Fin del día consultado
         }
 
-        // Probar sin lookup ni unwind
-        const asistencias = await Asistencia.find({
-            gym_id: new mongoose.Types.ObjectId(gym_id),
-            fecha_hora: { $gte: fechaInicio, $lte: fechaFin }
-        })
-        .skip((page - 1) * limit)
-        .limit(parseInt(limit));
+        // Agregar $lookup para obtener la información del usuario
+        const asistencias = await Asistencia.aggregate([
+            {
+                $match: {
+                    gym_id: new mongoose.Types.ObjectId(gym_id),
+                    fecha_hora: { $gte: fechaInicio, $lte: fechaFin } // Filtrar por el rango de fechas
+                }
+            },
+            {
+                $lookup: {
+                    from: 'usuarios', // Colección de usuarios
+                    localField: 'usuario_id', // Campo en asistencias
+                    foreignField: '_id', // Campo en colección de usuarios
+                    as: 'usuario'
+                }
+            },
+            { $unwind: '$usuario' }, // Descomprimir el array de usuarios
+            { 
+                $skip: (page - 1) * limit 
+            }, 
+            { 
+                $limit: parseInt(limit) 
+            }
+        ]);
 
         const total = await Asistencia.countDocuments({
             gym_id: new mongoose.Types.ObjectId(gym_id),
