@@ -1,5 +1,6 @@
 const asistenciasService = require('../services/asistenciasService');
 const Membresia = require('../models/membresias');
+const Gym = require('../models/gym');
 
 //Controlador para que el registre las entradas y salidas (por ahora por medio de peticiones, cambiar para registro de QR)
 const registrarAsistencia = async (req, res) => {
@@ -40,11 +41,16 @@ const registrarAsistencia = async (req, res) => {
 //Controlador para que el admin vea las asistencias del día u otra fecha
 const verAsistencias = async (req, res) => {
     try {
-        const gym_id = req.params; // Obtener el gym_id desde la url
+        const gymId = req.params; // Obtener el gym_id desde la url
         const { fecha, search, page = 1, limit = 10 } = req.query; // Parámetros opcionales
 
+        const gimnasio = await Gym.findById(gymId);
+        if(!gimnasio) {
+            res.status(400).json({  error: 'No existe el gimnasio'});
+        }
+
         // Llamada al servicio para obtener las asistencias paginadas
-        const { asistencias, total } = await asistenciasService.verAsistencias(gym_id, fecha, search, parseInt(page), parseInt(limit));
+        const { asistencias, total } = await asistenciasService.verAsistencias(gymId, fecha, search, parseInt(page), parseInt(limit));
 
         // Responder con los datos paginados
         res.status(200).json({

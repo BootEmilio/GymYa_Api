@@ -63,11 +63,6 @@ const registrarAsistencia = async (gymId, membresiaId, fecha_hora) => {
 //Servicio para que el administrador vea las asistencias (paginadas y poder cambiar los días a ver)
 const verAsistencias = async (gym_id, fecha = null, search = '', page = 1, limit = 10) => {
     try {
-        // Verificar si gymId es un ObjectId válido
-        if (!mongoose.Types.ObjectId.isValid(gym_id)) {
-            throw new Error('El gym_id proporcionado no es válido');
-        }
-
         // Crear condición de búsqueda
         let searchCondition = {};
         if (search) {
