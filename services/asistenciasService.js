@@ -126,22 +126,23 @@ const verAsistencias = async (gym_id, fecha, search = '', page = 1, limit = 10) 
             const { _id, asistencias } = usuario;
             const emparejadas = [];
 
-            let entradaActual = null;
-
-            asistencias.forEach(asistencia => {
-                if (asistencia.tipo_acceso === 'Entrada') {
-                    if (entradaActual) {
-                        emparejadas.push({ entrada: entradaActual, salida: null });
+            // Verificar que asistencias no sea undefined
+            if (asistencias && Array.isArray(asistencias)) {
+                asistencias.forEach(asistencia => {
+                    if (asistencia.tipo_acceso === 'Entrada') {
+                        if (entradaActual) {
+                            emparejadas.push({ entrada: entradaActual, salida: null });
+                        }
+                        entradaActual = asistencia;
+                    } else if (asistencia.tipo_acceso === 'Salida' && entradaActual) {
+                        emparejadas.push({ entrada: entradaActual, salida: asistencia });
+                        entradaActual = null;
                     }
-                    entradaActual = asistencia;
-                } else if (asistencia.tipo_acceso === 'Salida' && entradaActual) {
-                    emparejadas.push({ entrada: entradaActual, salida: asistencia });
-                    entradaActual = null;
-                }
-            });
+                });
 
-            if (entradaActual) {
-                emparejadas.push({ entrada: entradaActual, salida: null });
+                if (entradaActual) {
+                    emparejadas.push({ entrada: entradaActual, salida: null });
+                }
             }
 
             return {
