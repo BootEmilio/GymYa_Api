@@ -63,7 +63,20 @@ const registrarAsistencia = async (gymId, membresiaId, fecha_hora) => {
 //Servicio para que el administrador vea las asistencias (paginadas y poder cambiar los días a ver)
 const verAsistencias = async (gym_id, fecha, search = '', page = 1, limit = 10) => {
     try {
-        // Obtener el rango de fechas (inicio y fin del día actual)
+        let searchCondition = {};
+        if (search) {
+            const searchConditions = [
+                { 'usuario.nombre_completo': { $regex: search, $options: 'i' } },
+                { 'usuario.username': { $regex: search, $options: 'i' } }
+            ];
+
+            if (mongoose.Types.ObjectId.isValid(search)) {
+                searchConditions.push({ '_id': new mongoose.Types.ObjectId(search) });
+            }
+
+            searchCondition = { $or: searchConditions };
+        }
+
         let fechaInicio, fechaFin;
 
         if (!fecha) {
@@ -76,7 +89,6 @@ const verAsistencias = async (gym_id, fecha, search = '', page = 1, limit = 10) 
             fechaFin = new Date(fechaConsulta.setHours(23, 59, 59, 999)); // Fin del día consultado
         }
 
-        // Agregar $lookup para obtener la información del usuario
         const asistencias = await Asistencia.aggregate([
             {
                 $match: {
@@ -87,12 +99,15 @@ const verAsistencias = async (gym_id, fecha, search = '', page = 1, limit = 10) 
             {
                 $lookup: {
                     from: 'usuarios', // Colección de usuarios
-                    localField: 'usuario_id', // Campo en asistencias
-                    foreignField: '_id', // Campo en colección de usuarios
+                    localField: 'membresia_id', // Campo en asistencias
+                    foreignField: 'membresia_id', // Campo en colección de usuarios (array)
                     as: 'usuario'
                 }
             },
             { $unwind: '$usuario' }, // Descomprimir el array de usuarios
+            {
+                $match: searchCondition // Aplicar la condición de búsqueda
+            },
             { 
                 $skip: (page - 1) * limit 
             }, 
@@ -106,7 +121,37 @@ const verAsistencias = async (gym_id, fecha, search = '', page = 1, limit = 10) 
             fecha_hora: { $gte: fechaInicio, $lte: fechaFin }
         });
 
-        return { asistencias, total };
+        // Procesar el resultado para emparejar entradas con salidas
+        const asistenciasEmparejadas = asistencias.map(usuario => {
+            const { _id, asistencias } = usuario;
+            const emparejadas = [];
+
+            let entradaActual = null;
+
+            asistencias.forEach(asistencia => {
+                if (asistencia.tipo_acceso === 'Entrada') {
+                    if (entradaActual) {
+                        emparejadas.push({ entrada: entradaActual, salida: null });
+                    }
+                    entradaActual = asistencia;
+                } else if (asistencia.tipo_acceso === 'Salida' && entradaActual) {
+                    emparejadas.push({ entrada: entradaActual, salida: asistencia });
+                    entradaActual = null;
+                }
+            });
+
+            if (entradaActual) {
+                emparejadas.push({ entrada: entradaActual, salida: null });
+            }
+
+            return {
+                usuario_id: _id.usuario_id,
+                nombre_completo: _id.nombre_completo,
+                asistencias: emparejadas
+            };
+        });
+
+        return { asistencias: asistenciasEmparejadas, total };
     } catch (error) {
         console.error(`Error al mostrar las asistencias del día ${fecha} para gymId: ${gym_id}:`, error);
         throw new Error(`Error al mostrar las asistencias del día ${fecha}`);
