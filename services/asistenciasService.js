@@ -61,7 +61,7 @@ const registrarAsistencia = async (gymId, membresiaId, fecha_hora) => {
 };
 
 //Servicio para que el administrador vea las asistencias (paginadas y poder cambiar los días a ver)
-const verAsistencias = async (gym_id, fecha = null, search = '', page = 1, limit = 10) => {
+const verAsistencias = async (gym_id, fecha, search = '', page = 1, limit = 10) => {
     try {
         // Crear condición de búsqueda
         let searchCondition = {};
