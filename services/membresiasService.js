@@ -64,7 +64,7 @@ const registroUsuario = async(plan_id, nombre_completo, email, password, telefon
             membresia_id: nuevaMembresia._id,
             gym_id: planSeleccionado.gym_id,
             fecha_hora: fecha_inicio,
-            concepto: planSeleccionado.nombrePlan,
+            concepto: planSeleccionado.nombre,
             monto: planSeleccionado.costo
         });
 
@@ -351,7 +351,7 @@ const aplazarMembresia = async(membresia_id, plan_id) => {
             membresia_id: membresia._id,
             gym_id: membresia.gym_id,
             fecha_hora: fecha_actual, // Fecha y hora actual para el nuevo pago
-            concepto: planSeleccionado.nombrePlan,
+            concepto: planSeleccionado.nombre,
             monto: planSeleccionado.costo
         });
 
