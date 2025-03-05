@@ -37,7 +37,7 @@ const crearGimnasio = async (req, res) => {
     }
 };
 
-//Controlador para ver gimnasios
+//Controlador para que el admin vea sus gimnasios
 const verGimnasios = async (req, res) => {
     try {
         const adminId = req.user.id; // Obtener el ID del administrador desde el token
@@ -118,4 +118,22 @@ const editarGimnasio = async (req, res) => {
     }
 };
 
-module.exports = { crearGimnasio, verGimnasios, editarGimnasio };
+//Controlador para que el usuario vea los gimnasios a los que puede acceder con su membresía
+const verGimnasiosUser = async (req, res) => {
+    try {
+        const {membresiaId} = req.params; // Obtener el ID de la membresía desde la URL
+
+        // Llamar al servicio para obtener los gimnasios
+        const gimnasios = await gymService.verGimnasiosUser(membresiaId);
+
+        res.status(200).json(gimnasios);
+    } catch (error) {
+        console.error('Error en el controlador de obtenerGimnasiosDeAdmin:', error);
+        if (error.message === 'Membresía no encontrada') {
+            return res.status(404).json({ error: 'Membresía no encontrada' });
+        }
+        res.status(500).json({ error: 'Error al obtener los gimnasios de la membresía' });
+    }
+};
+
+module.exports = { crearGimnasio, verGimnasios, editarGimnasio, verGimnasiosUser };

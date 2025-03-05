@@ -1,6 +1,7 @@
 //Aquí se encuentran los services para el manejo de gimnasios
 const Gym = require('../models/gym');
 const Admin = require('../models/admin');
+const Membresia = require('../models/membresias');
 require('dotenv').config();
 
 //Servicio para agregar un gimnasio
@@ -32,7 +33,7 @@ const crearGimnasio = async (nombre, direccion, telefono, horario, adminId, imag
     }
 };
 
-//Servicio para ver gimnasios
+//Servicio para que el admin vea sus gimnasios
 const verGimnasios = async (adminId) => {
   try {
       // Buscar el administrador por su ID y obtener su array gym_id
@@ -73,4 +74,23 @@ const editarGimnasio = async (id, updateFields) => {
     }
 };
 
-module.exports = { crearGimnasio, verGimnasios, editarGimnasio };
+//Servicio para que el usuario vea los gimnasios a los que puede acceder con su membresía
+const verGimnasiosUser = async (membresiaId) => {
+  try {
+      // Buscar el administrador por su ID y obtener su array gym_id
+      const membresia = await Membresia.findById(membresiaId).select('gym_id');
+      if (!membresia) {
+          throw new Error('Membresía no encontrada');
+      }
+
+      // Obtener los gimnasios correspondientes a los gym_id
+      const gimnasios = await Gym.find({ _id: { $in: membresia.gym_id } });
+
+      return gimnasios;
+  } catch (error) {
+      console.error('Error en el servicio de obtenerGimnasiosDeAdmin:', error);
+      throw new Error('Error al obtener los gimnasios del administrador');
+  }
+};
+
+module.exports = { crearGimnasio, verGimnasios, editarGimnasio, verGimnasiosUser };
