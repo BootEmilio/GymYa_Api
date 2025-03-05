@@ -26,4 +26,21 @@ const authenticateUser = async (usuario) => {
   }
 };
 
-module.exports = { authenticateUser };
+//Servicio para editar usuario
+const editarUsuario = async (usuarioId, updateFields) => {
+  try{
+    // Buscar y actualizar el usuario
+    const usuarioActualizado = await user.findByIdAndUpdate(
+      usuarioId,
+      { $set: updateFields }, // Actualizar solo los campos proporcionados
+      { new: true } // Devolver el documento actualizado
+    );
+
+    return usuarioActualizado;
+  }catch (error) {
+    console.error('Error editanto al usuario', error);
+    throw new Error('Error editanto al usuario');
+  }
+};
+
+module.exports = { authenticateUser, editarUsuario };
