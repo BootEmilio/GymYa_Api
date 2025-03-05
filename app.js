@@ -21,6 +21,8 @@ const loggerMiddleware = require('./middlewares/loggerMiddleware');
 const app = express();
 connectDB();
 
+require('./cron');
+
 const corsOptions = {
   origin: 'https://gymya-web.onrender.com', // Permitir solo tu frontend
   methods: 'GET,POST,PUT,DELETE', // Métodos permitidos

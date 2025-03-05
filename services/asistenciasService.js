@@ -11,9 +11,11 @@ const registrarAsistencia = async (gymId, membresiaId, fecha_hora) => {
         }).sort({ fecha_hora: -1 }); //Ordenar por las más recientes
 
         let tipo_acceso = 'Entrada'; //Valor por defecto
+        let mensaje = 'Puede pasar al gimnasio'; // Mensaje por defecto para entradas
 
         if(ultimaAsistencia && ultimaAsistencia.tipo_acceso === 'Entrada') {
             tipo_acceso = 'Salida'; // Si la última asistencia fue 'Entrada', la siguiente será 'Salida'
+            mensaje = 'Gracias por su visita'; // Mensaje para salidas
         }
 
         //Creamos la asistencia
@@ -24,36 +26,7 @@ const registrarAsistencia = async (gymId, membresiaId, fecha_hora) => {
             fecha_hora: fecha_hora
         })
 
-        //Si es una entrada, programamos la salida después de x tiempo (ahora es un minuto)
-        if(tipo_acceso === 'Entrada') {
-            const AUTO_LOGOUT_TIME = 3 * 60 * 60 * 1000; // 3 horas en milisegundos (3 * 60 * 60 * 1000)
-
-            setTimeout(async () => {
-                // Verificar si ya se registró una salida manualmente en este tiempo
-                const salidaRegistrada = await Asistencia.findOne({
-                    membresia_id: membresiaId,
-                    gym_id: gymId,
-                    tipo_acceso: 'Salida',
-                    fecha_hora: { $gte: nuevaAsistencia.fecha_hora } // Buscar salidas después de esta entrada
-                });
-
-                // Si no se registró una salida, crearla automáticamente
-                if (!salidaRegistrada) {
-                    // Usar la fecha de entrada y sumarle el tiempo adicional (3 horas)
-                    const fechaSalidaAutomatica = new Date(nuevaAsistencia.fecha_hora.getTime() + AUTO_LOGOUT_TIME);
-                    await Asistencia.create({
-                        membresia_id: membresiaId,
-                        gym_id: gymId,
-                        tipo_acceso: 'Salida',
-                        fecha_hora: fechaSalidaAutomatica // Fecha actual, cuando se registra la salida automática
-                    });
-
-                    console.log('Salida automática registrada para el usuario:', membresia.usuario_id);
-                }
-            }, 60000) // 60000 milisegundos = 1 minuto
-        }
-
-        return{ success: true, message: 'Puede pasar al gimnasio', asistencia: nuevaAsistencia };
+        return{ success: true, message: mensaje, asistencia: nuevaAsistencia };
     }catch(error){
         console.error('Erros al registrar la asistencia:', error);
         throw new Error('Error al registrar al la asistencia');
