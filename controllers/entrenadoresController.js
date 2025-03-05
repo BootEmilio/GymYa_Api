@@ -1,6 +1,7 @@
 const entrenadoresService = require('../services/entrenadoresService');
 const Entrenador = require('../models/entrenador');
 const Gym = require('../models/gym');
+const Membresia = require('../models/membresias');
 const cloudinary = require('../cloudinary-config');
 const fs = require('fs'); // para manejar el borrado de archivos temporales
 const bcrypt = require('bcryptjs');
@@ -90,6 +91,31 @@ const verEntrenador = async(req, res) => {
   }
 };
 
+//Controlador para ver los entrenadores disponibles con la membresia
+const verEntrenadoresUser = async(req,res) => {
+  try{
+    const {membresiaId} = req.params; //Obtenemos el gym_id de la ruta
+    const userMembresiaIds = req.user.membresia_id; // Array de gym_id del administrador
+        
+    // Buscar la membresía en la base de datos usando Mongoose
+    const membresia = await Membresia.findById(membresiaId);
+    if (!membresia) {
+      return res.status(404).json({ error: 'Membresía no encontrada' });
+    }
+        
+    // Verificar si el gymId está en el array de gym_id del administrador
+    if (!userMembresiaIds.includes(membresiaId)) {
+      return res.status(403).json({ error: 'No tienes permisos para ver los entrenadores disponibles' });
+    }
+
+    const entrenadores = await entrenadoresService.verEntrenadores(membresiaId);
+
+    res.status(200).json(entrenadores);
+  }catch (error){
+    res.status(500).json({error: 'Error al mostrar los entrenadores'});
+  }
+};
+
 //Registro de entrenador independiente
 const registro = async(req,res) => {
     try{
@@ -147,4 +173,4 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { agregarEntrenador, verEntrenadores, verEntrenador, registro, login };
+module.exports = { agregarEntrenador, verEntrenadores, verEntrenador, verEntrenadoresUser, registro, login };

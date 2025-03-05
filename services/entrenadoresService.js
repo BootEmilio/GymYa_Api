@@ -1,4 +1,5 @@
 const Entrenador = require('../models/entrenador');
+const Membresia = require('../models/membresias');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -10,7 +11,7 @@ const agregarEntrenador = async(gymId, nombre_completo, especialidad, horario, i
     try{
         //Crear al entrenador
         const nuevoEntrenador = await Entrenador.create({
-            gym_id: [gymId],
+            gym_id: gymId,
             nombre_completo: nombre_completo,
             especialidad: especialidad,
             horario: horario,
@@ -50,6 +51,27 @@ const verEntrenador = async (entrenadorId) => {
       return entrenador;
     } catch (error) {
       throw new Error('Error al buscar el entrenador: ' + error.message);
+    }
+};
+
+//Servicio para ver los entrenadores disponibles con la membresia
+const verEntrenadoresUser = async (membresiaId) => {
+    try {
+        // Buscar la membresía junto a su array de gym_id
+        const membresia = await Membresia.findById(membresiaId).select('gym_id');
+        const gymIds = membresia.gym_id; // Array de gym_id de la membresía
+
+        // Buscar todos los entrenadores que tengan el gymId en su array gym_id
+        const entrenadores = await Entrenador.find({ gym_id: { $in: gymIds } }).exec();
+    
+        // Si no se encuentran entrenadores, puedes devolver un array vacío o un mensaje
+        if (!entrenadores || entrenadores.length === 0) {
+            return []; // o puedes devolver un mensaje como { message: 'No hay entrenadores en este gimnasio' }
+        }
+    
+        return entrenadores;
+    } catch (error) {
+        throw new Error('Error al buscar los entrenadores: ' + error.message);
     }
 };
 
@@ -101,4 +123,4 @@ const login = async (entrenador) => {
     }
 };
 
-module.exports= { agregarEntrenador, verEntrenadores, verEntrenador, registro, login };
+module.exports= { agregarEntrenador, verEntrenadores, verEntrenador, verEntrenadoresUser, registro, login };
