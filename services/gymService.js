@@ -2,6 +2,7 @@
 const Gym = require('../models/gym');
 const Admin = require('../models/admin');
 const Membresia = require('../models/membresias');
+const Asistencia = require('../models/asistencias');
 require('dotenv').config();
 
 //Servicio para agregar un gimnasio
@@ -77,7 +78,7 @@ const editarGimnasio = async (id, updateFields) => {
 //Servicio para que el usuario vea los gimnasios a los que puede acceder con su membresía
 const verGimnasiosUser = async (membresiaId) => {
   try {
-      // Buscar el administrador por su ID y obtener su array gym_id
+      // Buscar la membresía por su ID y obtener el array de gym_id
       const membresia = await Membresia.findById(membresiaId).select('gym_id');
       if (!membresia) {
           throw new Error('Membresía no encontrada');
@@ -86,11 +87,49 @@ const verGimnasiosUser = async (membresiaId) => {
       // Obtener los gimnasios correspondientes a los gym_id
       const gimnasios = await Gym.find({ _id: { $in: membresia.gym_id } });
 
-      return gimnasios;
+      // Para cada gimnasio, contar los usuarios con una asistencia de tipo "Entrada" sin "Salida"
+      const gimnasiosConUsuariosDentro = await Promise.all(gimnasios.map(async (gimnasio) => {
+          // Encontrar las asistencias "Entrada" sin "Salida" para este gimnasio
+          const usuariosDentro = await Asistencia.aggregate([
+              {
+                  $match: {
+                      gym_id: gimnasio._id,
+                      tipo_acceso: 'Entrada'
+                  }
+              },
+              {
+                  $lookup: {
+                      from: 'asistencias',
+                      localField: '_id', // Relacionar la asistencia de entrada
+                      foreignField: 'entrada_id', // Campo que se relaciona con la salida
+                      as: 'salida'
+                  }
+              },
+              {
+                  $match: {
+                      salida: { $size: 0 } // Buscar solo las asistencias que no tienen salida
+                  }
+              },
+              {
+                  $group: {
+                      _id: '$usuario_id', // Agrupar por usuario
+                      count: { $sum: 1 }
+                  }
+              }
+          ]);
+
+          return {
+              ...gimnasio.toObject(), // Incluimos los datos del gimnasio
+              usuariosDentro: usuariosDentro.length // Número de usuarios "dentro" del gimnasio
+          };
+      }));
+
+      return gimnasiosConUsuariosDentro;
   } catch (error) {
-      console.error('Error en el servicio de obtenerGimnasiosDeAdmin:', error);
-      throw new Error('Error al obtener los gimnasios del administrador');
+      console.error('Error en el servicio verGimnasiosUser:', error);
+      throw new Error('Error al obtener los gimnasios del usuario');
   }
 };
+
 
 module.exports = { crearGimnasio, verGimnasios, editarGimnasio, verGimnasiosUser };
