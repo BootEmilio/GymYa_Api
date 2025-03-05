@@ -14,7 +14,6 @@ const planesRoutes = require('./routes/planesRoutes');
 const membresiasRoutes = require('./routes/membresiasRoutes');
 const entrenadoresRoutes = require('./routes/entrenadorRoutes');
 const asistenciasRoutes = require('./routes/asistenciasRoutes'); 
-const adminPaymentsRoutes = require ('./routes/adminPaymentsRoutes');
 // Rutas para usuarios
 const userRoutes = require('./routes/userRoutes');
 const authMiddleware = require('./middlewares/authMiddleware');
