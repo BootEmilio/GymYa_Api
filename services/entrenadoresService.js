@@ -66,7 +66,7 @@ const verEntrenadoresUser = async (membresiaId) => {
     
         // Si no se encuentran entrenadores, puedes devolver un array vacío o un mensaje
         if (!entrenadores || entrenadores.length === 0) {
-            return []; // o puedes devolver un mensaje como { message: 'No hay entrenadores en este gimnasio' }
+            return "No hay entrenadores disponibles con esta membresía"; // o puedes devolver un mensaje como { message: 'No hay entrenadores en este gimnasio' }
         }
     
         return entrenadores;
