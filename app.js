@@ -61,9 +61,6 @@ app.use('/api', asistenciasRoutes); // Registrar entradas y salidas, consultarla
 
 //Rutas para entrenadores
 
-app.use('/api', adminUsersRoutes);
-app.use('/api', adminPaymentsRoutes);
-
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
