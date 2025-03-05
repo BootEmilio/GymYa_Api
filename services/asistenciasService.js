@@ -131,10 +131,34 @@ const verAsistencias = async (gym_id, fecha, search = '', page = 1, limit = 10) 
             }
         ]);
 
-        const total = await Asistencia.countDocuments({
-            gym_id: new mongoose.Types.ObjectId(gym_id),
-            fecha_hora: { $gte: fechaInicio, $lte: fechaFin }
-        });
+        // Contar el número de usuarios únicos con asistencias
+        const totalUsuarios = await Asistencia.aggregate([
+            {
+                $match: {
+                    gym_id: new mongoose.Types.ObjectId(gym_id),
+                    fecha_hora: { $gte: fechaInicio, $lte: fechaFin }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'usuarios',
+                    localField: 'membresia_id',
+                    foreignField: 'membresia_id',
+                    as: 'usuario'
+                }
+            },
+            { $unwind: '$usuario' },
+            {
+                $group: {
+                    _id: '$usuario._id' // Agrupar por usuario
+                }
+            },
+            {
+                $count: 'totalUsuarios' // Contar usuarios únicos
+            }
+        ]);
+
+        const total = totalUsuarios.length > 0 ? totalUsuarios[0].totalUsuarios : 0;
 
         // Procesar el resultado para emparejar entradas con salidas
         const asistenciasEmparejadas = asistencias.map(usuario => {
@@ -169,7 +193,13 @@ const verAsistencias = async (gym_id, fecha, search = '', page = 1, limit = 10) 
             };
         });
 
-        return { asistencias: asistenciasEmparejadas, total };
+        return { 
+            asistencias: asistenciasEmparejadas, 
+            total, 
+            page, 
+            limit, 
+            totalPages: Math.ceil(total / limit) 
+        };
     } catch (error) {
         console.error(`Error al mostrar las asistencias del día ${fecha} para gymId: ${gym_id}:`, error);
         throw new Error(`Error al mostrar las asistencias del día ${fecha}`);
@@ -289,13 +319,4 @@ const verAsistenciasUser = async (membresiaId, page = 1, limit = 8) => {
     }
 };
 
-//Servicio para que el usuario vea cuantos usuarios hay en el gimnasio
-const verCantidadAsistencias = async () => {
-    try{
-
-    }catch(error){
-
-    }
-};
-
-module.exports = { registrarAsistencia, verAsistencias, verAsistencia, verAsistenciasUser, verCantidadAsistencias };
+module.exports = { registrarAsistencia, verAsistencias, verAsistencia, verAsistenciasUser };
