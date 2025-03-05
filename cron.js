@@ -3,7 +3,7 @@ const cron = require('node-cron');
 const Asistencia = require('./models/asistencias'); // Asegúrate de importar el modelo de Asistencia
 
 // Programar el cron job para ejecutarse cada 15 minutos
-cron.schedule('*/10 * * * *', async () => {
+cron.schedule('*/5 * * * *', async () => {
     try {
         const AUTO_LOGOUT_TIME = 30 * 60000; // 30 minutos en milisegundos
 
