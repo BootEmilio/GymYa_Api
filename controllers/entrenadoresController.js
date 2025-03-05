@@ -1,6 +1,8 @@
 const entrenadoresService = require('../services/entrenadoresService');
 const Entrenador = require('../models/entrenador');
 const Gym = require('../models/gym');
+const cloudinary = require('../cloudinary-config');
+const fs = require('fs'); // para manejar el borrado de archivos temporales
 const bcrypt = require('bcryptjs');
 
 //Controlador para que un administrador agregue a un entrenador

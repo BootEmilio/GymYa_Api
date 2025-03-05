@@ -10,11 +10,11 @@ const agregarEntrenador = async(gymId, nombre_completo, especialidad, horario, i
     try{
         //Crear al entrenador
         const nuevoEntrenador = await Entrenador.create({
-            gymId,
-            nombre_completo,
-            especialidad,
-            horario,
-            imagenUrl
+            gym_id: [gymId],
+            nombre_completo: nombre_completo,
+            especialidad: especialidad,
+            horario: horario,
+            imagen: imagenUrl
         });
 
         return { success: true, message: 'Se ha agregado correctamente un entrenador nuevo', entrenador: nuevoEntrenador };
