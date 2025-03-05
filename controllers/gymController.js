@@ -68,6 +68,26 @@ const verGimnasios = async (req, res) => {
     }
 };
 
+//Para que pueda buscar un gym por id el admin
+const obtenerGimnasioPorId = async (req, res) => {
+    try {
+        const { gymId } = req.params;
+
+        // Buscar el gimnasio en la base de datos
+        const gimnasio = await Gym.findById(gymId);
+
+        if (!gimnasio) {
+            return res.status(404).json({ error: "Gimnasio no encontrado" });
+        }
+
+        // Enviar el gimnasio encontrado
+        res.status(200).json(gimnasio);
+    } catch (error) {
+        console.error("Error al obtener el gimnasio:", error);
+        res.status(500).json({ error: "Error al obtener el gimnasio" });
+    }
+};
+
 //Controlador para editar gimnasios
 const editarGimnasio = async (req, res) => {
     try{
@@ -149,4 +169,4 @@ const verGimnasiosUser = async (req, res) => {
     }
 };
 
-module.exports = { crearGimnasio, verGimnasios, editarGimnasio, verGimnasiosUser };
+module.exports = { crearGimnasio, verGimnasios, editarGimnasio, verGimnasiosUser, obtenerGimnasioPorId  };

@@ -9,6 +9,8 @@ const router = express.Router();
 router.post('/gym', token, upload.single('imagen'), gymController.crearGimnasio);
 //Ruta para que el admin vea sus gimnasios
 router.get('/gym', token, gymController.verGimnasios)
+// Ruta para obtener un gimnasio por su ID
+router.get("/gym/:gymId", gymController.obtenerGimnasioPorId);
 //Ruta para editar un gimnasio
 router.put('/:gymId/editar', upload.single('imagen'), token, gymController.editarGimnasio);
 //Ruta para que el usuario vea los gimnasios a los que puede acceder con su membresía
