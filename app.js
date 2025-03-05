@@ -52,7 +52,6 @@ app.use(authMiddleware); //De aquí en adelante las rutas necesitan del token
 //Rutas para administradores
 app.use('/api', gymRoutes); // Crear, ver y editar gimnasio
 app.use('/api', planesRoutes); // Agregar, ver, editar y "eliminar" planes de membresía
-app.use('/api', entrenadoresRoutes); //Agregar entrenador
 
 //Rutas para usuarios
 app.use('/api', userRoutes); // Editar número de télefono, imagen, contraseña y email
@@ -60,6 +59,7 @@ app.use('/api', userRoutes); // Editar número de télefono, imagen, contraseña
 //Rutas para ambos
 app.use('/api', membresiasRoutes); //Agregar membresias y usuarios nuevas, ver y aplazar membresía existentes
 app.use('/api', asistenciasRoutes); // Registrar entradas y salidas, consultarlas como admin y user
+app.use('/api', entrenadoresRoutes); //Agregar entrenador, ver lista e individual
 
 //Rutas para entrenadores
 

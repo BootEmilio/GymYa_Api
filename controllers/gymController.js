@@ -1,7 +1,8 @@
 const gymService = require('../services/gymService');
 const cloudinary = require('../cloudinary-config');
 const fs = require('fs'); // para manejar el borrado de archivos temporales
-const Gym = require('../models/gym')
+const Gym = require('../models/gym');
+const Admin = require('../models/admin');
 
 //Controlador para agregar gimnasios
 const crearGimnasio = async (req, res) => {
@@ -9,14 +10,20 @@ const crearGimnasio = async (req, res) => {
         const { nombre, direccion, telefono, horario } = req.body;
         const adminId = req.user.id; //Obtenemos el _id del administraddr por medio de su token
 
+        //Verificar que exista el admin
+        const administrador = await Admin.findById(adminId);
+        if(!administrador){
+            return res.status(400).json({ error: 'No existe este administrador' });
+        }
+
         // Validar campos obligatorios
         if (!nombre || !direccion || !telefono || !horario) {
-            return res.status(400).json({ error: 'Todos los campos son obligatorios' });
+            return res.status(400).json({ error: 'Llene todos los campos del gimnasio' });
         }
 
         // Validar si hay un archivo de imagen en la petición
         if (!req.file) {
-            return res.status(400).json({ error: 'La imagen es obligatoria' });
+            return res.status(400).json({ error: 'Suba una imagen de su gimnasios' });
         }
 
         // Subir imagen a Cloudinary
@@ -41,6 +48,12 @@ const crearGimnasio = async (req, res) => {
 const verGimnasios = async (req, res) => {
     try {
         const adminId = req.user.id; // Obtener el ID del administrador desde el token
+
+        //Verificar que exista el admin
+        const administrador = await Admin.findById(adminId);
+        if(!administrador){
+            return res.status(400).json({ error: 'No existe este administrador' });
+        }
 
         // Llamar al servicio para obtener los gimnasios
         const gimnasios = await gymService.verGimnasios(adminId);

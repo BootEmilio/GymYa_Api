@@ -6,25 +6,50 @@ const secretKey = process.env.JWT_SECRET;
 const tokenExpiration = process.env.JWT_EXPIRATION || '2h';
 
 //Servicio para que un administrador agregue un entrenador a su gimnasio
-const agregarEntrenador = async(gym_id, nombre_completo, especialidad, horario, imagen) => {
+const agregarEntrenador = async(gymId, nombre_completo, especialidad, horario, imagenUrl) => {
     try{
-        //Agregamos una imagen por defecto del entrenador
-        if(!imagen){
-            imagen = 'user.jpg';
-        }
         //Crear al entrenador
         const nuevoEntrenador = await Entrenador.create({
-            gym_id,
+            gymId,
             nombre_completo,
             especialidad,
             horario,
-            imagen
+            imagenUrl
         });
 
         return { success: true, message: 'Se ha agregado correctamente un entrenador nuevo', entrenador: nuevoEntrenador };
     }catch(error){
         console.error('Error al agregar al entrenador:', error);
         throw new Error('Error al agregar al entrenador');
+    }
+};
+
+//Servicio para que un administrador vea los entrenadores de su gimnasio
+const verEntrenadores = async (gymId) => {
+    try {
+      // Buscar todos los entrenadores que tengan el gymId en su array gym_id
+      const entrenadores = await Entrenador.find({ gym_id: gymId }).exec();
+  
+      // Si no se encuentran entrenadores, puedes devolver un array vacío o un mensaje
+      if (!entrenadores || entrenadores.length === 0) {
+        return []; // o puedes devolver un mensaje como { message: 'No hay entrenadores en este gimnasio' }
+      }
+  
+      return entrenadores;
+    } catch (error) {
+      throw new Error('Error al buscar los entrenadores: ' + error.message);
+    }
+};
+
+//Servicio para que un administrador vea los entrenadores de su gimnasio
+const verEntrenador = async (entrenadorId) => {
+    try {
+      // Buscar todos los entrenadores que tengan el gymId en su array gym_id
+      const entrenador = await Entrenador.findById(entrenadorId);
+  
+      return entrenador;
+    } catch (error) {
+      throw new Error('Error al buscar el entrenador: ' + error.message);
     }
 };
 
@@ -76,4 +101,4 @@ const login = async (entrenador) => {
     }
 };
 
-module.exports= { agregarEntrenador, registro, login };
+module.exports= { agregarEntrenador, verEntrenadores, verEntrenador, registro, login };

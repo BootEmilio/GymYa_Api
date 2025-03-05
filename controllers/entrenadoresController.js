@@ -1,23 +1,91 @@
 const entrenadoresService = require('../services/entrenadoresService');
 const Entrenador = require('../models/entrenador');
+const Gym = require('../models/gym');
 const bcrypt = require('bcryptjs');
 
 //Controlador para que un administrador agregue a un entrenador
 const agregarEntrenador = async(req, res) => {
     try{
-        const {nombre_completo, especialidad, horario, imagen } = req.body;
-        const gym_id = req.user.gym_id; //Obtenemos el gym_id del token del administrador
+        const {gymId} = req.params; //Obtenemos el gym_id de la ruta
+        const {nombre_completo, especialidad, horario } = req.body;
+        const adminGymIds = req.user.gym_id; // Array de gym_id del administrador
+        
+        // Buscar el gimnasio en la base de datos usando Mongoose
+        const gimnasioActual = await Gym.findById(gymId);
+        if (!gimnasioActual) {
+          return res.status(404).json({ error: 'Gimnasio no encontrado' });
+        }
+        
+        // Verificar si el gymId está en el array de gym_id del administrador
+        if (!adminGymIds.includes(gymId)) {
+          return res.status(403).json({ error: 'No tienes permisos para agregar entrenadores en este gimnasio' });
+        }
 
         //Validar que todos los datos son proporcionados
         if(!nombre_completo || !especialidad || !horario){
-            return res.status(400).json({ error: 'Todos los campos son obligatorios' });
+            return res.status(400).json({ error: 'Llene todos los campos del entrenador' });
         }
 
-        const nuevoEntrenador = await entrenadoresService.agregarEntrenador(gym_id, nombre_completo, especialidad, horario, imagen);
+        // Validar si hay un archivo de imagen en la petición
+        if (!req.file) {
+          return res.status(400).json({ error: 'Suba una imagen del entrenador' });
+        }
+
+        // Subir imagen a Cloudinary
+        const result = await cloudinary.uploader.upload(req.file.path);
+        
+        // Guardar la URL de la imagen
+        const imagenUrl = result.secure_url;
+
+        const nuevoEntrenador = await entrenadoresService.agregarEntrenador(gymId, nombre_completo, especialidad, horario, imagenUrl);
         res.status(201).json(nuevoEntrenador);
     }catch (error){
         res.status(500).json({error: 'Error al agregar al entrenador'});
     }
+};
+
+//Controlador para que un administrador vea los entrenadores de su gimnasio
+const verEntrenadores = async(req,res) => {
+  try{
+    const {gymId} = req.params; //Obtenemos el gym_id de la ruta
+    const adminGymIds = req.user.gym_id; // Array de gym_id del administrador
+        
+    // Buscar el gimnasio en la base de datos usando Mongoose
+    const gimnasioActual = await Gym.findById(gymId);
+    if (!gimnasioActual) {
+      return res.status(404).json({ error: 'Gimnasio no encontrado' });
+    }
+        
+    // Verificar si el gymId está en el array de gym_id del administrador
+    if (!adminGymIds.includes(gymId)) {
+      return res.status(403).json({ error: 'No tienes permisos para ver los entrenadores de este gimnasio' });
+    }
+
+    const entrenadores = await entrenadoresService.verEntrenadores(gymId);
+
+    res.status(200).json(entrenadores);
+  }catch (error){
+    res.status(500).json({error: 'Error al mostrar los entrenadores'});
+  }
+};
+
+//Controlador para ver un entrenador en web o app móvil
+const verEntrenador = async(req, res) => {
+  try{
+    const {entrenadorId} = req.params; //Obtenemos el _id del entrenador
+
+    // Buscar el entrenador 
+    const entrenador = await Entrenador.findById(entrenadorId);
+    if (!entrenador) {
+      return res.status(404).json({ error: 'Entrenador no encontrado' });
+    }
+
+    const result = await entrenadoresService.verEntrenador(entrenadorId);
+
+    res.status(200).json(result);
+  }catch (error){
+    res.status(500).json({error: 'Error al mostrar el entrenador'});
+  }
 };
 
 //Registro de entrenador independiente
@@ -77,4 +145,4 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { agregarEntrenador, registro, login };
+module.exports = { agregarEntrenador, verEntrenadores, verEntrenador, registro, login };

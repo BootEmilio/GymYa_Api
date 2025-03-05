@@ -39,9 +39,6 @@ const verGimnasios = async (adminId) => {
   try {
       // Buscar el administrador por su ID y obtener su array gym_id
       const admin = await Admin.findById(adminId).select('gym_id');
-      if (!admin) {
-          throw new Error('Administrador no encontrado');
-      }
 
       // Obtener los gimnasios correspondientes a los gym_id
       const gimnasios = await Gym.find({ _id: { $in: admin.gym_id } });
