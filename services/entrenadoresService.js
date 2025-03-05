@@ -11,9 +11,9 @@ const agregarEntrenador = async(gymId, nombre_completo, especialidad, horario, i
         //Crear al entrenador
         const nuevoEntrenador = await Entrenador.create({
             gym_id: [gymId],
-            nombre_completo,
-            especialidad,
-            horario,
+            nombre_completo: nombre_completo,
+            especialidad: especialidad,
+            horario: horario,
             imagen: imagenUrl
         });
 
