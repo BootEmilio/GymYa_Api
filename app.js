@@ -13,9 +13,10 @@ const gymRoutes = require('./routes/gymRoutes');
 const planesRoutes = require('./routes/planesRoutes');
 const membresiasRoutes = require('./routes/membresiasRoutes');
 const entrenadoresRoutes = require('./routes/entrenadorRoutes');
-const adminUsersRoutes = require('./routes/adminUsersRoutes');
 const asistenciasRoutes = require('./routes/asistenciasRoutes'); 
 const adminPaymentsRoutes = require ('./routes/adminPaymentsRoutes');
+// Rutas para usuarios
+const userRoutes = require('./routes/userRoutes');
 const authMiddleware = require('./middlewares/authMiddleware');
 const loggerMiddleware = require('./middlewares/loggerMiddleware');
 const app = express();
@@ -51,6 +52,9 @@ app.use(authMiddleware); //De aquí en adelante las rutas necesitan del token
 app.use('/api', gymRoutes); // Crear, ver y editar gimnasio
 app.use('/api', planesRoutes); // Agregar, ver, editar y "eliminar" planes de membresía
 app.use('/api', entrenadoresRoutes); //Agregar entrenador
+
+//Rutas para usuarios
+app.use('/api', userRoutes); // Editar número de télefono, imagen, contraseña y email
 
 //Rutas para ambos
 app.use('/api', membresiasRoutes); //Agregar membresias y usuarios nuevas, ver y aplazar membresía existentes
