@@ -44,31 +44,31 @@ const loginUser = async (req, res) => {
 
 //Controlador para editar los datos del usuario
 const editarUsuario = async (req, res) => {
-  try{
+  try {
     const { usuarioId } = req.params;
-    
-    //Buscamos al usuario
+
+    // Buscamos al usuario
     const usuario = await user.findById(usuarioId);
-    if(!usuario) {
-      res.status(404).json({error: 'Usuario no encontrado'});
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
     }
 
-    //Creamos el objeto de edición
-    const updateFields = [];
+    // Creamos el objeto de edición
+    const updateFields = {}; // Debe ser un objeto, no un arreglo
 
-    //Verificamos que se pase una imagen en la solicitud
-    if(req.file){
+    // Verificamos que se pase una imagen en la solicitud
+    if (req.file) {
       const imagenActualUrl = usuario.imagen; // Obtener la imagen actual
 
-      //Subimos la nueva imagen
+      // Subimos la nueva imagen a Cloudinary
       const result = await cloudinary.uploader.upload(req.file.path);
       const nuevaImagenUrl = result.secure_url;
 
       // Guardar la URL de la nueva imagen en los campos de actualización
       updateFields.imagen = nuevaImagenUrl;
 
-      // Eliminar la imagen anterior de Cloudinary (si existe)
-      if (imagenActualUrl) {
+      // Eliminar la imagen anterior de Cloudinary (solo si está en Cloudinary)
+      if (imagenActualUrl && imagenActualUrl.includes('cloudinary')) {
         const imagenId = imagenActualUrl.split('/').pop().split('.')[0]; // Extraer el ID de la imagen
         await cloudinary.uploader.destroy(imagenId);
       }
@@ -82,12 +82,13 @@ const editarUsuario = async (req, res) => {
       return res.status(400).json({ error: 'No se han proporcionado datos para actualizar' });
     }
 
+    // Actualizamos el usuario en la base de datos
     const actualizado = await userService.editarUsuario(usuarioId, updateFields);
 
     res.status(200).json(actualizado);
-  }catch (error){
-    console.error('Error al subir la imagen', error);
-    res.status(500).json({ message: 'Error al subir la imagen' });
+  } catch (error) {
+    console.error('Error al editar el usuario:', error);
+    res.status(500).json({ message: 'Error al editar el usuario' });
   }
 };
 
