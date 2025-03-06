@@ -92,29 +92,40 @@ const verEntrenador = async(req, res) => {
 };
 
 //Controlador para ver los entrenadores disponibles con la membresia
-const verEntrenadoresUser = async(req,res) => {
-  try{
-    const {membresiaId} = req.params; //Obtenemos el gym_id de la ruta
-    const userMembresiaIds = req.user.membresia_id; // Array de gym_id del administrador
-        
-    // Buscar la membresía en la base de datos usando Mongoose
-    const membresia = await Membresia.findById(membresiaId);
-    if (!membresia) {
-      return res.status(404).json({ error: 'Membresía no encontrada' });
-    }
-        
-    // Verificar si el gymId está en el array de gym_id del administrador
-    if (!userMembresiaIds.includes(membresiaId)) {
-      return res.status(403).json({ error: 'No tienes permisos para ver los entrenadores disponibles' });
-    }
+const verEntrenadoresUser = async (req, res) => {
+  try {
+      const { membresiaId } = req.params; // Obtenemos el gym_id de la ruta
+      const userMembresiaIds = req.user.membresia_id; // Array de membresias del Usuario
 
-    const entrenadores = await entrenadoresService.verEntrenadores(membresiaId);
+      console.log("membresiaId recibido:", membresiaId);
+      console.log("userMembresiaIds en el usuario:", userMembresiaIds);
 
-    res.status(200).json(entrenadores);
-  }catch (error){
-    res.status(500).json({error: 'Error al mostrar los entrenadores'});
+      // Buscar la membresía en la base de datos usando Mongoose
+      const membresia = await Membresia.findById(membresiaId);
+      if (!membresia) {
+          return res.status(404).json({ error: 'Membresía no encontrada' });
+      }
+
+      console.log("Membresía encontrada:", membresia);
+
+      // Verificar si el gymId está en el array de gym_id del administrador
+      if (!userMembresiaIds.includes(membresiaId)) {
+          return res.status(403).json({ error: 'No tienes permisos para ver los entrenadores disponibles' });
+      }
+
+      // Llamamos al servicio para buscar entrenadores
+      const entrenadores = await entrenadoresService.verEntrenadoresUser(membresiaId);
+
+      // Verificar el resultado
+      console.log("Entrenadores encontrados:", entrenadores);
+
+      res.status(200).json(entrenadores);
+  } catch (error) {
+      console.error("Error en verEntrenadoresUser:", error);
+      res.status(500).json({ error: 'Error al mostrar los entrenadores' });
   }
 };
+
 
 //Registro de entrenador independiente
 const registro = async(req,res) => {
