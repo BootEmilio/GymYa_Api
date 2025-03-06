@@ -59,19 +59,10 @@ const verEntrenadoresUser = async (membresiaId) => {
     try {
         // Buscar la membresía junto con su array de gym_id
         const membresia = await Membresia.findById(membresiaId).exec();
+        const gymIds = membresia.gym_id.map(id => mongoose.Types.ObjectId(id)); // Convertir cada gym_id a un ObjectId
 
-        // Validar si la membresía existe
-        if (!membresia) {
-            return { message: "Membresía no encontrada" };
-        }
-
-        const gymIds = membresia.gym_id; // Array de gym_id de la membresía
-        console.log("Gym IDs asociados a la membresía:", gymIds); // Verifica qué gym_ids estás obteniendo
-        
         // Buscar todos los entrenadores que tengan gym_id en su array gym_id
         const entrenadores = await Entrenador.find({ gym_id: { $in: gymIds } }).exec();
-        
-        console.log("Entrenadores encontrados:", entrenadores); // Revisa qué entrenadores se están encontrando
         
         // Si no se encuentran entrenadores
         if (!entrenadores || entrenadores.length === 0) {
