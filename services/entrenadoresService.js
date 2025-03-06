@@ -1,6 +1,5 @@
 const Entrenador = require('../models/entrenador');
 const Membresia = require('../models/membresias');
-const Plan = require('../models/planes');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -60,10 +59,7 @@ const verEntrenadoresUser = async (membresiaId) => {
     try {
         // Buscar la membresía junto a su array de gym_id
         const membresia = await Membresia.findById(membresiaId);
-
-        // Buscar el plan asociado a la membresía para obtener su array de gym_id
-        const plan = await Plan.findById(membresia.plan_id);
-        const gymIds = plan.gym_id; // Array de gym_id de la membresía
+        const gymIds = membresia.gym_id; // Array de gym_id de la membresía
 
         // Buscar todos los entrenadores que tengan el gymId en su array gym_id
         const entrenadores = await Entrenador.find({ gym_id: { $in: gymIds } }).exec();
