@@ -57,18 +57,27 @@ const verEntrenador = async (entrenadorId) => {
 //Servicio para ver los entrenadores disponibles con la membresia
 const verEntrenadoresUser = async (membresiaId) => {
     try {
-        // Buscar la membresía junto a su array de gym_id
+        // Buscar la membresía junto con su array de gym_id
         const membresia = await Membresia.findById(membresiaId).exec();
-        const gymIds = membresia.gym_id; // Array de gym_id de la membresía
 
-        // Buscar todos los entrenadores que tengan el gymId en su array gym_id
-        const entrenadores = await Entrenador.find({ gym_id: { $in: gymIds } }).exec();
-    
-        // Si no se encuentran entrenadores, puedes devolver un array vacío o un mensaje
-        if (!entrenadores || entrenadores.length === 0) {
-            return { message: "No hay entrenadores disponibles con esta membresía" }; // o puedes devolver un mensaje como { message: 'No hay entrenadores en este gimnasio' }
+        // Validar si la membresía existe
+        if (!membresia) {
+            return { message: "Membresía no encontrada" };
         }
-    
+
+        const gymIds = membresia.gym_id; // Array de gym_id de la membresía
+        console.log("Gym IDs asociados a la membresía:", gymIds); // Verifica qué gym_ids estás obteniendo
+        
+        // Buscar todos los entrenadores que tengan gym_id en su array gym_id
+        const entrenadores = await Entrenador.find({ gym_id: { $in: gymIds } }).exec();
+        
+        console.log("Entrenadores encontrados:", entrenadores); // Revisa qué entrenadores se están encontrando
+        
+        // Si no se encuentran entrenadores
+        if (!entrenadores || entrenadores.length === 0) {
+            return { message: "No hay entrenadores disponibles con esta membresía" };
+        }
+        
         return entrenadores;
     } catch (error) {
         throw new Error('Error al buscar los entrenadores: ' + error.message);
