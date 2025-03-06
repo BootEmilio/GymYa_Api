@@ -330,7 +330,8 @@ const getMembresia = async (membresiaId) => {
                     nombreCompelto: '$usuario.nombre_completo', // Incluir el nombre del usuario
                     email: '$usuario.email', // Incluir el email del usuario
                     telefono: '$usuario.telefono', // Incluir el télefono del usuario
-                    imagen: '$usuario.imagen' // Incluir la imagen del usuario
+                    imagen: '$usuario.imagen', // Incluir la imagen del usuario
+                    gym_id: 1
                 }
             }
         ]);
