@@ -58,7 +58,7 @@ const verEntrenador = async (entrenadorId) => {
 const verEntrenadoresUser = async (membresiaId) => {
     try {
         // Buscar la membresía junto a su array de gym_id
-        const membresia = await Membresia.findById(membresiaId);
+        const membresia = await Membresia.findById(membresiaId).exec();
         const gymIds = membresia.gym_id; // Array de gym_id de la membresía
 
         // Buscar todos los entrenadores que tengan el gymId en su array gym_id
@@ -66,7 +66,7 @@ const verEntrenadoresUser = async (membresiaId) => {
     
         // Si no se encuentran entrenadores, puedes devolver un array vacío o un mensaje
         if (!entrenadores || entrenadores.length === 0) {
-            return "No hay entrenadores disponibles con esta membresía"; // o puedes devolver un mensaje como { message: 'No hay entrenadores en este gimnasio' }
+            return { message: "No hay entrenadores disponibles con esta membresía" }; // o puedes devolver un mensaje como { message: 'No hay entrenadores en este gimnasio' }
         }
     
         return entrenadores;
