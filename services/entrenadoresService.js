@@ -59,7 +59,7 @@ const verEntrenador = async (entrenadorId) => {
 const verEntrenadoresUser = async (membresiaId) => {
     try {
         // Buscar la membresía junto a su array de gym_id
-        const membresia = await Membresia.findById(membresiaId).select('plan_id');
+        const membresia = await Membresia.findById(membresiaId);
 
         // Buscar el plan asociado a la membresía para obtener su array de gym_id
         const plan = await Plan.findById(membresia.plan_id);
