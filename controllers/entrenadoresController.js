@@ -51,17 +51,11 @@ const agregarEntrenador = async(req, res) => {
 const verEntrenadores = async(req,res) => {
   try{
     const {gymId} = req.params; //Obtenemos el gym_id de la ruta
-    const adminGymIds = req.user.gym_id; // Array de gym_id del administrador
         
     // Buscar el gimnasio en la base de datos usando Mongoose
     const gimnasioActual = await Gym.findById(gymId);
     if (!gimnasioActual) {
       return res.status(404).json({ error: 'Gimnasio no encontrado' });
-    }
-        
-    // Verificar si el gymId está en el array de gym_id del administrador
-    if (!adminGymIds.includes(gymId)) {
-      return res.status(403).json({ error: 'No tienes permisos para ver los entrenadores de este gimnasio' });
     }
 
     const entrenadores = await entrenadoresService.verEntrenadores(gymId);
