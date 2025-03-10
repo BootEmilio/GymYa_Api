@@ -13,7 +13,7 @@ router.get('/:gymId/membresias/:status', token, membresiasController.getMembresi
 router.get('/membresias', token, membresiasController.getMembresiasUser);
 // Ruta para obtener una membresía del usuario
 router.get('/:membresiaId', token, membresiasController.getMembresia);
-router.get('/membresias/count', membershipController.getMembresiasCount);
+router.get('/membresias/count', membresiasController.getMembresiasCount);
 // Ruta para aplazar las membresías existentes
 router.put('/:membresiaId/aplazar', token, membresiasController.aplazarMembresia);
 module.exports = router;
