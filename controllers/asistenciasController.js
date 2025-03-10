@@ -84,7 +84,7 @@ const verAsistencia = async (req, res) => {
         if (!ultimaEntrada) {
             return res.status(404).json({
                 success: false,
-                message: "Aún no hay entradas en el gimnasio proporcionado."
+                message: "Aún no hay entradas en el gimnasio seleccionado."
             });
         }
 
