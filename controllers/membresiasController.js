@@ -101,7 +101,7 @@ const getMembresiasCount = async (req, res) => {
 
   try {
       // Llamar al servicio para obtener el conteo de membresías
-      const result = await membershipService.getMembresiasCount(gymId, status);
+      const result = await membresiasService.getMembresiasCount(gymId, status);
 
       // Devolver el resultado
       return res.status(200).json(result);
