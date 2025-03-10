@@ -232,6 +232,61 @@ const getMembresias = async (gymId, status, page = 1, limit = 10, search = '') =
     }
 };
 
+const getMembresiasCount = async (gymId, status) => {
+    try {
+        // Establecer la condición de fecha según el estado (activas o expiradas)
+        let dateCondition;
+        if (status === 'activas') {
+            dateCondition = { $gt: new Date() }; // Membresías activas
+        } else if (status === 'expiradas') {
+            dateCondition = { $lt: new Date() }; // Membresías expiradas
+        } else {
+            throw new Error('El estado proporcionado no es válido. Use "activas" o "expiradas".');
+        }
+
+        // Agregación en MongoDB desde Usuario
+        const countResult = await user.aggregate([
+            {
+                $lookup: {
+                    from: 'membresias', // Colección membresias
+                    localField: 'membresia_id', // Campo en usuarios
+                    foreignField: '_id', // Campo en membresias
+                    as: 'membresias'
+                }
+            },
+            { $unwind: '$membresias' }, // Descomprimir el array de membresías
+            {
+                $lookup: {
+                    from: 'planes', // Colección planes
+                    localField: 'membresias.plan_id', // Campo en membresias
+                    foreignField: '_id', // Campo en planes
+                    as: 'plan'
+                }
+            },
+            { $unwind: '$plan' }, // Descomprimir el array de planes
+            {
+                $match: {
+                    'plan.gym_id': new mongoose.Types.ObjectId(gymId), // Filtrar por gym_id
+                    'membresias.fecha_fin': dateCondition // Condición dinámica según el estado
+                }
+            },
+            {
+                $count: 'total' // Contar los resultados
+            }
+        ]);
+
+        // Si no hay resultados, devolver un total de 0
+        const total = countResult.length > 0 ? countResult[0].total : 0;
+
+        return { total };
+
+    } catch (error) {
+        console.error(`Error al contar las membresías ${status} para gymId: ${gymId}:`, error);
+        throw new Error(`Error al contar las membresías ${status}: ${error.message}`);
+    }
+};
+
+
 //Servicio para mostrar las membresías del usuario
 const getMembresiasUser = async (usuario_id) => {
     try {
@@ -423,4 +478,4 @@ const aplazarMembresia = async(membresia_id, plan_id) => {
     }
 };
 
-module.exports = { registroUsuario, crearMembresia, getMembresias, getMembresiasUser, getMembresia, aplazarMembresia };
+module.exports = { registroUsuario, crearMembresia, getMembresias, getMembresiasCount, getMembresiasUser, getMembresia, aplazarMembresia };
