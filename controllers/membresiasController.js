@@ -118,7 +118,7 @@ const getTotalMembresias = async (req, res) => {
   }
 
   try {
-      const result = await membershipService.getTotalMembresias(gymId);
+      const result = await membresiasService.getTotalMembresias(gymId);
       return res.status(200).json(result);
   } catch (error) {
       return res.status(500).json({ error: error.message });
