@@ -381,6 +381,7 @@ const getMembresia = async (membresiaId) => {
                     _id: 1, // Incluir el _id de la membresía
                     fecha_inicio: 1, // Incluir la fecha de inicio de la membresía
                     fecha_fin: 1, // Incluir la fecha de fin de la membresía
+                    plan_id: '$plan._id', //_id del plan
                     nombrePlan: '$plan.nombre', // Incluir el nombre del plan
                     nombreCompelto: '$usuario.nombre_completo', // Incluir el nombre del usuario
                     email: '$usuario.email', // Incluir el email del usuario
