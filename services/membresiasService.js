@@ -286,6 +286,48 @@ const getMembresiasCount = async (gymId, status) => {
     }
 };
 
+const getTotalMembresias = async (gymId) => {
+    try {
+        const totalResult = await user.aggregate([
+            {
+                $lookup: {
+                    from: 'membresias', // Colección membresías
+                    localField: 'membresia_id', // Campo en usuarios
+                    foreignField: '_id', // Campo en membresías
+                    as: 'membresias'
+                }
+            },
+            { $unwind: '$membresias' }, // Descomprimir el array de membresías
+            {
+                $lookup: {
+                    from: 'planes', // Colección planes
+                    localField: 'membresias.plan_id', // Campo en membresías
+                    foreignField: '_id', // Campo en planes
+                    as: 'plan'
+                }
+            },
+            { $unwind: '$plan' }, // Descomprimir el array de planes
+            {
+                $match: {
+                    'plan.gym_id': new mongoose.Types.ObjectId(gymId) // Filtrar por gym_id
+                }
+            },
+            {
+                $count: 'total' // Contar los resultados
+            }
+        ]);
+
+        // Si no hay resultados, devolver un total de 0
+        const total = totalResult.length > 0 ? totalResult[0].total : 0;
+
+        return { total };
+    } catch (error) {
+        console.error(`Error al contar las membresías para gymId: ${gymId}`, error);
+        throw new Error(`Error al contar las membresías: ${error.message}`);
+    }
+};
+
+
 
 //Servicio para mostrar las membresías del usuario
 const getMembresiasUser = async (usuario_id) => {
@@ -479,4 +521,4 @@ const aplazarMembresia = async(membresia_id, plan_id) => {
     }
 };
 
-module.exports = { registroUsuario, crearMembresia, getMembresias, getMembresiasCount, getMembresiasUser, getMembresia, aplazarMembresia };
+module.exports = { registroUsuario, crearMembresia, getMembresias, getMembresiasCount, getMembresiasUser, getMembresia, aplazarMembresia, getTotalMembresias };
