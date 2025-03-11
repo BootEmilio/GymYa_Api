@@ -110,6 +110,21 @@ const getMembresiasCount = async (req, res) => {
   }
 };
 
+const getTotalMembresias = async (req, res) => {
+  const { gymId } = req.query;
+
+  if (!gymId) {
+      return res.status(400).json({ error: "El parámetro 'gymId' es requerido." });
+  }
+
+  try {
+      const result = await membershipService.getTotalMembresias(gymId);
+      return res.status(200).json(result);
+  } catch (error) {
+      return res.status(500).json({ error: error.message });
+  }
+};
+
 //Controlador para ver membresias activas y expiradas de un usuario
 const getMembresiasUser = async (req, res) => {
   try {
@@ -188,4 +203,4 @@ const aplazarMembresia = async (req, res) => {
   }
 };
 
-module.exports = { registroUsuario, crearMembresia, getMembresias,  getMembresiasUser, getMembresia, aplazarMembresia, getMembresiasCount };
+module.exports = { registroUsuario, crearMembresia, getMembresias,  getMembresiasUser, getMembresia, aplazarMembresia, getMembresiasCount, getTotalMembresias };
