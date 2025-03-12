@@ -87,18 +87,13 @@ const registroUsuario = async(plan_id, nombre_completo, email) => {
         //Hash de la contraseña
         const hashedPassword = await bcrypt.hash(password, 12);
 
-        //Agregamos nulo al telefono
-        if(!telefono){
-            telefono = null;
-        }
-
         //Crear el usuario
         const nuevoUsuario = await user.create({
             membresia_id,
             nombre_completo,
             email,
             password: hashedPassword,
-            telefono,
+            telefono: null,
             imagen: 'https://api-gymya-api.onrender.com/uploads/default-user.png'
         });
 
