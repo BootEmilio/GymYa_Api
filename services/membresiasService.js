@@ -23,8 +23,8 @@ const enviarCorreoContrasena = async (email, contrasena) => {
     const transporter = nodemailer.createTransport({
         service: 'Gmail', // O el servicio de correo que estés utilizando
         auth: {
-            user: 'leviolevos@gmail.com',
-            pass: 'tel9298862@'
+            user: 'emiorea8@gmail.com',
+            pass: 'Cacadevaca2004'
         }
     });
 
