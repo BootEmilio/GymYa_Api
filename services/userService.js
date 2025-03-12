@@ -27,7 +27,7 @@ const authenticateUser = async (usuario) => {
 };
 
 //Servicio para editar usuario
-const editarUsuario = async (usuarioId, updateFields) => {
+const editarImagen = async (usuarioId, updateFields) => {
   try{
     // Buscar y actualizar el usuario
     const usuarioActualizado = await user.findByIdAndUpdate(
@@ -43,4 +43,4 @@ const editarUsuario = async (usuarioId, updateFields) => {
   }
 };
 
-module.exports = { authenticateUser, editarUsuario };
+module.exports = { authenticateUser, editarImagen };

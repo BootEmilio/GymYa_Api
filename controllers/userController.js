@@ -42,8 +42,8 @@ const loginUser = async (req, res) => {
   }
 };
 
-//Controlador para editar los datos del usuario
-const editarUsuario = async (req, res) => {
+//Controlador para editar la imagen del usuario
+const editarImagen = async (req, res) => {
   try {
     const { usuarioId } = req.params;
 
@@ -77,18 +77,13 @@ const editarUsuario = async (req, res) => {
       fs.unlinkSync(req.file.path);
     }
 
-    // Verificamos si se proporcionó el teléfono en el cuerpo de la solicitud
-    if (req.body.telefono !== undefined) {
-      updateFields.telefono = req.body.telefono; // Agregar el teléfono a los campos de actualización
-    }
-
     // Si no se proporcionaron campos, lanzamos un error
     if (Object.keys(updateFields).length === 0) {
       return res.status(400).json({ error: 'No se han proporcionado datos para actualizar' });
     }
 
     // Actualizamos el usuario en la base de datos
-    const actualizado = await userService.editarUsuario(usuarioId, updateFields);
+    const actualizado = await userService.editarImagen(usuarioId, updateFields);
 
     res.status(200).json(actualizado);
   } catch (error) {
@@ -97,4 +92,4 @@ const editarUsuario = async (req, res) => {
   }
 };
 
-module.exports = { loginUser, editarUsuario };
+module.exports = { loginUser, editarImagen };
