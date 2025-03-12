@@ -9,7 +9,7 @@ const registroUsuario = async (req, res) => {
     const {plan_id, nombre_completo, email, password, telefono} = req.body;
 
     // Validar que todos los campos estén presentes
-    if (!plan_id || !nombre_completo || !email || !password) {
+    if (!plan_id || !nombre_completo || !email) {
       return res.status(400).json({ error: 'Todos los campos son obligatorios' });
     }
 
@@ -25,7 +25,7 @@ const registroUsuario = async (req, res) => {
       return res.status(400).json({error: 'El plan seleccionado no existe'});
     }
 
-    const usuarioNuevo = await membresiasService.registroUsuario(plan_id, nombre_completo, email, password, telefono);
+    const usuarioNuevo = await membresiasService.registroUsuario(plan_id, nombre_completo, email);
     res.status(201).json(usuarioNuevo);
   }catch (error) {
     res.status(500).json({error: 'Error al registrar el usuario junto a su membresía'});

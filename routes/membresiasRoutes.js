@@ -13,7 +13,9 @@ router.get('/:gymId/membresias/:status', token, membresiasController.getMembresi
 router.get('/membresias', token, membresiasController.getMembresiasUser);
 // Ruta para obtener una membresía del usuario
 router.get('/:membresiaId', token, membresiasController.getMembresia);
+// Ruta para obtener el número de todas las membresías activas
 router.get('/membresias/count', membresiasController.getMembresiasCount);
+// Ruta para obtener el número de todas las membresías registradas
 router.get('/membresias/total', membresiasController.getTotalMembresias);
 // Ruta para aplazar las membresías existentes
 router.put('/:membresiaId/aplazar', token, membresiasController.aplazarMembresia);

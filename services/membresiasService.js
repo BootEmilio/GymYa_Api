@@ -6,8 +6,44 @@ const Pago = require('../models/pagos');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
+// Función para generar una contraseña aleatoria
+const generarContrasenaAleatoria = () => {
+    const longitud = 12; // Longitud de la contraseña
+    const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+';
+    let contrasena = '';
+    for (let i = 0; i < longitud; i++) {
+        contrasena += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+    }
+    return contrasena;
+};
+
+// Función para enviar la contraseña por correo
+const enviarCorreoContrasena = async (email, contrasena) => {
+    const transporter = nodemailer.createTransport({
+        service: 'Gmail', // O el servicio de correo que estés utilizando
+        auth: {
+            user: 'leviolevos@gmail.com',
+            pass: 'tel9298862'
+        }
+    });
+
+    const mailOptions = {
+        from: 'leviolevos@gmail.com',
+        to: email,
+        subject: 'Tu nueva contraseña',
+        text: `Hola, \n\nTu nueva contraseña es: ${contrasena}\n\nPor favor cámbiala una vez que inicies sesión.`
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+    } catch (error) {
+        console.error('Error al enviar el correo:', error);
+        throw new Error('Error al enviar el correo');
+    }
+};
+
 //Servicio para crear un nuevo usuario con su membresia
-const registroUsuario = async(plan_id, nombre_completo, email, password, telefono) => {
+const registroUsuario = async(plan_id, nombre_completo, email) => {
     try{
         //Obtenemos la fecha de hoy
         const fecha_inicio = new Date();
@@ -41,8 +77,14 @@ const registroUsuario = async(plan_id, nombre_completo, email, password, telefon
         //Obtenemos el _id de la nueva membresía
         const membresia_id = [nuevaMembresia._id];
 
-        // Hash de la contraseña
-        const hashedPassword = await bcrypt.hash(password, 10);
+        //Generamos la contraseña de manera aleatoria
+        const password = generarContrasenaAleatoria();
+
+        //Enviar contraseña por correo
+        await enviarCorreoContrasena(email, password);
+
+        //Hash de la contraseña
+        const hashedPassword = await bcrypt.hash(password, 12);
 
         //Agregamos nulo al telefono
         if(!telefono){
