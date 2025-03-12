@@ -160,7 +160,7 @@ const getMembresia = async (req, res) => {
 };
 
 //controlador para aplazar las membresías existentes
-const aplazarMembresia = async (req, res) => {
+const aplazarMembresiaVentanilla = async (req, res) => {
   try{
     const { membresiaId } = req.params; // Obtenemos el _id de la membresía en el URL
     const { plan_id } = req.body; // Obtenemos el id del plan por medio del body
@@ -203,4 +203,4 @@ const aplazarMembresia = async (req, res) => {
   }
 };
 
-module.exports = { registroUsuario, crearMembresia, getMembresias,  getMembresiasUser, getMembresia, aplazarMembresia, getMembresiasCount, getTotalMembresias };
+module.exports = { registroUsuario, crearMembresia, getMembresias,  getMembresiasUser, getMembresia, aplazarMembresiaVentanilla, getMembresiasCount, getTotalMembresias };

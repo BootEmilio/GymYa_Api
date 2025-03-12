@@ -9,8 +9,8 @@ require('dotenv').config();
 
 // Función para generar una contraseña aleatoria
 const generarContrasenaAleatoria = () => {
-    const longitud = 12; // Longitud de la contraseña
-    const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+';
+    const longitud = 6; // Longitud de la contraseña
+    const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@$&_+';
     let contrasena = '';
     for (let i = 0; i < longitud; i++) {
         contrasena += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
@@ -31,8 +31,21 @@ const enviarCorreoContrasena = async (email, contrasena) => {
     const mailOptions = {
         from: 'leviolevos@gmail.com',
         to: email,
-        subject: 'Tu nueva contraseña',
-        text: `Hola, \n\nTu nueva contraseña es: ${contrasena}\n\nPor favor cámbiala una vez que inicies sesión.`
+        subject: 'Bienvenido a GymYa',
+        html: `
+        <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+            <h2 style="color: #4CAF50;">Se ha registrado en GymYa/h2>
+            <p>Hola,</p>
+            <p>Tu nueva contraseña es:</p>
+            <p style="font-size: 18px; font-weight: bold; color: #333;">${contrasena}</p>
+            <p>Por favor cámbiala una vez que inicies sesión en la aplicación móvil.</p>
+            <a href="https://miweb.com/cambiar-contraseña" style="background-color: #4CAF50; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px;">Descarga aquí la aplicación</a>
+            <p>Administra, comunica y entrena</p>
+            <p><strong>El equipo de GymYa</strong></p>
+            <hr style="border: 0; height: 1px; background-color: #ccc; margin: 20px 0;" />
+            <p style="font-size: 12px; color: #888;">Por favor no respondas a este correo.</p>
+        </div>
+        `
     };
 
     try {
