@@ -6,6 +6,6 @@ const token = require('../middlewares/authMiddleware');
 const router = express.Router();
 
 // Ruta para actualizar imagen del usuario
-router.put('/:usuarioId/actualizarImagen', upload.single('imagen'), token, userController.editarUsuario);
+router.put('/:usuarioId/actualizarImagen', upload.single('imagen'), token, userController.editarImagen);
 
 module.exports = router;
