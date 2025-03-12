@@ -24,7 +24,7 @@ const enviarCorreoContrasena = async (email, contrasena) => {
         service: 'Gmail', // O el servicio de correo que estés utilizando
         auth: {
             user: 'leviolevos@gmail.com',
-            pass: 'tel9298862'
+            pass: 'tel9298862@'
         }
     });
 
