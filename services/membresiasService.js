@@ -4,6 +4,7 @@ const user = require('../models/usuarios');
 const plan = require('../models/planes');
 const Pago = require('../models/pagos');
 const bcrypt = require('bcryptjs');
+const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 // Función para generar una contraseña aleatoria
