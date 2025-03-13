@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const mercadopago = require('mercadopago');
 
 // Configurar MercadoPago con tu Access Token (ahora cn el access token de prueba)
-mercadopago.configurations.setAccessToken('APP_USR-806128994004266-031309-e14a1eacf70ca9d5cb3eb38293ea604a-2326694508');
+mercadopago.configure({access_token: 'APP_USR-806128994004266-031309-e14a1eacf70ca9d5cb3eb38293ea604a-2326694508'});
 
 //Controlador para registrar primer administrador
 const registro = async (req, res) => {
