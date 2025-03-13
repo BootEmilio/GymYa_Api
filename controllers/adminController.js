@@ -1,10 +1,10 @@
 const adminService = require('../services/adminService');
 const Admin = require('../models/admin');
 const bcrypt = require('bcryptjs');
-import mercadopago from 'mercadopago';
+const mercadopago = require('mercadopago');
 
+mercadopago.MercadoPagoConfig({access_token: 'APP_USR-806128994004266-031309-e14a1eacf70ca9d5cb3eb38293ea604a-2326694508'});
 // Configurar MercadoPago con tu Access Token (ahora cn el access token de prueba)
-mercadopago.configure({access_token: 'APP_USR-806128994004266-031309-e14a1eacf70ca9d5cb3eb38293ea604a-2326694508'});
 
 //Controlador para registrar primer administrador
 const registro = async (req, res) => {
