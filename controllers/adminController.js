@@ -1,11 +1,11 @@
 const adminService = require('../services/adminService');
 const Admin = require('../models/admin');
 const bcrypt = require('bcryptjs');
-const {MercadoPagoConfig, Payment} = require('mercadopago');
+const {MercadoPagoConfig, Preference} = require('mercadopago');
 
 // Configurar MercadoPago con tu Access Token (ahora cn el access token de prueba)
 const client = new MercadoPagoConfig({access_token: 'APP_USR-806128994004266-031309-e14a1eacf70ca9d5cb3eb38293ea604a-2326694508'});
-const payment = new Payment(client);
+const preference = new Preference(client);
 
 //Controlador para registrar primer administrador
 const registro = async (req, res) => {
@@ -35,7 +35,7 @@ const registro = async (req, res) => {
         return res.status(400).json({ error: 'El teléfono ya está registrado' });
     }
 
-    const preference = {
+    const preferenceData = {
       items: [
         {
           title: `Pago de registro para ${username}`,
@@ -57,7 +57,7 @@ const registro = async (req, res) => {
     };
 
     // Crea la preferencia en MercadoPago
-    const response = await payment.create(preference);
+    const response = await preference.create(preferenceData);
 
     // Enviar la URL de MercadoPago para que el usuario realice el pago
     res.status(200).json({
