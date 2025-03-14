@@ -2,6 +2,11 @@ const membresiasService = require('../services/membresiasService');
 const User = require('../models/usuarios');
 const Membresia = require('../models/membresias');
 const plan = require('../models/planes');
+const {MercadoPagoConfig, Preference} = require('mercadopago');
+
+// Configurar MercadoPago con tu Access Token (ahora cn el access token de prueba)
+const client = new MercadoPagoConfig({access_token: 'APP_USR-806128994004266-031309-e14a1eacf70ca9d5cb3eb38293ea604a-2326694508'});
+const preference = new Preference(client);
 
 //Controlador para registrar usuarios con sus membresias
 const registroUsuario = async (req, res) => {
@@ -32,7 +37,7 @@ const registroUsuario = async (req, res) => {
   }
 };
 
-//Controlador para crear membresía de un usaurio que ya tiene una cuenta
+//Controlador para crear membresía de un usuario que ya tiene una cuenta
 const crearMembresia = async (req, res) => {
   try{
     const {plan_id, email} = req.body;
@@ -203,4 +208,91 @@ const aplazarMembresiaVentanilla = async (req, res) => {
   }
 };
 
-module.exports = { registroUsuario, crearMembresia, getMembresias,  getMembresiasUser, getMembresia, aplazarMembresiaVentanilla, getMembresiasCount, getTotalMembresias };
+//Controlador para aplazar la membresía desde la app móvil
+const aplazarMembresiaOnline = async(req, res) => {
+  try{
+    const { membresiaId } = req.params; // Obtenemos el _id de la membresía en el URL
+    const { plan_id, usuario_id } = req.body; // Obtenemos el id del plan por medio del body
+
+    //Buscamos el usuario por su _id
+    const usuario = await User.findById(usuario_id);
+    if(!usuario){
+      return res.status(400).json({error: 'El usuario no existe'});
+    }
+
+    //Buscamos la membresía por su _id
+    const membresiaExiste = await Membresia.findById(membresiaId);
+    if(!membresiaExiste){
+      return res.status(400).json({error: 'La membresía no existe'});
+    }
+
+    //Obtener el plan seleccionado
+    const planSeleccionado = await plan.findById(plan_id);
+    if(!planSeleccionado){
+      return res.status(400).json({error: 'El plan seleccionado no existe'});
+    }
+
+    const preferenceData = {
+      items: [
+        {
+          title: planSeleccionado.nombre,
+          unit_price: planSeleccionado.precio, // Precio del plan
+          quantity: 1,
+        }
+      ],
+      payer: {
+        email: usuario.email // Email del cliente que pagará
+      },
+      back_urls: {
+        success: "https://gymya-web.onrender.com/src/html/pago_correcto.html",  // Redirige al usuario en caso de éxito
+        failure: "https://gymya-web.onrender.com/src/html/pago_incorrecto.html",  // Redirige al usuario en caso de fallo
+        pending: "https://gymya-web.onrender.com/src/html/pago_pendiente.html"  // Redirige al usuario en caso de pendiente
+      },
+      auto_return: "approved",  // Redirige automáticamente si el pago es aprobado
+      metadata: { membresiaId, plan_id },
+      notification_url: "https://api-gymya-api.onrender.com/api/usuario/pago",  // URL del webhook
+      /*
+      transfers: [
+        {
+          // ID de la cuenta de MercadoPago del administrador (quien recibe el 90% del pago)
+          collector_id: administrador.mercado_pago_collector_id,  
+          amount: planSeleccionado.precio,  // 90% del pago va al administrador
+        }
+      ],*/
+    };
+
+    // Crea la preferencia en MercadoPago
+    const response = await preference.create(preferenceData);
+
+    // Enviar la URL de MercadoPago para que el usuario realice el pago
+    res.status(200).json({
+      init_point: response.body.init_point,
+    });
+  }catch (error){
+    res.status(500).json({ error: 'Ocurrió un error al aplazar la fecha fin de la membresía.' });
+  }
+};
+
+// Controlador para manejar la notificación del pago (webhook)
+const NotificarPago = async(req,res) =>{
+  try{
+    const payment = req.query;  // Los datos del pago que envía MercadoPago
+
+    if (payment.status === 'approved') {
+      // El pago fue aprobado, registrar al usuario usando el servicio existente
+      const { membresiaId, plan_id } = payment.metadata;  // Datos del usuario que deberían venir como metadata
+    
+      // Usar el servicio existente para registrar el nuevo administrador
+      const adminPrincipal = await membresiasService.aplazarMembresia(membresiaId, plan_id);
+    
+      return res.status(201).json({ message: 'Administrador registrado exitosamente', admin: adminPrincipal });
+    } else {
+      return res.status(400).json({ error: 'El pago no fue aprobado' });
+    }
+  }catch(error){
+    console.error('Error en la notificación de pago:', error);
+    res.status(500).json({ error: 'Error al procesar la notificación de pago' });
+  }
+}
+
+module.exports = { registroUsuario, crearMembresia, getMembresias,  getMembresiasUser, getMembresia, getMembresiasCount, getTotalMembresias, aplazarMembresiaVentanilla, aplazarMembresiaOnline, NotificarPago };

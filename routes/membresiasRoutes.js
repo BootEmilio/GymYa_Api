@@ -19,4 +19,8 @@ router.get('/membresias/count', membresiasController.getMembresiasCount);
 router.get('/membresias/total', membresiasController.getTotalMembresias);
 // Ruta para aplazar las membresías existentes
 router.put('/:membresiaId/aplazar', token, membresiasController.aplazarMembresiaVentanilla);
+// Ruta para aplazar las membresía desde la app móvil
+router.put('/:membresiaId/aplazarOnline', token, membresiasController.aplazarMembresiaOnline);
+// Ruta que notifica el pago del usuario
+router.post('/usuario/pago', membresiasController.NotificarPago);
 module.exports = router;
