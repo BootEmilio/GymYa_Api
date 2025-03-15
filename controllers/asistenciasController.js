@@ -8,6 +8,7 @@ const registrarAsistencia = async (req, res) => {
     try{
         const { gymId } = req.params; // Obtenemos los datos de la URL
         const { membresia_id } = req.body; //Obtener los datos de la petición
+        const fecha_hora = moment.tz(req.body.fecha_hora, 'America/Mexico_City').format(); // Convertir a UTC-6:00
 
         //Buscamos el _id de la membresía
         const membresia = await Membresia.findById(membresia_id);
@@ -20,13 +21,10 @@ const registrarAsistencia = async (req, res) => {
             return res.status(400).json({ error: 'El gimnasio no está asociado a esta membresía, no tiene acceso' });
         }
 
-        // Convertir la fecha_hora a la zona horaria UTC-6:00 (America/Mexico_City)
-        const fecha_hora = moment.tz(fecha_hora, 'America/Mexico_City').format();
-
         const fechaFin = membresia.fecha_fin;
         // Verificamos que la fecha_fin dentro del QR es mayor a la fecha actual
-        if(fechaFin < fecha_hora) {
-            res.status(400).json({ error: 'Su membresía esta expirada, no tiene acceso al gimnasio'});
+        if(fechaFin < new Date(fecha_hora)) {
+            return res.status(400).json({ error: 'Su membresía esta expirada, no tiene acceso al gimnasio'});
         }
 
         const resultado = await asistenciasService.registrarAsistencia(gymId, membresia_id, fecha_hora);
