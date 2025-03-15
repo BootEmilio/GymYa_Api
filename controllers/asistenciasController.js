@@ -9,11 +9,6 @@ const registrarAsistencia = async (req, res) => {
         const { gymId } = req.params; // Obtenemos los datos de la URL
         const { membresia_id } = req.body; //Obtener los datos de la petición
 
-        //Validar que se pasaron todos los datos
-        if(!membresia_id || !fecha_hora) {
-            return res.status(400).json({ error: 'Todos los campos son obligatorios' });
-        }
-
         //Buscamos el _id de la membresía
         const membresia = await Membresia.findById(membresia_id);
         if(!membresia) {
