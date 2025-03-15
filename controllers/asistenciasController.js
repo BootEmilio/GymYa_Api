@@ -21,12 +21,12 @@ const registrarAsistencia = async (req, res) => {
         }
 
         // Generar la fecha y hora actual en la zona horaria UTC-6:00 (America/Mexico_City)
-        const fecha_hora = moment.tz('America/Mexico_City').format(); // Fecha y hora actual en UTC-6:00
+        const fecha_hora = moment.tz('America/Mexico_City'); // Fecha y hora actual en UTC-6:00
 
-        const fechaFin = membresia.fecha_fin;
         // Verificamos que la fecha_fin dentro del QR es mayor a la fecha actual
-        if(fechaFin < new Date(fecha_hora)) {
-            return res.status(400).json({ error: 'Su membresía esta expirada, no tiene acceso al gimnasio'});
+        const fechaFin = moment.tz(membresia.fecha_fin, 'America/Mexico_City'); // Convertir fecha_fin a la misma zona horaria
+        if (fechaFin.isBefore(fecha_hora)) {
+            return res.status(400).json({ error: 'Su membresía está expirada, no tiene acceso al gimnasio' });
         }
 
         const resultado = await asistenciasService.registrarAsistencia(gymId, membresia_id, fecha_hora);
