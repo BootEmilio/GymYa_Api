@@ -1,12 +1,13 @@
 const asistenciasService = require('../services/asistenciasService');
 const Membresia = require('../models/membresias');
 const Gym = require('../models/gym');
+const moment = require('moment-timezone');
 
 //Controlador para que el registre las entradas y salidas (por ahora por medio de peticiones, cambiar para registro de QR)
 const registrarAsistencia = async (req, res) => {
     try{
         const { gymId } = req.params; // Obtenemos los datos de la URL
-        const { membresia_id, fecha_hora } = req.body; //Obtener los datos de la petición
+        const { membresia_id } = req.body; //Obtener los datos de la petición
 
         //Validar que se pasaron todos los datos
         if(!membresia_id || !fecha_hora) {
@@ -24,15 +25,18 @@ const registrarAsistencia = async (req, res) => {
             return res.status(400).json({ error: 'El gimnasio no está asociado a esta membresía, no tiene acceso' });
         }
 
+        // Convertir la fecha_hora a la zona horaria UTC-6:00 (America/Mexico_City)
+        const fecha_hora = moment.tz(fecha_hora, 'America/Mexico_City').format();
+
         const fechaFin = membresia.fecha_fin;
         // Verificamos que la fecha_fin dentro del QR es mayor a la fecha actual
-        if(fechaFin < new Date()) {
+        if(fechaFin < fecha_hora) {
             res.status(400).json({ error: 'Su membresía esta expirada, no tiene acceso al gimnasio'});
         }
 
-        const nuevaAsistencia = await asistenciasService.registrarAsistencia(gymId, membresia_id, fecha_hora);
+        const resultado = await asistenciasService.registrarAsistencia(gymId, membresia_id, fecha_hora);
 
-        res.status(201).json(nuevaAsistencia);
+        res.status(201).json(resultado);
     }catch(error){
         res.status(500).json({error: 'Error al registrar el usuario junto a su membresía'});
     }

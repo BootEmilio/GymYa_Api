@@ -5,7 +5,7 @@ const router = express.Router();
 
 // Ruta para registrar usuarios junto a sus membresías
 router.post('/user/registro', token, membresiasController.registroUsuario);
-// Ruta para registrar usuarios junto a sus membresías
+// Ruta para agregar membresía a un usuario ya registrado
 router.post('/nuevaMembresia', token, membresiasController.crearMembresia);
 // Ruta para obtener las membresías activas o expiradas de un gimnasio
 router.get('/:gymId/membresias/:status', token, membresiasController.getMembresias);
@@ -19,8 +19,8 @@ router.get('/membresias/count', membresiasController.getMembresiasCount);
 router.get('/membresias/total', membresiasController.getTotalMembresias);
 // Ruta para aplazar las membresías existentes
 router.put('/:membresiaId/aplazar', token, membresiasController.aplazarMembresiaVentanilla);
-// Ruta para aplazar las membresía desde la app móvil
+// Ruta para aplazar las membresía desde la app móvil (pendiente)
 router.put('/:membresiaId/aplazarOnline', token, membresiasController.aplazarMembresiaOnline);
-// Ruta que notifica el pago del usuario
+// Ruta que notifica el pago del usuario (pendiente)
 router.post('/usuario/pago', membresiasController.NotificarPago);
 module.exports = router;

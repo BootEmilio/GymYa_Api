@@ -13,7 +13,7 @@ router.get('/gym', token, gymController.verGimnasios)
 router.get("/gym/:gymId", gymController.obtenerGimnasioPorId);
 //Ruta para editar un gimnasio
 router.put('/:gymId/editar', upload.single('imagen'), token, gymController.editarGimnasio);
-//Ruta para que el usuario vea los gimnasios a los que puede acceder con su membresía
+//Ruta para que el usuario vea los gimnasios a los que puede acceder con su membresía (pendiente)
 router.get('/:membresiaId/gimnasios', token, gymController.verGimnasiosUser);
 
 module.exports = router;
