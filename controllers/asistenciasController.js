@@ -33,7 +33,7 @@ const registrarAsistencia = async (req, res) => {
 
         res.status(201).json(resultado);
     }catch(error){
-        res.status(500).json({error: 'Error al registrar el usuario junto a su membresía'});
+        console.error('Error al registrar la entrada del usuario');
     }
 }
 
