@@ -1,5 +1,5 @@
 const Asistencia = require('../models/asistencias');
-const Membresia = require('../models/asistencias');
+const Membresia = require('../models/membresias');
 const mongoose = require('mongoose');
 
 //Servicio para extraer datos del código QR y registrar así una asistencia (entrada/salida)
@@ -19,7 +19,12 @@ const registrarAsistencia = async (gymId, membresiaId, fecha_hora) => {
             mensaje = 'Gracias por su visita'; // Mensaje para salidas
         }
 
-
+        // Actualizar el campo `activo` en el modelo `Membresia`
+        const membresiaActualizada = await Membresia.findByIdAndUpdate(
+            membresiaId,
+            { activo: tipo_acceso === 'Entrada' }, // true si es Entrada, false si es Salida
+            { new: true } // Devuelve el documento actualizado
+        );
 
         //Creamos la asistencia
         const nuevaAsistencia = await Asistencia.create({
@@ -29,7 +34,7 @@ const registrarAsistencia = async (gymId, membresiaId, fecha_hora) => {
             fecha_hora: fecha_hora
         })
 
-        return{ success: true, message: mensaje, asistencia: nuevaAsistencia};
+        return{ success: true, message: mensaje, asistencia: nuevaAsistencia, membresia: membresiaActualizada };
     }catch(error){
         console.error('Erros al registrar la asistencia:', error);
         throw new Error('Error al registrar al la asistencia');
