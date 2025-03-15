@@ -16,7 +16,8 @@ const registro = async (username, password, nombre_completo, email, telefono) =>
         nombre: 'Nombre del gimnasio',
         direccion: 'Dirección del gimnasio',
         telefono: 'Teléfono del gimnasio',
-        horario: '8:00 a.m. - 10:00 p.m.'
+        horario: '8:00 a.m. - 10:00 p.m.',
+        imagen: 'https://api-gymya-api.onrender.com/uploads/foto-gym.png'
     });
 
     const gym_id = [nuevoGimnasio._id];
