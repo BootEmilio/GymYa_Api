@@ -1,43 +1,47 @@
 const Asistencia = require('../models/asistencias');
-const Membresia = require('../models/membresias');
 const mongoose = require('mongoose');
 
 //Servicio para extraer datos del código QR y registrar así una asistencia (entrada/salida)
 const registrarAsistencia = async (gymId, membresiaId, fecha_hora) => {
-    try{
-        //Buscamos el último registro de asistencia de la membresía dentro del gimnasio
+    try {
+        // Buscamos el último registro de asistencia de la membresía dentro del gimnasio
         const ultimaAsistencia = await Asistencia.findOne({
             membresia_id: membresiaId,
             gym_id: gymId
-        }).sort({ fecha_hora: -1 }); //Ordenar por las más recientes
+        }).sort({ fecha_hora: -1 }); // Ordenar por las más recientes
 
-        let tipo_acceso = 'Entrada'; //Valor por defecto
+        let tipo_acceso = 'Entrada'; // Valor por defecto para entrada
         let mensaje = 'Puede pasar al gimnasio'; // Mensaje por defecto para entradas
 
-        if(ultimaAsistencia && ultimaAsistencia.tipo_acceso === 'Entrada') {
-            tipo_acceso = 'Salida'; // Si la última asistencia fue 'Entrada', la siguiente será 'Salida'
-            mensaje = 'Gracias por su visita'; // Mensaje para salidas
+        if (ultimaAsistencia && ultimaAsistencia.tipo_acceso === 'Entrada' && !ultimaAsistencia.salida_registrada) {
+            // Si la última asistencia es una entrada y no tiene salida, se registra una salida
+            tipo_acceso = 'Salida';
+            mensaje = 'Gracias por su visita';
+
+            // Actualizar la última asistencia de tipo entrada para marcar la salida
+            await Asistencia.findByIdAndUpdate(
+                ultimaAsistencia._id,
+                { salida_registrada: true }, // Marcamos la salida
+                { new: true }
+            );
+        } else {
+            // Si no hay una entrada previa sin salida, registramos una nueva entrada
+            const nuevaAsistencia = await Asistencia.create({
+                membresia_id: membresiaId,
+                gym_id: gymId,
+                tipo_acceso: tipo_acceso, // 'Entrada'
+                fecha_hora: fecha_hora,
+                salida_registrada: false // Nueva entrada, aún no se registra salida
+            });
+
+            return { success: true, message: mensaje, asistencia: nuevaAsistencia };
         }
 
-        // Actualizar el campo `activo` en el modelo `Membresia`
-        const membresiaActualizada = await Membresia.findByIdAndUpdate(
-            membresiaId,
-            { activo: tipo_acceso === 'Entrada' }, // true si es Entrada, false si es Salida
-            { new: true } // Devuelve el documento actualizado
-        );
+        return { success: true, message: mensaje }; // Mensaje para salidas
 
-        //Creamos la asistencia
-        const nuevaAsistencia = await Asistencia.create({
-            membresia_id: membresiaId,
-            gym_id: gymId,
-            tipo_acceso: tipo_acceso,
-            fecha_hora: fecha_hora
-        })
-
-        return{ success: true, message: mensaje, asistencia: nuevaAsistencia, membresia: membresiaActualizada };
-    }catch(error){
-        console.error('Erros al registrar la asistencia:', error);
-        throw new Error('Error al registrar al la asistencia');
+    } catch (error) {
+        console.error('Error al registrar la asistencia:', error);
+        throw new Error('Error al registrar la asistencia');
     }
 };
 
