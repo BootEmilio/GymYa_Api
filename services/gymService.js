@@ -84,44 +84,7 @@ const verGimnasiosUser = async (membresiaId) => {
       // Obtener los gimnasios correspondientes a los gym_id
       const gimnasios = await Gym.find({ _id: { $in: membresia.gym_id } });
 
-      // Para cada gimnasio, contar los usuarios con una asistencia de tipo "Entrada" sin "Salida"
-      const gimnasiosConUsuariosDentro = await Promise.all(gimnasios.map(async (gimnasio) => {
-          // Encontrar las asistencias "Entrada" sin "Salida" para este gimnasio
-          const usuariosDentro = await Asistencia.aggregate([
-              {
-                  $match: {
-                      gym_id: gimnasio._id,
-                      tipo_acceso: 'Entrada'
-                  }
-              },
-              {
-                  $lookup: {
-                      from: 'asistencias',
-                      localField: '_id', // Relacionar la asistencia de entrada
-                      foreignField: 'entrada_id', // Campo que se relaciona con la salida
-                      as: 'salida'
-                  }
-              },
-              {
-                  $match: {
-                      salida: { $size: 0 } // Buscar solo las asistencias que no tienen salida
-                  }
-              },
-              {
-                  $group: {
-                      _id: '$usuario_id', // Agrupar por usuario
-                      count: { $sum: 1 }
-                  }
-              }
-          ]);
-
-          return {
-              ...gimnasio.toObject(), // Incluimos los datos del gimnasio
-              usuariosDentro: usuariosDentro.length // Número de usuarios "dentro" del gimnasio
-          };
-      }));
-
-      return gimnasiosConUsuariosDentro;
+      return gimnasios;
   } catch (error) {
       console.error('Error en el servicio verGimnasiosUser:', error);
       throw new Error('Error al obtener los gimnasios del usuario');
