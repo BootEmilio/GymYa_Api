@@ -187,4 +187,4 @@ const contarMembresiasActivas = async (req, res) => {
     }
 };
 */
-module.exports = { crearGimnasio, verGimnasios, editarGimnasio, verGimnasiosUser, contarMembresiasActivas, obtenerGimnasioPorId  };
+module.exports = { crearGimnasio, verGimnasios, editarGimnasio, verGimnasiosUser, obtenerGimnasioPorId  };
