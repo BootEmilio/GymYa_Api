@@ -12,7 +12,7 @@ router.post("/admin/create-preference", async (req, res) => {
             items: [
                 {
                     title: `Pago de registro para ${req.body.username}`,
-                    unit_price: 100.0, // Precio del registro
+                    unit_price: 899.0, // Precio del registro
                     quantity: 1,
                 },
             ],

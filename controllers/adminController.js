@@ -1,6 +1,8 @@
 const adminService = require('../services/adminService');
 const Admin = require('../models/admin');
 const bcrypt = require('bcryptjs');
+const mercadopago = require('mercadopago');
+const { v4: uuidv4 } = require('uuid'); // Para generar ID único de referencia
 //const {MercadoPagoConfig, Preference} = require('mercadopago');
 
 /*
@@ -10,7 +12,7 @@ const preference = new Preference(client);
 */
 
 //Controlador para registrar primer administrador
-const registro = async (req, res) => {
+/*const registro = async (req, res) => {
   try{
     const {username, password, nombre_completo, email, telefono} = req.body;
 
@@ -64,7 +66,7 @@ const registro = async (req, res) => {
     */
 
     // Usar el servicio existente para registrar el nuevo administrador
-    const adminPrincipal = await adminService.registro(username, password, nombre_completo, email, telefono);
+   /* const adminPrincipal = await adminService.registro(username, password, nombre_completo, email, telefono);
 
     return res.status(201).json({ message: 'Administrador registrado exitosamente', admin: adminPrincipal });
 
@@ -72,7 +74,92 @@ const registro = async (req, res) => {
     console.error('Error en el controlador de registro:', error);
     res.status(500).json({ error: 'Error al registrar el administrador' });
   }
+};*/
+// Configuración de Mercado Pago
+mercadopago.configure({
+  access_token: 'TEST-1378290191875758-031219-61e09e114ecad9a4ce02acf1b2a2e1e4-2120356194', // Usa tu access token de Mercado Pago
+});
+
+// Controlador para registrar primer administrador
+const registro = async (req, res) => {
+  try {
+    const { username, password, nombre_completo, email, telefono } = req.body;
+
+    // Validar que todos los campos estén presentes
+    if (!username || !password || !nombre_completo || !email || !telefono) {
+      return res.status(400).json({ error: 'Todos los campos son obligatorios' });
+    }
+
+    // Verificar si el username ya existe
+    const adminExistente = await Admin.findOne({ username });
+    if (adminExistente) {
+      return res.status(400).json({ error: 'El nombre de usuario ya está registrado' });
+    }
+
+    // Verificar si el email ya existe
+    const emailExistente = await Admin.findOne({ email });
+    if (emailExistente) {
+      return res.status(400).json({ error: 'El email ya está registrado' });
+    }
+
+    // Verificar si el teléfono ya existe
+    const telefonoExistente = await Admin.findOne({ telefono });
+    if (telefonoExistente) {
+      return res.status(400).json({ error: 'El teléfono ya está registrado' });
+    }
+
+    // Generar preferencia de pago en Mercado Pago
+    const preference = {
+      items: [{
+        title: "Registro de Administrador GymYa",
+        quantity: 1,
+        currency_id: "MXN",
+        unit_price: 899 // Ajusta el precio
+      }],
+      payer: {
+        email: email
+      },
+      external_reference: uuidv4(), // ID único para identificar el pago
+      back_urls: {
+        success: `https://api-gymya-api.onrender.com/api/admin/confirm_payment?email=${email}&username=${username}&password=${password}&nombre_completo=${nombre_completo}&telefono=${telefono}`,
+        failure: "https://tupagina.com/fallo",
+        pending: "https://tupagina.com/pendiente"
+      },
+      auto_return: "approved"
+    };
+
+    // Crear pago en Mercado Pago
+    const response = await mercadopago.preferences.create(preference);
+
+    // Enviar al frontend la URL para el pago
+    res.json({ init_point: response.body.init_point });
+
+  } catch (error) {
+    console.error('Error en el controlador de registro:', error);
+    res.status(500).json({ error: 'Error al generar la preferencia de pago' });
+  }
 };
+
+// Confirmar el pago y registrar administrador
+const confirmPayment = async (req, res) => {
+  const { email, username, password, nombre_completo, telefono } = req.query;
+
+  try {
+    // Verificar si el pago fue exitoso (puedes verificarlo con la API de Mercado Pago)
+    if (req.query.status !== "approved") {
+      return res.redirect("https://tupagina.com/error");
+    }
+
+    // Crear el administrador en la base de datos después del pago
+    const adminPrincipal = await adminService.registro(username, password, nombre_completo, email, telefono);
+
+    res.redirect("https://tupagina.com/registro_exitoso"); // Redirigir a una página de éxito
+  } catch (error) {
+    console.error('Error al confirmar el pago:', error);
+    res.redirect("https://tupagina.com/error");
+  }
+};
+
 
 // Controlador para manejar la notificación del pago (webhook)
 const NotificacionPago = async (req, res) => {
@@ -131,4 +218,4 @@ const loginAdmin = async (req, res) => {
   }
 };
 
-module.exports = { registro, loginAdmin, NotificacionPago };
+module.exports = { registro, loginAdmin, NotificacionPago, confirmPayment };
