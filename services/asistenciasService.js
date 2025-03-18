@@ -4,34 +4,29 @@ const mongoose = require('mongoose');
 //Servicio para extraer datos del código QR y registrar así una asistencia (entrada/salida)
 const registrarAsistencia = async (gymId, membresiaId, fecha_hora) => {
     try {
-        // Buscar el último registro de asistencia de la membresía en el gimnasio
+        // Buscar la última asistencia de la membresía en el gimnasio
         const ultimaAsistencia = await Asistencia.findOne({
             membresia_id: membresiaId,
             gym_id: gymId
-        }).sort({ fecha_hora: -1 }); // Ordenar por fecha_hora descendente (la más reciente)
+        }).sort({ fecha_hora_entrada: -1 }); // Ordenar por fecha_hora_entrada descendente (la más reciente)
 
-        let tipo_acceso = 'Entrada'; // Valor por defecto para entrada
         let mensaje = 'Puede pasar al gimnasio'; // Mensaje por defecto para entradas
         let asistencia = null; // Variable para guardar la asistencia
 
-        if (ultimaAsistencia && ultimaAsistencia.tipo_acceso === 'Entrada' && !ultimaAsistencia.salida_registrada) {
-            // Si la última asistencia fue una entrada y no tiene salida, se marca como salida
-            tipo_acceso = 'Salida';
-            mensaje = 'Gracias por su visita';
-
-            // Actualizar la última asistencia para marcar la salida
+        if (ultimaAsistencia && !ultimaAsistencia.fecha_hora_salida) {
+            // Si la última asistencia no tiene salida registrada, actualizar con la hora de salida
             asistencia = await Asistencia.findByIdAndUpdate(
                 ultimaAsistencia._id,
-                { salida_registrada: true }, // Marcar la salida
+                { fecha_hora_salida: fecha_hora, salida_registrada: true }, // Registrar la salida
                 { new: true } // Devolver el documento actualizado
             );
+            mensaje = 'Gracias por su visita'; // Mensaje para salida
         } else {
-            // Si no hay una entrada previa sin salida, se registra una nueva entrada
+            // Si la última asistencia ya tiene entrada y salida, crear una nueva entrada
             asistencia = await Asistencia.create({
                 membresia_id: membresiaId,
                 gym_id: gymId,
-                tipo_acceso: tipo_acceso, // 'Entrada'
-                fecha_hora: fecha_hora,
+                fecha_hora_entrada: fecha_hora, // Registrar la nueva entrada
                 salida_registrada: false // Nueva entrada, aún no se registra salida
             });
         }
