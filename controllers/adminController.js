@@ -75,10 +75,9 @@ const preference = new Preference(client);
     res.status(500).json({ error: 'Error al registrar el administrador' });
   }
 };*/
+
 // Configuración de Mercado Pago
-mercadopago.configure({
-  access_token: 'TEST-1378290191875758-031219-61e09e114ecad9a4ce02acf1b2a2e1e4-2120356194', // Usa tu access token de Mercado Pago
-});
+mercadopago.configurations.setAccessToken('TEST-1378290191875758-031219-61e09e114ecad9a4ce02acf1b2a2e1e4-2120356194');
 
 // Controlador para registrar primer administrador
 const registro = async (req, res) => {
