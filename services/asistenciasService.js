@@ -166,23 +166,22 @@ const verAsistencias = async (gym_id, fecha, search = '', page = 1, limit = 10) 
 //Servicio para que el usuario vea su última asistencia
 const verAsistencia = async (membresiaId) => {
     try {
-        // Realizar una agregación para obtener la última asistencia con el nombre del gimnasio
-        const ultimaEntrada = await Asistencia.aggregate([
-            // Filtra las asistencias por membresia_id y tipo_acceso = "Entrada"
+        // Realizar una agregación para obtener la última asistencia completa con el nombre del gimnasio
+        const ultimaAsistencia = await Asistencia.aggregate([
+            // Filtrar por membresia_id
             {
                 $match: {
-                    membresia_id: new mongoose.Types.ObjectId(membresiaId),
-                    tipo_acceso: "Entrada"
+                    membresia_id: new mongoose.Types.ObjectId(membresiaId)
                 }
             },
 
-            // Ordenar por fecha_hora en orden descendente (la más reciente primero)
-            { $sort: { fecha_hora: -1 } },
+            // Ordenar por fecha_hora_entrada en orden descendente (la más reciente primero)
+            { $sort: { fecha_hora_entrada: -1 } },
 
-            // Limitar a 1 resultado (la última entrada)
+            // Limitar a 1 resultado (la última asistencia)
             { $limit: 1 },
 
-            // Realizar un "join" con la colección de Gimnasios usando el campo gimnasio_id
+            // Realizar un "join" con la colección de Gimnasios usando el campo gym_id
             {
                 $lookup: {
                     from: 'gimnasios', // Nombre de la colección de Gimnasios
@@ -199,28 +198,28 @@ const verAsistencia = async (membresiaId) => {
             {
                 $project: {
                     _id: 1, // Incluir el _id de la asistencia
-                    fecha_hora: 1, // Incluir la fecha y hora de la asistencia
-                    tipo_acceso: 1, // Incluir el tipo de acceso
+                    fecha_hora_entrada: 1, // Incluir la fecha y hora de entrada
+                    fecha_hora_salida: 1, // Incluir la fecha y hora de salida (si existe)
                     gimnasioNombre: '$gimnasio.nombre' // Incluir el nombre del gimnasio
                 }
             }
         ]);
 
         // Verificar si no se encontró ninguna asistencia
-        if (ultimaEntrada.length === 0) {
+        if (ultimaAsistencia.length === 0) {
             return null;
         }
 
-        // Retornar la última asistencia con el nombre del gimnasio
-        return ultimaEntrada[0];
+        // Retornar la última asistencia completa con el nombre del gimnasio
+        return ultimaAsistencia[0];
     } catch (error) {
-        console.error(`Error al obtener la última entrada para membresia_id ${membresiaId}:`, error.message);
-        throw new Error(`Error al obtener la última entrada para membresia_id ${membresiaId}: ${error.message}`);
+        console.error(`Error al obtener la última asistencia para membresia_id ${membresiaId}:`, error.message);
+        throw new Error(`Error al obtener la última asistencia para membresia_id ${membresiaId}: ${error.message}`);
     }
 };
 
 //Servicio para que el usuario vea sus asistencias (paginadas y poder cambiar los días a ver)
-const verAsistenciasUser = async (membresiaId, page = 1, limit = 8) => {
+const verAsistenciasUser = async (membresiaId, page = 1, limit = 5) => {
     try {
         // Realizar una agregación para obtener las asistencias con el nombre del gimnasio
         const asistencias = await Asistencia.aggregate([
