@@ -275,4 +275,20 @@ const verAsistenciasUser = async (membresiaId, page = 1, limit = 5) => {
     }
 };
 
-module.exports = { registrarAsistencia, verAsistencias, verAsistencia, verAsistenciasUser };
+// Servicio para contar los usuarios que hay dentro del gimnasio ahora
+const contarAsistencias = async (gymId) => {
+    try {
+      // Contar las asistencias que pertenecen al gimnasio y no tienen salida registrada (salida_registrada: false)
+      const usuariosDentro = await Asistencia.countDocuments({
+        gym_id: new mongoose.Types.ObjectId(gymId), // Filtrar por el gimnasio
+        salida_registrada: false // Solo las asistencias donde no se ha registrado la salida
+      });
+  
+      return usuariosDentro; // Devuelve el número de usuarios que aún están dentro
+    } catch (error) {
+      console.error(`Error al contar los usuarios dentro del gimnasio ${gymId}:`, error);
+      throw new Error(`Error al contar los usuarios dentro del gimnasio ${gymId}: ${error.message}`);
+    }
+  };  
+
+module.exports = { registrarAsistencia, verAsistencias, verAsistencia, verAsistenciasUser, contarAsistencias };

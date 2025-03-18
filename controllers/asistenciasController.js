@@ -104,7 +104,7 @@ const verAsistencia = async (req, res) => {
 //Controlador para que el usuario vea todas sus asitencias agrupadas
 const verAsistenciasUser = async (req, res) => {
     try {
-        const { membresiaId } = req.params; // Obtener el _id de la membresía por medio de
+        const { membresiaId } = req.params; // Obtener el _id de la membresía por medio de la URL
         const { page = 1, limit = 8 } = req.query; // Parámetros opcionales de paginación
 
         //Buscamos el _id de la membresía
@@ -132,4 +132,25 @@ const verAsistenciasUser = async (req, res) => {
     }
 };
 
-module.exports = { registrarAsistencia, verAsistencias, verAsistencia, verAsistenciasUser };
+//Controlador para contar los usuarios que hay dentro del gimnasio ahora
+const contarAsistencias = async(req, res) => {
+    try{
+        const { gymId } = req.params; // Obtener el _id de la membresía por medio de la URL
+
+        const gimnasio = await Gym.findById(gymId);
+        if(!gimnasio) {
+            res.status(400).json({  error: 'No existe el gimnasio'});
+        }
+
+        const asistencias = await asistenciasService.contarAsistencias(gymId);
+
+        res.status(200).json({asistencias});
+    }catch(error) {
+        console.error('Error en obtener el número de usuarios.', error);
+        res.status(500).json({
+            error: 'Error en obtener el número de usuarios.'
+        });
+    }
+}
+
+module.exports = { registrarAsistencia, verAsistencias, verAsistencia, verAsistenciasUser, contarAsistencias };

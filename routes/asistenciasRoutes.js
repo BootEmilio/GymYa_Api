@@ -11,5 +11,7 @@ router.get('/:gymId/asistencias', token, asistenciasController.verAsistencias);
 router.get('/:membresiaId/ultimaAsistencia', token, asistenciasController.verAsistencia);
 //Ruta para ver las entradas y salidas de un usuario
 router.get('/:membresiaId/asistenciasUser', token, asistenciasController.verAsistenciasUser);
+//Ruta para contar los usuarios que hay dentro del gimnasio ahora
+router.get('/:gymId/contarAsistencias', token, asistenciasController.contarAsistencias); 
 
 module.exports = router;
