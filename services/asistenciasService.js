@@ -60,8 +60,8 @@ const verAsistencias = async (gym_id, fecha, search = '', page = 1, limit = 10) 
 
         if (!fecha) {
             const hoy = new Date();
-            fechaInicio = new Date(hoy.setHours(0, 0, 0, 0)); // Inicio del día
-            fechaFin = new Date(hoy.setHours(23, 59, 59, 999)); // Fin del día
+            fechaInicio = new Date(hoy.setHours(0, 0, 0, 0)); // Inicio del día actual
+            fechaFin = new Date(hoy.setHours(23, 59, 59, 999)); // Fin del día actual
         } else {
             const fechaConsulta = new Date(fecha);
             fechaInicio = new Date(fechaConsulta.setHours(0, 0, 0, 0)); // Inicio del día consultado
@@ -72,14 +72,14 @@ const verAsistencias = async (gym_id, fecha, search = '', page = 1, limit = 10) 
             {
                 $match: {
                     gym_id: new mongoose.Types.ObjectId(gym_id),
-                    fecha_hora: { $gte: fechaInicio, $lte: fechaFin } // Filtrar por el rango de fechas
+                    fecha_hora_entrada: { $gte: fechaInicio, $lte: fechaFin } // Filtrar por rango de fechas
                 }
             },
             {
                 $lookup: {
                     from: 'usuarios', // Colección de usuarios
                     localField: 'membresia_id', // Campo en asistencias
-                    foreignField: 'membresia_id', // Campo en colección de usuarios (array)
+                    foreignField: 'membresia_id', // Campo en la colección de usuarios
                     as: 'usuario'
                 }
             },
@@ -96,8 +96,8 @@ const verAsistencias = async (gym_id, fecha, search = '', page = 1, limit = 10) 
                     asistencias: {
                         $push: {
                             asistencia_id: '$_id',
-                            fecha_hora: '$fecha_hora',
-                            tipo_acceso: '$tipo_acceso'
+                            fecha_hora_entrada: '$fecha_hora_entrada',
+                            fecha_hora_salida: '$fecha_hora_salida'
                         }
                     }
                 }
@@ -115,7 +115,7 @@ const verAsistencias = async (gym_id, fecha, search = '', page = 1, limit = 10) 
             {
                 $match: {
                     gym_id: new mongoose.Types.ObjectId(gym_id),
-                    fecha_hora: { $gte: fechaInicio, $lte: fechaFin }
+                    fecha_hora_entrada: { $gte: fechaInicio, $lte: fechaFin }
                 }
             },
             {
@@ -139,41 +139,19 @@ const verAsistencias = async (gym_id, fecha, search = '', page = 1, limit = 10) 
 
         const total = totalUsuarios.length > 0 ? totalUsuarios[0].totalUsuarios : 0;
 
-        // Procesar el resultado para emparejar entradas con salidas
-        const asistenciasEmparejadas = asistencias.map(usuario => {
-            const { _id, asistencias } = usuario;
-            const emparejadas = [];
-
-            let entradaActual = null;
-
-            // Verificar que asistencias no sea undefined ni vacío
-            if (asistencias && asistencias.length > 0) {
-                asistencias.forEach(asistencia => {
-                    if (asistencia.tipo_acceso === 'Entrada') {
-                        if (entradaActual) {
-                            emparejadas.push({ entrada: entradaActual, salida: null });
-                        }
-                        entradaActual = asistencia;
-                    } else if (asistencia.tipo_acceso === 'Salida' && entradaActual) {
-                        emparejadas.push({ entrada: entradaActual, salida: asistencia });
-                        entradaActual = null;
-                    }
-                });
-
-                if (entradaActual) {
-                    emparejadas.push({ entrada: entradaActual, salida: null });
-                }
-            }
-
-            return {
-                usuario_id: _id.usuario_id,
-                nombre_completo: _id.nombre_completo,
-                asistencias: emparejadas
-            };
-        });
+        // No es necesario emparejar entradas con salidas, ya que ambas están en el mismo registro
+        const asistenciasProcesadas = asistencias.map(usuario => ({
+            usuario_id: usuario._id.usuario_id,
+            nombre_completo: usuario._id.nombre_completo,
+            asistencias: usuario.asistencias.map(asistencia => ({
+                asistencia_id: asistencia.asistencia_id,
+                entrada: asistencia.fecha_hora_entrada,
+                salida: asistencia.fecha_hora_salida || 'Aún en el gimnasio' // Mostrar mensaje si no hay salida
+            }))
+        }));
 
         return { 
-            asistencias: asistenciasEmparejadas, 
+            asistencias: asistenciasProcesadas, 
             total, 
             page, 
             limit, 
