@@ -15,8 +15,5 @@ router.get("/gym/:gymId", gymController.obtenerGimnasioPorId);
 router.put('/:gymId/editar', upload.single('imagen'), token, gymController.editarGimnasio);
 //Ruta para que el usuario vea los gimnasios a los que puede acceder con su membresía
 router.get('/:membresiaId/gimnasios', token, gymController.verGimnasiosUser);
-/*
-//Ruta para ver los usuarios activos
-router.get('/:gymId/usuariosActivos', token, gymController.contarMembresiasActivas);
-*/
+
 module.exports = router;

@@ -168,23 +168,5 @@ const verGimnasiosUser = async (req, res) => {
         res.status(500).json({ error: 'Error al obtener los gimnasios de la membresía' });
     }
 };
-/*
-//Controlador para que el usuario vea los gimnasios a los que puede acceder con su membresía
-const contarMembresiasActivas = async (req, res) => {
-    try {
-        const {gymId} = req.params; // Obtener el ID de la membresía desde la URL
 
-        // Llamar al servicio para obtener los gimnasios
-        const usuariosActivos = await gymService.contarMembresiasActivas(gymId);
-
-        res.status(200).json(usuariosActivos);
-    } catch (error) {
-        console.error('Error en el controlador de obtenerGimnasiosDeAdmin:', error);
-        if (error.message === 'Membresía no encontrada') {
-            return res.status(404).json({ error: 'Membresía no encontrada' });
-        }
-        res.status(500).json({ error: 'Error al obtener los gimnasios de la membresía' });
-    }
-};
-*/
 module.exports = { crearGimnasio, verGimnasios, editarGimnasio, verGimnasiosUser, obtenerGimnasioPorId  };

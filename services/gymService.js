@@ -90,24 +90,5 @@ const verGimnasiosUser = async (membresiaId) => {
       throw new Error('Error al obtener los gimnasios del usuario');
   }
 };
-/*
-//Serivicio para contar los usuarios dentro del gimnasio
-const contarMembresiasActivasPorGimnasio = async (gymId) => {
-    try {
-      // Buscar las asistencias activas (en las que no se ha registrado una salida) en el gimnasio dado
-      const asistenciasActivas = await Asistencia.countDocuments({
-        gym_id: gymId,            // Filtrar por el ID del gimnasio
-        tipo_acceso: 'entrada',   // Considerar solo entradas
-        fecha_hora: {             // Opcional: podrías agregar una validación de fecha si es necesario
-          $lte: new Date()        // Fecha y hora hasta el momento actual
-        }
-      });
-  
-      return asistenciasActivas;
-    } catch (error) {
-      console.error('Error en el servicio contarMembresiasActivasPorGimnasio:', error);
-      throw new Error('Error al contar las membresías activas en el gimnasio');
-    }
-  };    
-*/
+
 module.exports = { crearGimnasio, verGimnasios, editarGimnasio, verGimnasiosUser };
