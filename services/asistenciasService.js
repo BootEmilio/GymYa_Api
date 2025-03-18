@@ -251,8 +251,8 @@ const verAsistenciasUser = async (membresiaId, page = 1, limit = 8) => {
             {
                 $project: {
                     _id: 1, // Incluir el _id de la asistencia
-                    fecha_hora: 1, // Incluir la fecha y hora de la asistencia
-                    tipo_acceso: 1, // Incluir el tipo de acceso
+                    fecha_hora_entrada: 1, // Incluir la fecha y hora de la asistencia
+                    fecha_hora_salida: 1, // Incluir la fecha y hora de la asistencia
                     gimnasioNombre: '$gimnasio.nombre', // Incluir el nombre del gimnasio
                 },
             },
