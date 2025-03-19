@@ -29,9 +29,6 @@ const corsOptions = {
   allowedHeaders: 'Content-Type,Authorization', // Headers permitidos
 };
 
-const paymentRoutes = require("./controllers/paymentController");
-app.use("/api", paymentRoutes);
-
 // Permitir que Express sirva archivos estáticos desde la carpeta "uploads"
 app.use('/uploads', express.static('uploads'));
 
