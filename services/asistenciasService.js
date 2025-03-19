@@ -231,7 +231,7 @@ const verAsistenciasUser = async (membresiaId, page = 1, limit = 5) => {
             },
 
             // Ordenar por fecha_hora en orden descendente (la más reciente primero)
-            { $sort: { fecha_hora: -1 } },
+            { $sort: { fecha_hora_entrada: -1 } },
 
             // Realizar un "join" con la colección de Gimnasios usando el campo gimnasio_id
             {
