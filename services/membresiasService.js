@@ -23,23 +23,22 @@ const enviarCorreoContrasena = async (email, contrasena) => {
     const transporter = nodemailer.createTransport({
         service: 'Gmail', // O el servicio de correo que estés utilizando
         auth: {
-            user: 'leviolevos@gmail.com',
-            pass: 'mcdw ylbc gpbi wqej'
+            user: 'gymyamx@gmail.com',
+            pass: 'prkc kril ilan wzzw'
         }
     });
 
     const mailOptions = {
-        from: 'leviolevos@gmail.com',
+        from: 'gymyamx@gmail.com',
         to: email,
         subject: 'Bienvenido a GymYa',
         html: `
         <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
-            <h2 style="color: #4CAF50;">Se ha registrado en GymYa/h2>
-            <p>Hola,</p>
+            <h2 style="color: #555;">Registro en GymYa</h2>
             <p>Tu nueva contraseña es:</p>
-            <p style="font-size: 18px; font-weight: bold; color: #333;">${contrasena}</p>
+            <p style="font-size: 18px; font-weight: bold; color: #000;">${contrasena}</p>
             <p>Por favor cámbiala una vez que inicies sesión en la aplicación móvil.</p>
-            <a href="https://miweb.com/cambiar-contraseña" style="background-color: #4CAF50; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px;">Descarga aquí la aplicación</a>
+            <a href="https://miweb.com/cambiar-contraseña" style="background-color: #6A0DAD; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">Descarga aquí la aplicación</a>
             <p>Administra, comunica y entrena</p>
             <p><strong>El equipo de GymYa</strong></p>
             <hr style="border: 0; height: 1px; background-color: #ccc; margin: 20px 0;" />
