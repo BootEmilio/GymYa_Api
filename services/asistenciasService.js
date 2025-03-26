@@ -223,7 +223,7 @@ const verActivos = async (gym_id, search = '', page = 1, limit = 10) => {
         ]);
 
         return { 
-            asistencias: asistencias, 
+            asistencias, 
             page, 
             limit, 
             //totalPages: Math.ceil(total / limit) 
