@@ -201,16 +201,12 @@ const verActivos = async (gym_id, search = '', page = 1, limit = 10) => {
             },
             {
                 $group: {
-                    _id: {
+                    activos: {
+                        asistencia_id: '$_id',
+                        fecha_hora_entrada: '$fecha_hora_entrada',
                         usuario_id: '$usuario._id',
                         nombre_completo: '$usuario.nombre_completo',
                         imagen: '$usuario.imagen'
-                    },
-                    asistencias: {
-                        $push: {
-                            asistencia_id: '$_id',
-                            fecha_hora_entrada: '$fecha_hora_entrada'
-                        }
                     }
                 }
             },
