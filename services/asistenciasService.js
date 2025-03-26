@@ -216,6 +216,7 @@ const verActivos = async (gym_id, search = '', page = 1, limit = 10) => {
             }
         ]);
 
+        // Simplificar la respuesta
         return { 
             asistencias, 
             page, 
