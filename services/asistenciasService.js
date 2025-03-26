@@ -46,7 +46,7 @@ const verAsistencias = async (gym_id, fecha, search = '', page = 1, limit = 10) 
         if (search) {
             const searchConditions = [
                 { 'usuario.nombre_completo': { $regex: search, $options: 'i' } },
-                { 'usuario.username': { $regex: search, $options: 'i' } }
+                { 'usuario.email': { $regex: search, $options: 'i' } }
             ];
 
             if (mongoose.Types.ObjectId.isValid(search)) {
@@ -153,6 +153,77 @@ const verAsistencias = async (gym_id, fecha, search = '', page = 1, limit = 10) 
         return { 
             asistencias: asistenciasProcesadas, 
             total, 
+            page, 
+            limit, 
+            totalPages: Math.ceil(total / limit) 
+        };
+    } catch (error) {
+        console.error(`Error al mostrar las asistencias del día ${fecha} para gymId: ${gym_id}:`, error);
+        throw new Error(`Error al mostrar las asistencias del día ${fecha}`);
+    }
+};
+
+//Servicio para que el administrador vea los usuarios dentro del gym
+const verActivos = async (gym_id, search = '', page = 1, limit = 10) => {
+    try {
+        let searchCondition = {};
+        if (search) {
+            const searchConditions = [
+                { 'usuario.nombre_completo': { $regex: search, $options: 'i' } },
+                { 'usuario.email': { $regex: search, $options: 'i' } }
+            ];
+
+            if (mongoose.Types.ObjectId.isValid(search)) {
+                searchConditions.push({ '_id': new mongoose.Types.ObjectId(search) });
+            }
+
+            searchCondition = { $or: searchConditions };
+        }
+
+        const asistencias = await Asistencia.aggregate([
+            {
+                $match: {
+                    gym_id: new mongoose.Types.ObjectId(gym_id),
+                    salida_registrada: false // Filtrar por asistencias que aún no tienen salida
+                }
+            },
+            {
+                $lookup: {
+                    from: 'usuarios', // Colección de usuarios
+                    localField: 'membresia_id', // Campo en asistencias
+                    foreignField: 'membresia_id', // Campo en la colección de usuarios
+                    as: 'usuario'
+                }
+            },
+            { $unwind: '$usuario' }, // Descomprimir el array de usuarios
+            {
+                $match: searchCondition // Aplicar la condición de búsqueda
+            },
+            {
+                $group: {
+                    _id: {
+                        usuario_id: '$usuario._id',
+                        nombre_completo: '$usuario.nombre_completo',
+                        imagen: '$usuario.imagen'
+                    },
+                    asistencias: {
+                        $push: {
+                            asistencia_id: '$_id',
+                            fecha_hora_entrada: '$fecha_hora_entrada'
+                        }
+                    }
+                }
+            },
+            { 
+                $skip: (page - 1) * limit 
+            }, 
+            { 
+                $limit: parseInt(limit) 
+            }
+        ]);
+
+        return { 
+            asistencias: asistencias, 
             page, 
             limit, 
             totalPages: Math.ceil(total / limit) 
@@ -291,4 +362,4 @@ const contarAsistencias = async (gymId) => {
     }
   };  
 
-module.exports = { registrarAsistencia, verAsistencias, verAsistencia, verAsistenciasUser, contarAsistencias };
+module.exports = { registrarAsistencia, verAsistencias, verAsistencia, verActivos, verAsistenciasUser, contarAsistencias };

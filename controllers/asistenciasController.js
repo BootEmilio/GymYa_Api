@@ -67,6 +67,35 @@ const verAsistencias = async (req, res) => {
     }
 };
 
+//Controlador para que el admin vea las asistencias del día u otra fecha
+const verActivos = async (req, res) => {
+    try {
+        const {gymId} = req.params; // Obtener el gym_id desde la url
+        const { search, page = 1, limit = 10 } = req.query; // Parámetros opcionales
+
+        const gimnasio = await Gym.findById(gymId);
+        if(!gimnasio) {
+            res.status(400).json({  error: 'No existe el gimnasio'});
+        }
+
+        // Llamada al servicio para obtener las asistencias paginadas
+        const asistencias = await asistenciasService.verAsistencias(gymId, fecha, search, parseInt(page), parseInt(limit));
+
+        // Responder con los datos paginados
+        res.status(200).json({
+            asistencias,        // Lista de activos
+            page: parseInt(page), // Página actual
+            limit: parseInt(limit), // Límite de resultados por página
+            totalPages: Math.ceil(total / limit) // Calcular número de páginas totales
+        });
+    } catch (error) {
+        console.error('Error en obtener las asistencias:', error);
+        res.status(500).json({
+            error: 'Ocurrió un error al obtener las asistencias.'
+        });
+    }
+};
+
 //Controlador para ver última asistencia
 const verAsistencia = async (req, res) => {
     try {
@@ -153,4 +182,4 @@ const contarAsistencias = async(req, res) => {
     }
 }
 
-module.exports = { registrarAsistencia, verAsistencias, verAsistencia, verAsistenciasUser, contarAsistencias };
+module.exports = { registrarAsistencia, verAsistencias, verAsistencia, verActivos, verAsistenciasUser, contarAsistencias };
