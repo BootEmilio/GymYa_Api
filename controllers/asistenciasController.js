@@ -79,7 +79,7 @@ const verActivos = async (req, res) => {
         }
 
         // Llamada al servicio para obtener las asistencias paginadas
-        const asistencias = await asistenciasService.verAsistencias(gymId, fecha, search, parseInt(page), parseInt(limit));
+        const asistencias = await asistenciasService.verAsistencias(gymId, search, parseInt(page), parseInt(limit));
 
         // Responder con los datos paginados
         res.status(200).json({
