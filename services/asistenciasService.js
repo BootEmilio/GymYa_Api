@@ -164,7 +164,7 @@ const verAsistencias = async (gym_id, fecha, search = '', page = 1, limit = 10) 
 };
 
 //Servicio para que el administrador vea los usuarios dentro del gym
-const verActivos = async (gym_id, search = '', page = 1, limit = 10) => {
+const verActivos = async (gym_id, search = '') => {
     try {
         let searchCondition = {};
         if (search) {

@@ -71,7 +71,7 @@ const verAsistencias = async (req, res) => {
 const verActivos = async (req, res) => {
     try {
         const {gymId} = req.params; // Obtener el gym_id desde la url
-        const { search, page = 1, limit = 10 } = req.query; // Parámetros opcionales
+        const { search } = req.query; // Parámetros opcionales
 
         const gimnasio = await Gym.findById(gymId);
         if(!gimnasio) {
@@ -79,7 +79,7 @@ const verActivos = async (req, res) => {
         }
 
         // Llamada al servicio para obtener las asistencias paginadas
-        const asistencias = await asistenciasService.verActivos(gymId, search, parseInt(page), parseInt(limit));
+        const asistencias = await asistenciasService.verActivos(gymId, search);
 
         // Responder con los datos paginados
         res.status(200).json({
