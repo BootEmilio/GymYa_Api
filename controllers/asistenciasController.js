@@ -83,9 +83,7 @@ const verActivos = async (req, res) => {
 
         // Responder con los datos paginados
         res.status(200).json({
-            asistencias,        // Lista de activos
-            page: parseInt(page), // Página actual
-            limit: parseInt(limit), // Límite de resultados por página
+            asistencias        // Lista de activos
         });
     } catch (error) {
         console.error('Error en obtener las asistencias:', error);

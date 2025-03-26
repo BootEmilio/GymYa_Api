@@ -207,20 +207,12 @@ const verActivos = async (gym_id, search = '', page = 1, limit = 10) => {
                     nombre_completo: '$usuario.nombre_completo',
                     imagen: '$usuario.imagen'
                 }
-            },
-            { 
-                $skip: (page - 1) * limit 
-            }, 
-            { 
-                $limit: parseInt(limit) 
             }
         ]);
 
         // Simplificar la respuesta
         return { 
-            asistencias, 
-            page, 
-            limit, 
+            asistencias
         };
     } catch (error) {
         console.error(`Error al mostrar los activos para gymId: ${gym_id}:`, error);
