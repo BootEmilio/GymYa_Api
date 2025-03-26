@@ -226,7 +226,7 @@ const verActivos = async (gym_id, search = '', page = 1, limit = 10) => {
             asistencias: asistencias, 
             page, 
             limit, 
-            totalPages: Math.ceil(total / limit) 
+            //totalPages: Math.ceil(total / limit) 
         };
     } catch (error) {
         console.error(`Error al mostrar los activos para gymId: ${gym_id}:`, error);

@@ -86,7 +86,7 @@ const verActivos = async (req, res) => {
             asistencias,        // Lista de activos
             page: parseInt(page), // Página actual
             limit: parseInt(limit), // Límite de resultados por página
-            totalPages: Math.ceil(total / limit) // Calcular número de páginas totales
+            //totalPages: Math.ceil(total / limit) // Calcular número de páginas totales
         });
     } catch (error) {
         console.error('Error en obtener las asistencias:', error);
