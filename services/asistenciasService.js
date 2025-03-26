@@ -200,14 +200,12 @@ const verActivos = async (gym_id, search = '', page = 1, limit = 10) => {
                 $match: searchCondition // Aplicar la condición de búsqueda
             },
             {
-                $group: {
-                    activos: {
-                        asistencia_id: '$_id',
-                        fecha_hora_entrada: '$fecha_hora_entrada',
-                        usuario_id: '$usuario._id',
-                        nombre_completo: '$usuario.nombre_completo',
-                        imagen: '$usuario.imagen'
-                    }
+                $project: { // Usamos $project para seleccionar los campos que queremos mostrar
+                    asistencia_id: '$_id',
+                    fecha_hora_entrada: '$fecha_hora_entrada',
+                    usuario_id: '$usuario._id',
+                    nombre_completo: '$usuario.nombre_completo',
+                    imagen: '$usuario.imagen'
                 }
             },
             { 
@@ -222,7 +220,7 @@ const verActivos = async (gym_id, search = '', page = 1, limit = 10) => {
             asistencias, 
             page, 
             limit, 
-            //totalPages: Math.ceil(total / limit) 
+            totalPages: Math.ceil(asistencias.length / limit) 
         };
     } catch (error) {
         console.error(`Error al mostrar los activos para gymId: ${gym_id}:`, error);
